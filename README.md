@@ -25,7 +25,7 @@
 
 ### Предварительные требования
 - Docker & Docker Compose
-- Go 1.21+
+- Go 1.24+
 - Task (Taskfile)
 
 ### Установка и запуск
