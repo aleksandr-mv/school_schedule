@@ -1,0 +1,61 @@
+services:
+  prometheus:
+    env_file:
+      - .env
+    image: prom/prometheus:v3.3.1 
+    container_name: prometheus
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Монтируем конфигурацию Prometheus
+      - prometheus_data:/prometheus # Подключаем volume для хранения данных Prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml' # Указываем путь к файлу конфигурации
+      - '--storage.tsdb.path=/prometheus' # Директория для хранения временных рядов
+      - '--web.enable-lifecycle' # Включает HTTP API для управления Prometheus
+      - '--web.enable-remote-write-receiver' # Включает поддержку remote write API для приема метрик
+    restart: unless-stopped
+    networks:
+      - school_net
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:9090/-/healthy" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+
+  grafana:
+    image: grafana/grafana:12.0.0
+    container_name: grafana
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin} # Имя пользователя администратора
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin} # Пароль администратора
+      - GF_USERS_ALLOW_SIGN_UP=false # Запрещаем регистрацию новых пользователей
+    volumes:
+      - grafana_data:/var/lib/grafana # Подключаем volume для хранения данных Grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning # Монтируем директорию с настройками для автоматического провижининга
+      - ./grafana/dashboards:/var/lib/grafana/dashboards # Монтируем директорию с дашбордами
+    restart: unless-stopped
+    networks:
+      - school_net
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:3000/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    depends_on:
+      prometheus:
+        condition: service_healthy
+
+
+volumes:
+  prometheus_data: # Именованный том для хранения данных Prometheus
+  grafana_data: # Именованный том для хранения данных Grafana
+
+networks:
+  school_net:
+    external: true

@@ -1,0 +1,18 @@
+# Пример конфигурации приложения и логирования
+# Соответствует структуре rawAppConfig в platform/pkg/config/internal/app/app.go
+
+app:
+  # Уровень логирования: debug, info, warn/warning, error
+  log_level: "debug"
+  
+  # Формат логирования: true для JSON, false для текста
+  logger_as_json: true
+  
+  # Директория с миграциями базы данных
+  migrations_dir: "db/migrations"
+  
+  # Путь к Swagger документации
+  swagger_path: "../v1/order.swagger.yaml"
+  
+  # Путь к Swagger UI
+  swagger_ui_path: "./api/swagger-ui.html"

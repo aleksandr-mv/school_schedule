@@ -1,0 +1,237 @@
+package app
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+
+	v1 "github.com/aleksandr-mv/school_schedule/iam/internal/api/auth/v1"
+	userAPI "github.com/aleksandr-mv/school_schedule/iam/internal/api/user/v1"
+	"github.com/aleksandr-mv/school_schedule/iam/internal/repository"
+	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/notification"
+	sessionRepo "github.com/aleksandr-mv/school_schedule/iam/internal/repository/session"
+	userRepo "github.com/aleksandr-mv/school_schedule/iam/internal/repository/user"
+	"github.com/aleksandr-mv/school_schedule/iam/internal/service"
+	authService "github.com/aleksandr-mv/school_schedule/iam/internal/service/auth"
+	userService "github.com/aleksandr-mv/school_schedule/iam/internal/service/user"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/builder"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/migrator"
+	authv1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
+	userV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1"
+)
+
+type diContainer struct {
+	cfg contracts.Provider
+
+	authV1 authv1.AuthServiceServer
+	userV1 userV1.UserServiceServer
+
+	authService service.AuthServiceInterface
+	userService service.UserServiceInterface
+
+	userRepository         repository.UserRepository
+	sessionRepository      repository.SessionRepository
+	notificationRepository repository.NotificationRepository
+
+	postgresPool *pgxpool.Pool
+	redisClient  cache.RedisClient
+	migrator     *migrator.Migrator
+}
+
+func NewDiContainer(cfg contracts.Provider) *diContainer {
+	return &diContainer{cfg: cfg}
+}
+
+func (d *diContainer) AuthV1API(ctx context.Context) (authv1.AuthServiceServer, error) {
+	if d.authV1 == nil {
+		authService, err := d.AuthService(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.authV1 = v1.NewAPI(authService)
+	}
+
+	return d.authV1, nil
+}
+
+func (d *diContainer) UserV1API(ctx context.Context) (userV1.UserServiceServer, error) {
+	if d.userV1 == nil {
+		userService, err := d.UserService(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.userV1 = userAPI.NewAPI(userService)
+	}
+
+	return d.userV1, nil
+}
+
+func (d *diContainer) AuthService(ctx context.Context) (service.AuthServiceInterface, error) {
+	if d.authService == nil {
+		userRepo, err := d.UserRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		notificationRepo, err := d.NotificationRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		sessionRepo, err := d.SessionRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.authService = authService.NewService(userRepo, notificationRepo, sessionRepo, d.cfg.Session().TTL())
+	}
+
+	return d.authService, nil
+}
+
+func (d *diContainer) UserService(ctx context.Context) (service.UserServiceInterface, error) {
+	if d.userService == nil {
+		userRepo, err := d.UserRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		notificationRepo, err := d.NotificationRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.userService = userService.NewService(userRepo, notificationRepo)
+	}
+
+	return d.userService, nil
+}
+
+func (d *diContainer) UserRepository(ctx context.Context) (repository.UserRepository, error) {
+	if d.userRepository == nil {
+		pool, err := d.PostgresPool(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.userRepository = userRepo.NewRepository(pool)
+	}
+
+	return d.userRepository, nil
+}
+
+func (d *diContainer) NotificationRepository(ctx context.Context) (repository.NotificationRepository, error) {
+	if d.notificationRepository == nil {
+		pool, err := d.PostgresPool(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.notificationRepository = notification.NewRepository(pool)
+	}
+
+	return d.notificationRepository, nil
+}
+
+func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
+	if d.postgresPool == nil {
+		dsn := d.cfg.Database().PostgresDSN()
+		if dsn == "" {
+			return nil, fmt.Errorf("postgres dsn is empty")
+		}
+
+		pgCfg, err := pgxpool.ParseConfig(dsn)
+		if err != nil {
+			return nil, fmt.Errorf("invalid postgres dsn: %w", err)
+		}
+
+		pool, err := pgxpool.NewWithConfig(ctx, pgCfg)
+		if err != nil {
+			return nil, fmt.Errorf("create postgres pool failed: %w", err)
+		}
+
+		closer.AddNamed("PostgreSQL pool", func(ctx context.Context) error {
+			logger.Info(ctx, "🐘 [Shutdown] Закрытие PostgreSQL pool")
+			pool.Close()
+			return nil
+		})
+
+		logger.Info(ctx, "✅ [Database] Пул PostgreSQL создан")
+		d.postgresPool = pool
+	}
+
+	return d.postgresPool, nil
+}
+
+func (d *diContainer) SessionRepository(ctx context.Context) (repository.SessionRepository, error) {
+	if d.sessionRepository == nil {
+		redis, err := d.RedisClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.sessionRepository = sessionRepo.NewRepository(redis)
+	}
+
+	return d.sessionRepository, nil
+}
+
+func (d *diContainer) RedisClient(ctx context.Context) (cache.RedisClient, error) {
+	if d.redisClient == nil {
+		redisBuilder := builder.NewRedisBuilder(d.cfg.Redis())
+		redigoPool, err := redisBuilder.BuildPool()
+		if err != nil {
+			return nil, err
+		}
+
+		pool := d.cfg.Redis().Pool()
+		client := redis.NewClient(redigoPool, nil, pool.PoolTimeout())
+
+		if err = client.Ping(ctx); err != nil {
+			return nil, fmt.Errorf("redis ping failed: %w", err)
+		}
+
+		closer.AddNamed("Redis client", func(ctx context.Context) error {
+			logger.Info(ctx, "🔴 [Shutdown] Закрытие Redis клиента")
+			return redigoPool.Close()
+		})
+
+		logger.Info(ctx, "✅ [Cache] Redis клиент создан")
+		d.redisClient = client
+	}
+
+	return d.redisClient, nil
+}
+
+func (d *diContainer) RunMigrations(ctx context.Context) error {
+	if d.migrator != nil {
+		return nil
+	}
+
+	pool, err := d.PostgresPool(ctx)
+	if err != nil {
+		return fmt.Errorf("postgres pool failed: %w", err)
+	}
+	if pool == nil {
+		return fmt.Errorf("cannot run migrations: DB pool is nil")
+	}
+
+	mig := migrator.NewMigrator(stdlib.OpenDB(*pool.Config().ConnConfig), d.cfg.App().MigrationsDir())
+
+	if err = mig.Up(ctx); err != nil {
+		return fmt.Errorf("migrations failed: %w", err)
+	}
+
+	d.migrator = mig
+
+	return nil
+}

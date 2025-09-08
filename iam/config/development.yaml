@@ -1,0 +1,98 @@
+logger:
+  level: "debug"
+  as_json: true
+  otlp:
+    enable: true
+    endpoint: "localhost:4317"
+    shutdown_timeout: 5
+
+tracing:
+  enable: true
+  endpoint: "localhost:4317"
+  timeout: "5s"
+  sample_ratio: 100
+  retry_enabled: true
+  retry_initial_interval: "500ms"
+  retry_max_interval: "5s"
+  retry_max_elapsed_time: "30s"
+  enable_trace_context: true
+  enable_baggage: true
+  shutdown_timeout: "30s"
+
+metric:
+  enable: true
+  endpoint: "localhost:4317"
+  timeout: "30s"
+  namespace: "microservices"
+  app_name: "platform"
+  export_interval: "5s"
+  shutdown_timeout: "30s"
+  bucket_boundaries: [0.0001, 0.0002, 0.0004, 0.0008, 0.0016, 0.0032, 0.0064, 0.0128, 0.0256, 0.0512, 0.1024, 0.2048, 0.4096, 0.8192, 1.6384, 3.2768]
+
+app:
+  name: "iam-service"
+  environment: "development"
+  version: "1.0.0"
+  migrations_dir: "db/migrations"
+
+grpc_server:
+  host: "0.0.0.0"
+  port: 50053
+  timeout: "15s"
+  idle_timeout: "60s"
+  shutdown_timeout: "10s"
+
+grpc_client_limits:
+  max_recv_msg_size: 4194304  # 4MB
+  max_send_msg_size: 4194304  # 4MB
+  timeout: "5s"
+
+database:
+  postgres:
+    connection:
+      host: "localhost"
+      port: 5434
+      user: "postgres"
+      password: "password"
+      database: "iam"
+      application_name: "iam-service"
+    pool:
+      max_cons: 25
+      min_cons: 5
+      max_conn_lifetime: "1h"
+      max_conn_idle_time: "30m"
+      health_check_period: "1m"
+      connect_timeout: "5s"
+      shutdown_timeout: "30s"
+    tls:
+      enabled: false
+      ssl_mode: "disable"
+      ssl_cert: ""
+      ssl_key: ""
+      ssl_root_cert: ""
+      ssl_password: ""
+      ssl_crl: ""
+      ssl_compression: false
+
+redis:
+  enabled: true
+  connection:
+    host: "localhost"
+    port: 6380
+    password: ""
+    database: 0
+  pool:
+    pool_size: 10
+    min_idle: 5
+    max_retries: 3
+    dial_timeout: "5s"
+    read_timeout: "3s"
+    write_timeout: "3s"
+    pool_timeout: "4s"
+    idle_timeout: "30m"
+    idle_check_freq: "1m"
+
+session:
+  ttl: "24h" 
+
+

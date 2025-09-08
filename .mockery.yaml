@@ -1,0 +1,23 @@
+with-expecter: true
+#boilerplate-file: ".mockery_boilerplate_text.txt"
+dir: "{{.InterfaceDir}}/mocks"
+filename: "mock_{{.InterfaceNameSnake}}.go"
+outpkg: "mocks"
+mockname: "{{.InterfaceName}}"
+resolve-type-alias: False
+issue-845-fix: True
+disable-version-string: true
+
+packages:
+  # IAM сервис
+  github.com/Alexander-Mandzhiev/microservices-course/iam/internal/service:
+    config:
+      include-regex: ".*Service"
+  github.com/Alexander-Mandzhiev/microservices-course/iam/internal/repository:
+    config:
+      include-regex: ".*Repository"
+
+  # gRPC клиенты
+  github.com/Alexander-Mandzhiev/microservices-course/order/internal/client/grpc:
+    config:
+      include-regex: ".*Client"

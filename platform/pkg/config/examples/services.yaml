@@ -1,0 +1,12 @@
+# Пример конфигурации внешних сервисов
+# Соответствует структуре rawService в platform/pkg/config/internal/services/service.go
+
+services:
+  - name: "inventory"
+    address: "localhost"
+    port: 50051
+    timeout: "5s"
+  - name: "payment"
+    address: "localhost"
+    port: 50052
+    timeout: "5s"

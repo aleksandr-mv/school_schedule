@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "common/v1/user.proto";
+
+option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1;user_v1";
+
+service UserService {
+  // Регистрация нового пользователя
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/register"
+      body: "*"
+    };
+  }
+
+  // Получение информации о пользователе
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}"
+    };
+  }
+}
+
+// Запрос на регистрацию
+message RegisterRequest {
+  common.v1.UserInfo info = 1 [(validate.rules).message.required = true];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+// Ответ на регистрацию
+message RegisterResponse {
+  string user_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// Запрос информации о пользователе
+message GetUserRequest {
+  string user_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// Ответ с информацией о пользователе
+message GetUserResponse {
+  common.v1.User user = 1 [(validate.rules).message.required = true];
+}

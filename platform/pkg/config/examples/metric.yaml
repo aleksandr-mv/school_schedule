@@ -1,0 +1,14 @@
+# Конфигурация метрик OpenTelemetry
+metric:
+  # Основные настройки
+  enable: true
+  endpoint: "localhost:4317"
+  timeout: "30s"
+
+  # Настройки метрик
+  namespace: "microservices"
+  app_name: "platform"
+
+  # Настройки экспорта
+  export_interval: "5s"
+  shutdown_timeout: "30s"

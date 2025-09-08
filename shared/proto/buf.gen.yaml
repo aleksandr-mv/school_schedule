@@ -1,0 +1,36 @@
+version: v2
+clean: true
+
+plugins:
+  # Генерация Go-кода для всех proto-файлов (структура повторяет proto)
+  - local: ../../bin/protoc-gen-go
+    out: ../pkg/proto
+    opt:
+      - paths=source_relative
+
+  # Генерация gRPC-кода для Go (интерфейсы и серверы)
+  - local: ../../bin/protoc-gen-go-grpc
+    out: ../pkg/proto
+    opt:
+      - paths=source_relative
+
+  # Генерация grpc-gateway (REST proxy для gRPC)
+  - local: ../../bin/protoc-gen-grpc-gateway
+    out: ../pkg/proto
+    opt:
+      - paths=source_relative
+
+  # Генерация валидаторов для Go (protoc-gen-validate)
+  - local: ../../bin/protoc-gen-validate
+    out: ../pkg/proto
+    opt:
+      - paths=source_relative
+      - lang=go
+
+  # Генерация swagger (OpenAPI) для всех сервисов в одну папку
+  # Каждый swagger-файл будет лежать в своей подпапке внутри ../api/grpc
+  - local: ../../bin/protoc-gen-openapiv2
+    out: ../api/grpc
+    opt:
+      - allow_merge=false
+      - logtostderr=true

@@ -1,0 +1,50 @@
+# Пример конфигурации базы данных
+# Соответствует структуре в platform/pkg/config/internal/database/
+
+database:
+  postgres:
+    connection:
+      host: "localhost"
+      port: 5432
+      user: "postgres"
+      password: "password"
+      database: "order"
+      application_name: "order-service"
+    pool:
+      max_cons: 25
+      min_cons: 5
+      max_conn_lifetime: "1h"
+      max_conn_idle_time: "30m"
+      health_check_period: "1m"
+      connect_timeout: "5s"
+      shutdown_timeout: "30s"
+    tls:
+      enabled: false
+      ssl_mode: "disable"
+      ssl_cert: ""
+      ssl_key: ""
+      ssl_root_cert: ""
+      ssl_password: ""
+      ssl_crl: ""
+      ssl_compression: false
+  mongo:
+    connection:
+      host: "localhost"
+      port: 27017
+      user: "admin"
+      password: "password"
+      database: "inventory"
+      auth_db: "admin"
+    pool:
+      max_pool_size: 100
+      min_pool_size: 5
+      max_conn_idle_time: "30m"
+      max_connecting: 2
+      connect_timeout: "10s"
+      shutdown_timeout: "30s"
+    tls:
+      enabled: false
+      certificate_key_file: ""
+      ca_file: ""
+      allow_invalid_certificates: false
+      allow_invalid_hostnames: false

@@ -1,0 +1,48 @@
+services: 
+  cassandra:
+    image: cassandra:4.1.3
+    container_name: cassandra
+    ports:
+      - "${CASSANDRA_PORT}:9042"
+    env_file:
+      - .env
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - school_net
+
+  jaeger:
+    image: jaegertracing/jaeger:2.6.0
+    container_name: jaeger
+    ports:
+      - "${JAEGER_UI_PORT}:16686"
+    env_file:
+      - .env 
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "${JAEGER_HOST:-localhost}:${JAEGER_UI_PORT}"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - school_net
+
+volumes:
+  cassandra_data:
+  jaeger_data:
+  jaeger_key:
+
+networks:
+  school_net:
+    external: true

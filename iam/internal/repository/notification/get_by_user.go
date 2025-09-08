@@ -1,0 +1,38 @@
+package notification
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+
+	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
+	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/converter"
+	repoModel "github.com/aleksandr-mv/school_schedule/iam/internal/repository/model"
+)
+
+func (r *notificationRepository) GetByUser(ctx context.Context, userID uuid.UUID) ([]*model.NotificationMethod, error) {
+	query := `SELECT user_id, provider_name, target, created_at, updated_at 
+			  FROM notification_methods 
+			  WHERE user_id = $1 
+			  ORDER BY created_at ASC`
+
+	rows, err := r.pool.Query(ctx, query, userID)
+	if err != nil {
+		return nil, r.mapDatabaseError(err, "list")
+	}
+	defer rows.Close()
+
+	notificationMethods, err := pgx.CollectRows(rows, pgx.RowToStructByNameLax[repoModel.NotificationMethod])
+	if err != nil {
+		return nil, r.mapDatabaseError(err, "list")
+	}
+
+	result, err := converter.NotificationMethodListFromRepo(notificationMethods)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", model.ErrInternal, err)
+	}
+
+	return result, nil
+}

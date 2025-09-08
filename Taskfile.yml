@@ -1,0 +1,663 @@
+version: '3'
+
+# =============================================================================
+# ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ПРОЕКТА
+# =============================================================================
+
+vars:
+  # Версии инструментов разработки
+  GO_VERSION: '1.24'
+  GOLANGCI_LINT_VERSION: 'v2.2.1'
+  GCI_VERSION: 'v0.13.6'
+  GOFUMPT_VERSION: 'v0.8.0'
+  BUF_VERSION: '1.55.1'
+  PROTOC_GEN_GO_VERSION: 'v1.36.6'
+  PROTOC_GEN_GO_GRPC_VERSION: 'v1.5.1'
+  PROTOC_GEN_GRPC_GATEWAY_VERSION: 'v2.27.1'
+  PROTOC_GEN_VALIDATE_VERSION: 'v1.2.1'
+  PROTOC_GEN_OPENAPIV2_VERSION: 'v2.27.1'
+  YQ_VERSION: 'v4.45.4'
+  GRPCURL_VERSION: 'v1.9.3'
+  MOCKERY_VERSION: 'v2.53.3'
+  ENVSUBST_VERSION: 'v1.4.3'
+
+  # Пути к инструментам
+  BIN_DIR: '{{.ROOT_DIR}}/bin'
+  GOLANGCI_LINT: '{{.BIN_DIR}}/golangci-lint'
+  GCI: '{{.BIN_DIR}}/gci'
+  GOFUMPT: '{{.BIN_DIR}}/gofumpt'
+  BUF: '{{.BIN_DIR}}/buf'
+  YQ: '{{.BIN_DIR}}/yq'
+  PROTOC_GEN_GO: '{{.BIN_DIR}}/protoc-gen-go'
+  PROTOC_GEN_GO_GRPC: '{{.BIN_DIR}}/protoc-gen-go-grpc'
+  PROTOC_GEN_GRPC_GATEWAY: '{{.BIN_DIR}}/protoc-gen-grpc-gateway'
+  PROTOC_GEN_VALIDATE: '{{.BIN_DIR}}/protoc-gen-validate'
+  PROTOC_GEN_OPENAPIV2: '{{.BIN_DIR}}/protoc-gen-openapiv2'
+  GRPCURL: '{{.BIN_DIR}}/grpcurl'
+  MOCKERY: "{{.BIN_DIR}}/mockery"
+  ENVSUBST: '{{.BIN_DIR}}/envsubst'
+
+  # Пути к файлам проекта
+  COVERAGE_DIR: '{{.ROOT_DIR}}/coverage'
+  COVERAGE_FILE: total.out
+  ENVDIR: '{{.ROOT_DIR}}/deploy/env'
+
+  # Модули и сервисы
+  MODULES: platform shared iam
+  SERVICES: core,cache,eventbus,iam,logs,metrics,otel,tracing
+  GRPC_SERVER_ADDR: 'localhost:50051'
+
+# =============================================================================
+# УСТАНОВКА ИНСТРУМЕНТОВ РАЗРАБОТКИ
+# =============================================================================
+
+tasks:
+  # Форматирование кода
+  install-formatters:
+    desc: "Устанавливает форматтеры gci и gofumpt в ./bin"
+    summary: |
+      Эта задача проверяет наличие инструментов форматирования кода gofumpt и gci в директории bin.
+      Если инструменты не найдены, они будут автоматически установлены с указанными версиями.
+      
+      Используется:
+        - gofumpt: для форматирования кода Go
+        - gci: для сортировки импортов Go
+    cmds:
+      - |
+        [ -f {{.GOFUMPT}} ] || {
+          echo '📦 Устанавливаем gofumpt {{.GOFUMPT_VERSION}}...'
+          GOBIN={{.BIN_DIR}} go install mvdan.cc/gofumpt@{{.GOFUMPT_VERSION}}
+        }
+        [ -f {{.GCI}} ] || {
+          echo '📦 Устанавливаем gci {{.GCI_VERSION}}...'
+          GOBIN={{.BIN_DIR}} go install github.com/daixiang0/gci@{{.GCI_VERSION}}
+        }
+    status:
+      - test -x {{.GOFUMPT}}
+      - test -x {{.GCI}}
+
+  install-golangci-lint:
+    desc: "Устанавливает golangci-lint в каталог bin"
+    summary: |
+      Проверяет наличие golangci-lint в директории bin.
+      Если инструмент не найден, автоматически устанавливает его через go install.
+      
+      Устанавливаемая версия: {{.GOLANGCI_LINT_VERSION}}
+    cmds:
+      - |
+        [ -f {{.GOLANGCI_LINT}} ] || {
+          mkdir -p {{.BIN_DIR}}
+          echo "📦 Устанавливаем golangci-lint {{.GOLANGCI_LINT_VERSION}}..."
+          GOBIN={{.BIN_DIR}} go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{.GOLANGCI_LINT_VERSION}}
+        }
+    status:
+      - test -x {{.GOLANGCI_LINT}}
+
+  install-buf:
+    desc: "Устанавливает Buf в каталог bin"
+    cmds:
+      - |
+        [ -f {{.BUF}} ] || {
+          mkdir -p {{.BIN_DIR}} tmp-buf
+          curl -sSL \
+            "https://github.com/bufbuild/buf/releases/download/v{{.BUF_VERSION}}/buf-$(uname -s)-$(uname -m).tar.gz" \
+            | tar -xz -C tmp-buf
+          mv tmp-buf/buf/bin/buf {{.BUF}}
+          rm -rf tmp-buf
+          chmod +x {{.BUF}}
+        }
+
+  yq:install:
+    desc: "Устанавливает yq в bin/ при необходимости"
+    cmds:
+      - |
+        [ -f {{.YQ}} ] || {
+          echo '📦 Installing yq...'
+          GOBIN={{.BIN_DIR}} go install github.com/mikefarah/yq/v4@{{.YQ_VERSION}}
+        }
+
+  mockery:install:
+    desc: "Устанавливает mockery в ./bin"
+    cmds:
+      - |
+        [ -f {{.MOCKERY}} ] || {
+          echo '📦 Installing mockery...'
+          GOBIN={{.BIN_DIR}} go install github.com/vektra/mockery/v2@{{.MOCKERY_VERSION}}
+        }
+    status:
+      - test -x {{.MOCKERY}}
+
+  grpcurl:install:
+    desc: "Устанавливает grpcurl в каталог bin"
+    cmds:
+      - |
+        [ -f {{.GRPCURL}} ] || {
+          echo '📦 Устанавливаем grpcurl {{.GRPCURL_VERSION}}...'
+          GOBIN={{.BIN_DIR}} go install github.com/fullstorydev/grpcurl/cmd/grpcurl@{{.GRPCURL_VERSION}}
+        }
+    status:
+      - test -x {{.GRPCURL}}
+
+# =============================================================================
+# ФОРМАТИРОВАНИЕ И ЛИНТИНГ КОДА
+# =============================================================================
+
+  format:
+    desc: "Форматирует весь проект gofumpt + gci, исключая mocks"
+    summary: |
+      Форматирует все Go-файлы проекта с использованием gofumpt для стандартизации кода
+      и gci для сортировки импортов, исключая файлы в директориях mocks.
+      
+      Использует инструменты:
+        - gofumpt: для стандартизации форматирования
+        - gci: для сортировки импортов по стандартным группам
+    deps: [ install-formatters ]
+    cmds:
+      - |
+        echo "🧼 Форматируем через gofumpt ..."
+        
+        for module in {{.MODULES}}; do
+          if [ -d "$module" ]; then
+            echo "🧼 Форматируем $module"
+            find $module -type f -name '*.go' ! -path '*/mocks/*' -exec {{.GOFUMPT}} -extra -w {} +
+          fi
+        done
+      - |
+        echo "🎯 Сортируем импорты через gci ..."
+        
+        for module in {{.MODULES}}; do
+          if [ -d "$module" ]; then
+            echo "🎯 Сортируем импорты в $module"
+            find $module -type f -name '*.go' ! -path '*/mocks/*' -exec {{.GCI}} write -s standard -s default -s "prefix(github.com/aleksandr-mv/school_schedule)" {} +
+          fi
+        done
+
+  lint:
+    desc: "Запускает golangci-lint для всех модулей"
+    summary: |
+      Запускает линтер golangci-lint для всех модулей проекта.
+      Линтер проверяет код на соответствие стандартам качества и лучшим практикам.
+      Проверка включает проверку безопасности через gosec (встроенный в golangci-lint).
+      
+      Зависимости:
+        - install-golangci-lint: автоматически устанавливает линтер
+        - format: форматирует код перед проверкой
+    deps: [ install-golangci-lint ]
+    vars:
+      MODULES: '{{.MODULES}}'
+      GOLANGCI_LINT: '{{.GOLANGCI_LINT}}'
+    cmds:
+      - |
+        set -e
+        ERR=0
+        echo "🔍 Линтим все модули ..."
+        for mod in {{.MODULES}}; do
+          if [ -d "$mod" ]; then
+            echo "🔍 Линтим $mod module"
+            {{.GOLANGCI_LINT}} run $mod/... --config=.golangci.yml || ERR=1
+          fi
+        done
+        exit $ERR
+
+# =============================================================================
+# ГЕНЕРАЦИЯ КОДА (PROTOBUF И OPENAPI)
+# =============================================================================
+
+  proto:install-plugins:
+    desc: "Устанавливает protoc плагины в каталог bin"
+    cmds:
+      - |
+        [ -f {{.PROTOC_GEN_GO}} ] || {
+          echo '📦 Installing protoc-gen-go...'
+          GOBIN={{.BIN_DIR}} go install google.golang.org/protobuf/cmd/protoc-gen-go@{{.PROTOC_GEN_GO_VERSION}}
+        }
+        [ -f {{.PROTOC_GEN_GO_GRPC}} ] || {
+          echo '📦 Installing protoc-gen-go-grpc...'
+          GOBIN={{.BIN_DIR}} go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@{{.PROTOC_GEN_GO_GRPC_VERSION}}
+        }
+        [ -f {{.PROTOC_GEN_GRPC_GATEWAY}} ] || {
+          echo '📦 Installing protoc-gen-grpc-gateway...'
+          GOBIN={{.BIN_DIR}} go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@{{.PROTOC_GEN_GRPC_GATEWAY_VERSION}}
+        }
+        [ -f {{.PROTOC_GEN_VALIDATE}} ] || {
+          echo '📦 Installing protoc-gen-validate...'
+          GOBIN={{.BIN_DIR}} go install github.com/envoyproxy/protoc-gen-validate@{{.PROTOC_GEN_VALIDATE_VERSION}}
+        }
+        [ -f {{.PROTOC_GEN_OPENAPIV2}} ] || {
+          echo '📦 Installing protoc-gen-openapiv2...'
+          GOBIN={{.BIN_DIR}} go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@{{.PROTOC_GEN_OPENAPIV2_VERSION}}
+        }
+
+  proto:update-deps:
+    deps: [ install-buf ]
+    desc: Обновляет зависимости protobuf из удаленных репозиториев (googleapis и т.д.)
+    dir: shared/proto
+    cmds:
+      - |
+        echo "🔄 Обновляем зависимости buf..."
+        {{.BUF}} dep update
+
+  proto:lint:
+    deps: [ install-buf, proto:install-plugins ]
+    desc: Проверка .proto-файлов на соответствие стилю
+    dir: shared/proto
+    cmds:
+      - '{{.BUF}} lint'
+
+  proto:gen:
+    deps: [ install-buf, proto:install-plugins, proto:lint ]
+    desc: Генерация Go-кода из .proto
+    dir: shared/proto
+    cmds:
+      - '{{.BUF}} generate --template buf.gen.yaml'
+
+  gen:
+    desc: "Генерация всех proto файлов"
+    cmds:
+      - task: proto:gen
+
+  mockery:gen:
+    desc: "Генерирует моки интерфейсов с помощью mockery"
+    deps: [ mockery:install ]
+    cmds:
+      - |
+        echo '🧪 Генерация моков...'
+        {{.MOCKERY}}
+
+# =============================================================================
+# ЗАВИСИМОСТИ И УПРАВЛЕНИЕ МОДУЛЯМИ
+# =============================================================================
+
+  deps:update:
+    desc: "Обновление зависимостей в go.mod во всех модулях"
+    cmds:
+      - |
+        echo "🔄 Обновление зависимостей в go.mod во всех модулях"
+        for mod in {{.MODULES}}; do
+          if [ -d "$mod" ]; then
+            echo "🔄 Обновление зависимостей в $mod"
+            (cd "$mod" && go mod tidy -compat=1.24) || exit 1
+          fi
+        done
+
+# =============================================================================
+# ТЕСТИРОВАНИЕ И ПОКРЫТИЕ КОДА
+# =============================================================================
+
+  test-coverage:
+    desc: "Тесты с покрытием бизнес-логики (service/repository), отчёт по каждому модулю + общий"
+    cmds:
+      - |
+        echo "🧪 Запускаем расчёт покрытия..."
+        rm -rf {{.COVERAGE_DIR}}
+        mkdir -p {{.COVERAGE_DIR}}
+        
+        ERR=0
+        for mod in {{.MODULES}}; do
+          echo "📦 Обрабатываем модуль: $mod"
+        
+          TARGET_PKGS=$(go list ./$mod/... \
+            | grep -E '/(internal/(service|repository|api))' \
+            | grep -vE '/(mocks|testdata|pkg|proto|pb|cmd)' \
+            | paste -sd "," -)
+        
+          if [ -z "$TARGET_PKGS" ]; then
+            echo "⚠️  Нет подходящих пакетов в $mod"
+            continue
+          fi
+        
+          go test -coverpkg="$TARGET_PKGS" \
+            -coverprofile={{.COVERAGE_DIR}}/$mod.out \
+            -covermode=atomic \
+            $(echo "$TARGET_PKGS" | tr "," " ") || ERR=1
+        done
+        
+        if [ $ERR -ne 0 ]; then
+          echo "❌ Ошибки во время тестов"
+          exit $ERR
+        fi
+        
+        echo
+        echo "📊 Покрытие по каждому модулю:"
+        for mod in {{.MODULES}}; do
+          OUTFILE="{{.COVERAGE_DIR}}/$mod.out"
+          if [ -f "$OUTFILE" ]; then
+            printf " • %s: " "$mod"
+            go tool cover -func="$OUTFILE" | tail -n1
+          fi
+        done
+        
+        echo
+        echo "📦 Склеиваем все покрытия..."
+        {
+          echo "mode: atomic"
+          find {{.COVERAGE_DIR}} -type f -name '*.out' ! -name '{{.COVERAGE_FILE}}' \
+            -exec grep -h -v "^mode:" {} +
+        } > {{.COVERAGE_DIR}}/{{.COVERAGE_FILE}}
+        
+        echo
+        echo "🧾 Общее покрытие по всем модулям:"
+        go tool cover -func={{.COVERAGE_DIR}}/{{.COVERAGE_FILE}} | tail -n1
+
+  coverage:html:
+    desc: "Генерирует HTML-отчёт покрытия и открывает его в браузере"
+    deps: [ test-coverage ]
+    cmds:
+      - |
+        OUTPUT={{.COVERAGE_DIR}}/coverage.html
+        echo "🌐 Генерируем HTML-отчёт..."
+        go tool cover -html={{.COVERAGE_DIR}}/{{.COVERAGE_FILE}} -o $OUTPUT
+
+        echo "🚀 Открываем $OUTPUT"
+        if command -v open &> /dev/null; then
+          open $OUTPUT  # macOS
+        elif command -v xdg-open &> /dev/null; then
+          xdg-open $OUTPUT  # Linux
+        else
+          echo "📂 Отчёт сохранён в $OUTPUT (открой вручную)"
+        fi
+
+# =============================================================================
+# ТЕСТИРОВАНИЕ gRPC
+# =============================================================================
+
+  grpc:test:list:
+    desc: "Тестирует получение списка через gRPC"
+    deps: [ grpcurl:install ]
+    cmds:
+      - echo "📋 Получаем список через gRPC..."
+      - |
+        {{.GRPCURL}} -plaintext -d '{}' {{.GRPC_SERVER_ADDR}} list
+
+  grpc:test:get:
+    desc: "Тестирует получение по ID через gRPC"
+    deps: [ grpcurl:install ]
+    cmds:
+      - echo "🔍 Получаем по ID через gRPC... (замените ID на реальный)"
+      - |
+        {{.GRPCURL}} -plaintext -d '{
+          "id": "REPLACE_WITH_REAL_ID"
+        }' {{.GRPC_SERVER_ADDR}} get
+
+# =============================================================================
+# ОЧИСТКА
+# =============================================================================
+
+  clean:
+    desc: "Очистить сгенерированные файлы"
+    cmds:
+      - echo "[task] 🧹 Очищаем сгенерированные файлы"
+      - find . -name "*.pb.go" -delete
+      - find . -name "*.pb.gw.go" -delete
+      - echo "✅ Очистка завершена"
+
+# =============================================================================
+# ГЕНЕРАЦИЯ ENV ФАЙЛОВ
+# =============================================================================
+
+  env:install-envsubst:
+    desc: "Устанавливает envsubst в bin/"
+    cmds:
+      - |
+        [ -f {{.ENVSUBST}} ] || {
+          echo "📦 Устанавливаем envsubst версии {{.ENVSUBST_VERSION}}..."
+          GOBIN={{.BIN_DIR}} go install github.com/a8m/envsubst/cmd/envsubst@{{.ENVSUBST_VERSION}}
+        }
+        echo "✅ envsubst установлен: {{.ENVSUBST}}"
+
+  env:generate:
+    desc: "Генерирует .env файлы для всех сервисов из шаблонов и единого файла конфигурации"
+    deps: [ env:install-envsubst ]
+    cmds:
+      - |
+        ENV_FILE="{{.ENVDIR}}/.env"
+        TEMPLATE_FILE="{{.ENVDIR}}/.env.template"
+        SCRIPT="{{.ENVDIR}}/generate-env.sh"
+        
+        if [ ! -f "$ENV_FILE" ]; then
+          if [ -f "$TEMPLATE_FILE" ]; then
+            echo "🔄 Файл $ENV_FILE не найден, создаем из шаблона $TEMPLATE_FILE"
+            cp "$TEMPLATE_FILE" "$ENV_FILE"
+            echo "✅ Создан файл $ENV_FILE. Проверьте и отредактируйте значения переменных при необходимости."
+          else
+            echo "❌ Шаблон $TEMPLATE_FILE не найден!"
+            exit 1
+          fi
+        fi
+        
+        chmod +x "$SCRIPT"
+        # Передаем список сервисов в виде строки с разделителями-запятыми
+        export SERVICES="{{.SERVICES}}"
+        ENV_SUBST={{.ENVSUBST}} "$SCRIPT"
+
+# =============================================================================
+# DOCKER COMPOSE - УПРАВЛЕНИЕ СЕРВИСАМИ
+# =============================================================================
+
+  # Core сервисы (сеть)
+  up-core:
+    desc: "Поднять core контейнеры"
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🚀 Поднимаем core контейнеры"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-core:
+    desc: "Остановить и удалить core контейнеры"
+    dir: deploy/compose/core
+    cmds:
+      - echo "[task] 🛑 Останавливаем core контейнеры"
+      - docker compose -p school_schedule down --volumes
+
+  # Eventbus сервисы (Kafka)
+  up-eventbus:
+    desc: "Поднять eventbus контейнеры"
+    dir: deploy/compose/eventbus
+    cmds:
+      - echo "[task] 🔄 Поднимаем eventbus контейнеры"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-eventbus:
+    desc: "Остановить и удалить eventbus контейнеры"
+    dir: deploy/compose/eventbus
+    cmds:
+      - echo "[task] 🛑 Останавливаем eventbus контейнеры"
+      - docker compose -p school_schedule down --remove-orphans
+
+  # Opentelemetry сервисы (Otel-collector)
+  up-otel:
+    desc: "Поднять OTEL Collector"
+    dir: deploy/compose/otel
+    cmds:
+      - echo "[task] 📊 Поднимаем OTEL Collector"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-otel:
+    desc: "Остановить и удалить OTEL Collector"
+    dir: deploy/compose/otel
+    cmds:
+      - echo "[task] 🛑 Останавливаем OTEL Collector"
+      - docker compose -p school_schedule down --remove-orphans
+
+  # Tracing сервисы (Jaeger)
+  up-tracing:
+    desc: "Поднять tracing контейнеры"
+    dir: deploy/compose/tracing
+    cmds:
+      - echo "[task] 🔍 Поднимаем tracing контейнеры"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-tracing:
+    desc: "Остановить и удалить tracing контейнеры"
+    dir: deploy/compose/tracing
+    cmds:
+      - echo "[task] 🛑 Останавливаем tracing контейнеры"
+      - docker compose -p school_schedule down --remove-orphans
+
+  # Logs сервисы (ELK)
+  up-logs:
+    desc: "Поднять logs контейнеры"
+    dir: deploy/compose/logs
+    cmds:
+      - echo "[task] 📝 Поднимаем logs контейнеры"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-logs:
+    desc: "Остановить и удалить logs контейнеры"
+    dir: deploy/compose/logs
+    cmds:
+      - echo "[task] 🛑 Останавливаем logs контейнеры"
+      - docker compose -p school_schedule down --remove-orphans
+
+  # IAM сервис
+  up-iam:
+    desc: "Поднять iam сервис и все его зависимости"
+    dir: deploy/compose/iam
+    cmds: 
+      - echo "[task] 🔐 Поднимаем iam сервис с зависимостями"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-iam:
+    desc: "Остановить и удалить iam сервис и все его зависимости"
+    dir: deploy/compose/iam
+    cmds:
+      - echo "[task] 🛑 Останавливаем iam сервис с зависимостями"
+      - docker compose -p school_schedule down --volumes
+
+  # Metrics сервисы (Prometheus + Grafana)
+  up-metrics:
+    desc: "Поднять metrics контейнеры"
+    dir: deploy/compose/metrics
+    cmds:
+      - echo "[task] 📊 Поднимаем metrics контейнеры"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-metrics:
+    desc: "Остановить и удалить metrics контейнеры"
+    dir: deploy/compose/metrics
+    cmds:
+      - echo "[task] 🛑 Останавливаем metrics контейнеры"
+      - docker compose -p school_schedule down --volumes
+
+# =============================================================================
+# DOCKER COMPOSE - УПРАВЛЕНИЕ ВСЕМИ СЕРВИСАМИ
+# =============================================================================
+
+  up-all:
+    desc: "Поднять все сервисы по очереди вместе с зависимостями"
+    cmds:
+      - task: up-core
+      - task: up-eventbus
+      - task: up-tracing
+      - task: up-logs
+      - task: up-metrics
+      - task: up-iam
+      - task: up-otel
+      - echo "✅ Все сервисы подняты!"
+
+  down-all:
+    desc: "Остановить и удалить все сервисы по очереди вместе с зависимостями"
+    cmds:
+      - task: down-otel
+      - task: down-iam
+      - task: down-metrics
+      - task: down-logs
+      - task: down-tracing
+      - task: down-eventbus
+      - task: down-core
+      - echo "✅ Все сервисы остановлены!"
+
+  restart-all:
+    desc: "Перезапустить все сервисы"
+    cmds:
+      - task: down-all
+      - task: up-all
+
+# =============================================================================
+# DOCKER COMPOSE - МОНИТОРИНГ И ЛОГИ
+# =============================================================================
+
+  status:
+    desc: "Показать статус всех контейнеров"
+    cmds:
+      - echo "[task] 📊 Статус всех контейнеров"
+      - docker ps
+
+  logs:
+    desc: "Показать логи всех сервисов"
+    cmds:
+      - echo "[task] 📋 Логи всех сервисов"
+      - echo "--- Core logs ---"
+      - docker compose -f deploy/compose/core/docker-compose.yaml logs --tail=20
+      - echo "--- Eventbus logs ---"
+      - docker compose -f deploy/compose/eventbus/docker-compose.yaml logs --tail=20
+      - echo "--- IAM logs ---"
+      - docker compose -f deploy/compose/iam/docker-compose.yml logs --tail=20
+      - echo "--- Metrics logs ---"
+      - docker compose -f deploy/compose/metrics/docker-compose.yaml logs --tail=20
+      - echo "--- Logs logs ---"
+      - docker compose -f deploy/compose/logs/docker-compose.yml logs --tail=20
+      - echo "--- Tracing logs ---"
+      - docker compose -f deploy/compose/tracing/docker-compose.yml logs --tail=20
+      - echo "--- OTEL logs ---"
+      - docker compose -f deploy/compose/otel/docker-compose.yml logs --tail=20
+
+  logs-core:
+    desc: "Логи core сервисов"
+    dir: deploy/compose/core
+    cmds:
+      - docker compose logs --tail=50
+
+  logs-eventbus:
+    desc: "Логи eventbus сервисов"
+    dir: deploy/compose/eventbus
+    cmds:
+      - docker compose logs --tail=50
+
+  logs-iam:
+    desc: "Логи iam сервиса"
+    dir: deploy/compose/iam
+    cmds:
+      - docker compose logs --tail=50
+
+  logs-metrics:
+    desc: "Логи metrics сервисов"
+    dir: deploy/compose/metrics
+    cmds:
+      - docker compose logs --tail=50
+
+  logs-logs:
+    desc: "Логи logs сервисов"
+    dir: deploy/compose/logs
+    cmds:
+      - docker compose logs --tail=50
+
+  logs-tracing:
+    desc: "Логи tracing сервисов"
+    dir: deploy/compose/tracing
+    cmds:
+      - docker compose logs --tail=50
+
+  logs-otel:
+    desc: "Логи otel сервисов"
+    dir: deploy/compose/otel
+    cmds:
+      - docker compose logs --tail=50
+
+# =============================================================================
+# DOCKER COMPOSE - ОЧИСТКА И УПРАВЛЕНИЕ РЕСУРСАМИ
+# =============================================================================
+
+  clean:
+    desc: "Очистить все контейнеры, образы и volumes"
+    cmds:
+      - echo "[task] 🧹 Очищаем все Docker ресурсы"
+      - docker system prune -a --volumes -f
+      - echo "✅ Очистка завершена"

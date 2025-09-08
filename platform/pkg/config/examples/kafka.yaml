@@ -1,0 +1,26 @@
+# Пример конфигурации Apache Kafka
+# Соответствует структуре rawKafkaConfig в platform/pkg/config/internal/kafka/kafka.go
+
+kafka:
+  # Список адресов Kafka брокеров через запятую
+  brokers: "localhost:9092"
+  
+  # Конфигурация продюсеров
+  producers:
+    order_paid:
+      topic: "order.paid"
+      enabled: true
+    order_assembled:
+      topic: "order.assembled"
+      enabled: true
+  
+  # Конфигурация консюмеров
+  consumers:
+    order_paid:
+      topic: "order.paid"
+      group_id: "order-group-order-paid"
+      enabled: true
+    order_assembled:
+      topic: "order.assembled"
+      group_id: "order-group-order-assembled"
+      enabled: true

@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package auth.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "common/v1/user.proto";
+import "common/v1/session.proto";
+
+option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1;auth_v1";
+
+// =============================================================================
+// AuthService (auth.v1)
+// =============================================================================
+
+service AuthService {
+  // Аутентификация пользователя
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  // Получение информации о текущей сессии
+  rpc Whoami(WhoamiRequest) returns (WhoamiResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/whoami"
+    };
+  }
+
+  // Выход из системы
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/logout"
+      body: "*"
+    };
+  }
+}
+
+// Запрос на аутентификацию
+message LoginRequest {
+  string login = 1 [(validate.rules).string.min_len = 3];
+  string password = 2 [(validate.rules).string.min_len = 6];
+}
+
+// Ответ на аутентификацию
+message LoginResponse {
+  string session_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// Запрос информации о текущей сессии
+message WhoamiRequest {
+  string session_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// Ответ с информацией о текущей сессии
+message WhoamiResponse {
+  common.v1.Session session = 1 [(validate.rules).message.required = true];
+  common.v1.User user = 2 [(validate.rules).message.required = true];
+}
+
+// Запрос на выход из системы
+message LogoutRequest {
+  string session_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// Ответ на выход из системы
+message LogoutResponse {
+  bool success = 1;
+}

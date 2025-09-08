@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package common.v1;
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1";
+
+// =============================================================================
+// Session (common.v1)
+// =============================================================================
+
+// Информация о сессии
+message Session {
+  string id = 1 [(validate.rules).string.uuid = true];
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp expires_at = 4;
+}
