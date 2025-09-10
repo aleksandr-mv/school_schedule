@@ -43,7 +43,7 @@ vars:
   ENVDIR: '{{.ROOT_DIR}}/deploy/env'
 
   # Модули и сервисы
-  MODULES: platform shared iam
+  MODULES: platform shared iam rbac
   SERVICES: core,cache,eventbus,iam,logs,metrics,otel,tracing
   GRPC_SERVER_ADDR: 'localhost:50051'
 
@@ -530,6 +530,22 @@ tasks:
       - echo "[task] 🛑 Останавливаем iam сервис с зависимостями"
       - docker compose -p school_schedule down --volumes
 
+  # RBAC сервис
+  up-rbac:
+    desc: "Поднять rbac сервис и все его зависимости"
+    dir: deploy/compose/rbac
+    cmds: 
+      - echo "[task] 🔒 Поднимаем rbac сервис с зависимостями"
+      - task: env:generate
+      - docker compose -p school_schedule up --build --detach
+
+  down-rbac:
+    desc: "Остановить и удалить rbac сервис и все его зависимости"
+    dir: deploy/compose/rbac
+    cmds:
+      - echo "[task] 🛑 Останавливаем rbac сервис с зависимостями"
+      - docker compose -p school_schedule down --volumes
+
   # Metrics сервисы (Prometheus + Grafana)
   up-metrics:
     desc: "Поднять metrics контейнеры"
@@ -559,6 +575,7 @@ tasks:
       - task: up-logs
       - task: up-metrics
       - task: up-iam
+      - task: up-rbac
       - task: up-otel
       - echo "✅ Все сервисы подняты!"
 
@@ -566,6 +583,7 @@ tasks:
     desc: "Остановить и удалить все сервисы по очереди вместе с зависимостями"
     cmds:
       - task: down-otel
+      - task: down-rbac
       - task: down-iam
       - task: down-metrics
       - task: down-logs

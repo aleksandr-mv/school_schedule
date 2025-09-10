@@ -17,6 +17,14 @@ packages:
     config:
       include-regex: ".*Repository"
 
+  # RBAC сервис
+  github.com/aleksandr-mv/school_schedule/rbac/internal/service:
+    config:
+      include-regex: ".*Service"
+  github.com/aleksandr-mv/school_schedule/rbac/internal/repository:
+    config:
+      include-regex: ".*Repository"
+
   # gRPC клиенты
   github.com/Alexander-Mandzhiev/microservices-course/order/internal/client/grpc:
     config:

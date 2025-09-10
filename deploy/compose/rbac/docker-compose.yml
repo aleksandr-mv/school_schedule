@@ -1,0 +1,27 @@
+services:
+
+  postgres-rbac:
+    image: ${RBAC_POSTGRES_IMAGE_NAME}
+    container_name: ${RBAC_POSTGRES_CONTAINER_NAME}
+    env_file:
+      - .env
+    volumes:
+      - postgres_rbac_data:/var/lib/postgresql/data
+    ports:
+      - "${RBAC_EXTERNAL_POSTGRES_PORT}:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${RBAC_POSTGRES_USER} -d ${RBAC_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: ${RBAC_HEALTHCHECK_START_PERIOD}s
+    restart: unless-stopped
+    networks:
+      - school_net
+
+volumes:
+  postgres_rbac_data:
+
+networks:
+  school_net:
+    external: true

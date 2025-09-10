@@ -2,7 +2,6 @@ package interceptor
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -25,6 +24,8 @@ const (
 	userContextKey contextKey = "user"
 	// sessionIDContextKey ключ для хранения session ID в контексте
 	sessionIDContextKey contextKey = "session-id"
+	// permissionsContextKey ключ для хранения прав пользователя в контексте
+	permissionsContextKey contextKey = "permissions"
 )
 
 // IAMClient интерфейс для аутентификации пользователей
@@ -85,12 +86,14 @@ func (i *AuthInterceptor) authenticate(ctx context.Context) (context.Context, er
 		SessionId: sessionID,
 	})
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf("invalid session: %v", err))
+		return nil, status.Error(codes.Unauthenticated, "invalid session")
 	}
 
-	// Добавляем пользователя и session ID в контекст
+	// Добавляем пользователя, session ID и права в контекст
 	authCtx := context.WithValue(ctx, userContextKey, whoamiRes.User)
 	authCtx = context.WithValue(authCtx, sessionIDContextKey, sessionID)
+	authCtx = context.WithValue(authCtx, permissionsContextKey, whoamiRes.Permissions)
+
 	return authCtx, nil
 }
 
@@ -100,9 +103,20 @@ func GetUserFromContext(ctx context.Context) (*commonV1.User, bool) {
 	return user, ok
 }
 
+// GetPermissionsFromContext извлекает права пользователя из контекста
+func GetPermissionsFromContext(ctx context.Context) ([]*commonV1.Permission, bool) {
+	permissions, ok := ctx.Value(permissionsContextKey).([]*commonV1.Permission)
+	return permissions, ok
+}
+
 // GetUserContextKey возвращает ключ контекста для пользователя
 func GetUserContextKey() contextKey {
 	return userContextKey
+}
+
+// GetPermissionsContextKey возвращает ключ контекста для прав пользователя
+func GetPermissionsContextKey() contextKey {
+	return permissionsContextKey
 }
 
 // GetSessionIDFromContext извлекает session ID из контекста

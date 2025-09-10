@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package common.v1;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1";
+
+// Расширение для указания требуемых прав доступа
+extend google.protobuf.MethodOptions {
+  // Право доступа в формате "resource:action"
+  string permission = 50001;
+}

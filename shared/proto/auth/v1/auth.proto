@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package auth.v1;
 
-import "google/api/annotations.proto";
 import "validate/validate.proto";
 import "common/v1/user.proto";
 import "common/v1/session.proto";
+import "common/v1/role.proto";
+import "common/v1/permission.proto";
 
 option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1;auth_v1";
 
@@ -16,25 +17,14 @@ option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/au
 service AuthService {
   // Аутентификация пользователя
   rpc Login(LoginRequest) returns (LoginResponse) {
-    option (google.api.http) = {
-      post: "/v1/auth/login"
-      body: "*"
-    };
   }
 
   // Получение информации о текущей сессии
   rpc Whoami(WhoamiRequest) returns (WhoamiResponse) {
-    option (google.api.http) = {
-      get: "/v1/auth/whoami"
-    };
   }
 
   // Выход из системы
   rpc Logout(LogoutRequest) returns (LogoutResponse) {
-    option (google.api.http) = {
-      post: "/v1/auth/logout"
-      body: "*"
-    };
   }
 }
 
@@ -58,6 +48,8 @@ message WhoamiRequest {
 message WhoamiResponse {
   common.v1.Session session = 1 [(validate.rules).message.required = true];
   common.v1.User user = 2 [(validate.rules).message.required = true];
+  repeated common.v1.Role roles = 3;
+  repeated common.v1.Permission permissions = 4; 
 }
 
 // Запрос на выход из системы

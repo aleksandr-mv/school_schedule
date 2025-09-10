@@ -9,7 +9,6 @@ package auth_v1
 import (
 	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -172,6 +171,8 @@ type WhoamiResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Session       *v1.Session            `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
 	User          *v1.User               `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	Roles         []*v1.Role             `protobuf:"bytes,3,rep,name=roles,proto3" json:"roles,omitempty"`
+	Permissions   []*v1.Permission       `protobuf:"bytes,4,rep,name=permissions,proto3" json:"permissions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -216,6 +217,20 @@ func (x *WhoamiResponse) GetSession() *v1.Session {
 func (x *WhoamiResponse) GetUser() *v1.User {
 	if x != nil {
 		return x.User
+	}
+	return nil
+}
+
+func (x *WhoamiResponse) GetRoles() []*v1.Role {
+	if x != nil {
+		return x.Roles
+	}
+	return nil
+}
+
+func (x *WhoamiResponse) GetPermissions() []*v1.Permission {
+	if x != nil {
+		return x.Permissions
 	}
 	return nil
 }
@@ -314,7 +329,7 @@ var File_auth_v1_auth_proto protoreflect.FileDescriptor
 
 const file_auth_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x12auth/v1/auth.proto\x12\aauth.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x17common/v1/session.proto\"R\n" +
+	"\x12auth/v1/auth.proto\x12\aauth.v1\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x17common/v1/session.proto\x1a\x14common/v1/role.proto\x1a\x1acommon/v1/permission.proto\"R\n" +
 	"\fLoginRequest\x12\x1d\n" +
 	"\x05login\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x03R\x05login\x12#\n" +
 	"\bpassword\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x06R\bpassword\"8\n" +
@@ -323,19 +338,21 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"8\n" +
 	"\rWhoamiRequest\x12'\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"w\n" +
+	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"\xd7\x01\n" +
 	"\x0eWhoamiResponse\x126\n" +
 	"\asession\x18\x01 \x01(\v2\x12.common.v1.SessionB\b\xfaB\x05\x8a\x01\x02\x10\x01R\asession\x12-\n" +
-	"\x04user\x18\x02 \x01(\v2\x0f.common.v1.UserB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04user\"8\n" +
+	"\x04user\x18\x02 \x01(\v2\x0f.common.v1.UserB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04user\x12%\n" +
+	"\x05roles\x18\x03 \x03(\v2\x0f.common.v1.RoleR\x05roles\x127\n" +
+	"\vpermissions\x18\x04 \x03(\v2\x15.common.v1.PermissionR\vpermissions\"8\n" +
 	"\rLogoutRequest\x12'\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"*\n" +
 	"\x0eLogoutResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\x8b\x02\n" +
-	"\vAuthService\x12Q\n" +
-	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12R\n" +
-	"\x06Whoami\x12\x16.auth.v1.WhoamiRequest\x1a\x17.auth.v1.WhoamiResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/auth/whoami\x12U\n" +
-	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x17.auth.v1.LogoutResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/auth/logoutBJZHgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1;auth_v1b\x06proto3"
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xc1\x01\n" +
+	"\vAuthService\x128\n" +
+	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\"\x00\x12;\n" +
+	"\x06Whoami\x12\x16.auth.v1.WhoamiRequest\x1a\x17.auth.v1.WhoamiResponse\"\x00\x12;\n" +
+	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x17.auth.v1.LogoutResponse\"\x00BJZHgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1;auth_v1b\x06proto3"
 
 var (
 	file_auth_v1_auth_proto_rawDescOnce sync.Once
@@ -359,21 +376,25 @@ var file_auth_v1_auth_proto_goTypes = []any{
 	(*LogoutResponse)(nil), // 5: auth.v1.LogoutResponse
 	(*v1.Session)(nil),     // 6: common.v1.Session
 	(*v1.User)(nil),        // 7: common.v1.User
+	(*v1.Role)(nil),        // 8: common.v1.Role
+	(*v1.Permission)(nil),  // 9: common.v1.Permission
 }
 var file_auth_v1_auth_proto_depIdxs = []int32{
 	6, // 0: auth.v1.WhoamiResponse.session:type_name -> common.v1.Session
 	7, // 1: auth.v1.WhoamiResponse.user:type_name -> common.v1.User
-	0, // 2: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
-	2, // 3: auth.v1.AuthService.Whoami:input_type -> auth.v1.WhoamiRequest
-	4, // 4: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
-	1, // 5: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
-	3, // 6: auth.v1.AuthService.Whoami:output_type -> auth.v1.WhoamiResponse
-	5, // 7: auth.v1.AuthService.Logout:output_type -> auth.v1.LogoutResponse
-	5, // [5:8] is the sub-list for method output_type
-	2, // [2:5] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	8, // 2: auth.v1.WhoamiResponse.roles:type_name -> common.v1.Role
+	9, // 3: auth.v1.WhoamiResponse.permissions:type_name -> common.v1.Permission
+	0, // 4: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
+	2, // 5: auth.v1.AuthService.Whoami:input_type -> auth.v1.WhoamiRequest
+	4, // 6: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
+	1, // 7: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
+	3, // 8: auth.v1.AuthService.Whoami:output_type -> auth.v1.WhoamiResponse
+	5, // 9: auth.v1.AuthService.Logout:output_type -> auth.v1.LogoutResponse
+	7, // [7:10] is the sub-list for method output_type
+	4, // [4:7] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_auth_v1_auth_proto_init() }

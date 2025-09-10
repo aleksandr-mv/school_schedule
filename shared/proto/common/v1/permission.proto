@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package common.v1;
+
+import "validate/validate.proto";
+
+option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1";
+
+// =============================================================================
+// Permission Common Types (common.v1)
+// =============================================================================
+
+// Право доступа
+message Permission {
+  string id = 1 [(validate.rules).string.uuid = true];
+  string resource = 2 [(validate.rules).string.min_len = 1, (validate.rules).string.max_len = 100];
+  string action = 3 [(validate.rules).string.min_len = 1, (validate.rules).string.max_len = 50];
+}

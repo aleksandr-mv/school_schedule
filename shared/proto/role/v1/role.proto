@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package role.v1;
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "common/v1/role.proto";
+import "common/v1/annotations.proto";
+import "common/v1/identifier.proto";
+
+option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1;role_v1";
+
+// =============================================================================
+// RoleService (role.v1)
+// =============================================================================
+
+service RoleService {
+  // Создание новой роли
+  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {
+    option (common.v1.permission) = "role:write";
+  }
+
+  // Получение роли по ID или имени
+  rpc GetRole(GetRoleRequest) returns (GetRoleResponse) {
+    option (common.v1.permission) = "role:read";
+  }
+
+  // Обновление роли
+  rpc UpdateRole(UpdateRoleRequest) returns (google.protobuf.Empty) {
+    option (common.v1.permission) = "role:write";
+  }
+
+  // Удаление роли
+  rpc DeleteRole(DeleteRoleRequest) returns (google.protobuf.Empty) {
+    option (common.v1.permission) = "role:write";
+  }
+
+  // Получение списка всех ролей
+  rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {
+    option (common.v1.permission) = "role:read";
+  }
+
+}
+
+// =============================================================================
+// CreateRole
+// =============================================================================
+
+// Запрос на создание новой роли
+message CreateRoleRequest {
+  string name = 1 [(validate.rules).string.min_len = 2, (validate.rules).string.max_len = 50];
+  string description = 2;
+}
+
+// Ответ с ID созданной роли
+message CreateRoleResponse {
+  string role_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// =============================================================================
+// GetRole
+// =============================================================================
+
+// Запрос на получение роли по ID или имени
+message GetRoleRequest {
+  common.v1.GetIdentifier value = 1 [(validate.rules).message.required = true];
+}
+
+// Ответ с данными роли
+message GetRoleResponse {
+  common.v1.Role role = 1 [(validate.rules).message.required = true];
+}
+
+// =============================================================================
+// UpdateRole
+// =============================================================================
+
+// Запрос на обновление роли
+message UpdateRoleRequest {
+  string role_id = 1 [(validate.rules).string.uuid = true];
+  optional string name = 2 [(validate.rules).string.min_len = 2, (validate.rules).string.max_len = 50];
+  optional string description = 3;
+}
+
+// =============================================================================
+// DeleteRole
+// =============================================================================
+
+// Запрос на удаление роли по ID
+message DeleteRoleRequest {
+  string role_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// =============================================================================
+// ListRoles
+// =============================================================================
+
+// Запрос на получение списка ролей
+message ListRolesRequest {
+  // Опциональные фильтры
+  optional string name_filter = 1;
+}
+
+// Ответ со списком ролей
+message ListRolesResponse {
+  repeated common.v1.Role data = 1;
+}
+

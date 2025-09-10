@@ -49,8 +49,10 @@ func (m *AuthMiddleware) Handle(next http.Handler) http.Handler {
 		// Добавляем пользователя и session ID в контекст используя функции из grpc middleware
 		ctx := r.Context()
 		ctx = grpcAuth.AddSessionIDToContext(ctx, sessionID)
-		// Также добавляем пользователя в контекст
+
+		// Также добавляем пользователя и права в контекст
 		ctx = context.WithValue(ctx, grpcAuth.GetUserContextKey(), whoamiRes.User)
+		ctx = context.WithValue(ctx, grpcAuth.GetPermissionsContextKey(), whoamiRes.Permissions)
 
 		// Передаем управление следующему handler
 		next.ServeHTTP(w, r.WithContext(ctx))
