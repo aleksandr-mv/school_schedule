@@ -464,7 +464,7 @@ tasks:
     dir: deploy/compose/eventbus
     cmds:
       - echo "[task] 🛑 Останавливаем eventbus контейнеры"
-      - docker compose -p school_schedule down --remove-orphans
+      - docker compose -p school_schedule down
 
   # Opentelemetry сервисы (Otel-collector)
   up-otel:
@@ -480,7 +480,7 @@ tasks:
     dir: deploy/compose/otel
     cmds:
       - echo "[task] 🛑 Останавливаем OTEL Collector"
-      - docker compose -p school_schedule down --remove-orphans
+      - docker compose -p school_schedule down
 
   # Tracing сервисы (Jaeger)
   up-tracing:
@@ -496,7 +496,7 @@ tasks:
     dir: deploy/compose/tracing
     cmds:
       - echo "[task] 🛑 Останавливаем tracing контейнеры"
-      - docker compose -p school_schedule down --remove-orphans
+      - docker compose -p school_schedule down
 
   # Logs сервисы (ELK)
   up-logs:
@@ -512,7 +512,7 @@ tasks:
     dir: deploy/compose/logs
     cmds:
       - echo "[task] 🛑 Останавливаем logs контейнеры"
-      - docker compose -p school_schedule down --remove-orphans
+      - docker compose -p school_schedule down
 
   # IAM сервис
   up-iam:
