@@ -10,10 +10,10 @@ disable-version-string: true
 
 packages:
   # IAM сервис
-  github.com/Alexander-Mandzhiev/microservices-course/iam/internal/service:
+  github.com/aleksandr-mv/school_schedule/iam/internal/service:
     config:
       include-regex: ".*Service"
-  github.com/Alexander-Mandzhiev/microservices-course/iam/internal/repository:
+  github.com/aleksandr-mv/school_schedule/iam/internal/repository:
     config:
       include-regex: ".*Repository"
 

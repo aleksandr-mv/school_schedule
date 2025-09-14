@@ -21,7 +21,7 @@ type PermissionServiceInterface interface {
 }
 
 type UserRoleServiceInterface interface {
-	Assign(ctx context.Context, userID, roleID, assignedBy string) error
+	Assign(ctx context.Context, userID, roleID string, assignedBy *string) error
 	Revoke(ctx context.Context, userID, roleID string) error
 	GetUserRoles(ctx context.Context, userID string) ([]*model.EnrichedRole, error)
 	GetRoleUsers(ctx context.Context, roleID string, limit int32, cursor string) ([]string, *string, error)
@@ -30,4 +30,8 @@ type UserRoleServiceInterface interface {
 type RolePermissionServiceInterface interface {
 	Assign(ctx context.Context, roleID, permissionID string) error
 	Revoke(ctx context.Context, roleID, permissionID string) error
+}
+
+type UserConsumerService interface {
+	Run(ctx context.Context) error
 }

@@ -8,11 +8,11 @@ import (
 // API реализует AuthService gRPC сервер
 type API struct {
 	authV1.UnimplementedAuthServiceServer
-	authService service.AuthServiceInterface
+	authService service.AuthService
 }
 
 // NewAPI создает новый экземпляр API для AuthService
-func NewAPI(authService service.AuthServiceInterface) *API {
+func NewAPI(authService service.AuthService) *API {
 	return &API{
 		authService: authService,
 	}

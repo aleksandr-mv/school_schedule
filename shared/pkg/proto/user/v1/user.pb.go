@@ -28,7 +28,6 @@ type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Info          *v1.UserInfo           `protobuf:"bytes,1,opt,name=info,proto3" json:"info,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	RoleId        *string                `protobuf:"bytes,3,opt,name=role_id,json=roleId,proto3,oneof" json:"role_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,13 +72,6 @@ func (x *RegisterRequest) GetInfo() *v1.UserInfo {
 func (x *RegisterRequest) GetPassword() string {
 	if x != nil {
 		return x.Password
-	}
-	return ""
-}
-
-func (x *RegisterRequest) GetRoleId() string {
-	if x != nil && x.RoleId != nil {
-		return *x.RoleId
 	}
 	return ""
 }
@@ -223,13 +215,10 @@ var File_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x12user/v1/user.proto\x12\auser.v1\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x1bcommon/v1/annotations.proto\"\x9d\x01\n" +
+	"\x12user/v1/user.proto\x12\auser.v1\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x1bcommon/v1/annotations.proto\"i\n" +
 	"\x0fRegisterRequest\x121\n" +
 	"\x04info\x18\x01 \x01(\v2\x13.common.v1.UserInfoB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04info\x12#\n" +
-	"\bpassword\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x06R\bpassword\x12&\n" +
-	"\arole_id\x18\x03 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01H\x00R\x06roleId\x88\x01\x01B\n" +
-	"\n" +
-	"\b_role_id\"5\n" +
+	"\bpassword\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x06R\bpassword\"5\n" +
 	"\x10RegisterResponse\x12!\n" +
 	"\auser_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06userId\"3\n" +
 	"\x0eGetUserRequest\x12!\n" +
@@ -280,7 +269,6 @@ func file_user_v1_user_proto_init() {
 	if File_user_v1_user_proto != nil {
 		return
 	}
-	file_user_v1_user_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

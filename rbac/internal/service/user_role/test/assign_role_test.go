@@ -12,9 +12,9 @@ func (s *ServiceSuite) TestAssignSuccess() {
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(nil)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(nil)
 
-	err := s.service.Assign(s.ctx, userID, roleID, assignedBy)
+	err := s.service.Assign(s.ctx, userID, roleID, &assignedBy)
 
 	assert.NoError(s.T(), err)
 
@@ -25,9 +25,9 @@ func (s *ServiceSuite) TestAssignSuccessWithoutAssignedBy() {
 	userID := "user123"
 	roleID := "role456"
 
-	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, "").Return(nil)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, (*string)(nil)).Return(nil)
 
-	err := s.service.Assign(s.ctx, userID, roleID, "")
+	err := s.service.Assign(s.ctx, userID, roleID, nil)
 
 	assert.NoError(s.T(), err)
 
@@ -39,9 +39,9 @@ func (s *ServiceSuite) TestAssignAlreadyAssigned() {
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleAlreadyAssigned)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrRoleAlreadyAssigned)
 
-	err := s.service.Assign(s.ctx, userID, roleID, assignedBy)
+	err := s.service.Assign(s.ctx, userID, roleID, &assignedBy)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrRoleAlreadyAssigned, err)
@@ -54,9 +54,9 @@ func (s *ServiceSuite) TestAssignRepositoryError() {
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrInternal)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrInternal)
 
-	err := s.service.Assign(s.ctx, userID, roleID, assignedBy)
+	err := s.service.Assign(s.ctx, userID, roleID, &assignedBy)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrInternal, err)

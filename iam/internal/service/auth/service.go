@@ -8,7 +8,7 @@ import (
 	def "github.com/aleksandr-mv/school_schedule/iam/internal/service"
 )
 
-var _ def.AuthServiceInterface = (*AuthService)(nil)
+var _ def.AuthService = (*AuthService)(nil)
 
 type AuthService struct {
 	userRepository         repository.UserRepository

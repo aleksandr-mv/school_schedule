@@ -91,3 +91,12 @@ redis:
     pool_timeout: "${REDIS_POOL_TIMEOUT}"
     idle_timeout: "${REDIS_IDLE_TIMEOUT}"
     idle_check_freq: "${REDIS_IDLE_CHECK_FREQ}"
+
+kafka:
+  brokers: "${KAFKA_BROKERS}"
+  consumers:
+    user_created:
+      topic: "${KAFKA_USER_CREATED_TOPIC}"
+      group_id: "${KAFKA_USER_CREATED_GROUP_ID}"
+      enabled: ${KAFKA_ENABLED}
+  default_role_id: "${RBAC_DEFAULT_ROLE_ID}"

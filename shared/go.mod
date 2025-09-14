@@ -4,8 +4,6 @@ go 1.24.4
 
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.2.1
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.2
-	google.golang.org/genproto/googleapis/api v0.0.0-20250825161204-c5933d9347a5
 	google.golang.org/grpc v1.75.0
 	google.golang.org/protobuf v1.36.8
 )

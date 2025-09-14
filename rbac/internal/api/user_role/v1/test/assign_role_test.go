@@ -22,7 +22,7 @@ func (s *APISuite) TestAssignSuccess() {
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(nil).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(nil).Once()
 
 	resp, err := s.api.Assign(s.ctx, req)
 
@@ -42,7 +42,7 @@ func (s *APISuite) TestAssignSuccessWithoutAssignedBy() {
 		AssignedBy: nil,
 	}
 
-	s.userRoleService.On("Assign", mock.Anything, userID, roleID, "").Return(nil).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, (*string)(nil)).Return(nil).Once()
 
 	resp, err := s.api.Assign(s.ctx, req)
 
@@ -63,7 +63,7 @@ func (s *APISuite) TestAssignRoleAlreadyAssigned() {
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleAlreadyAssigned).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrRoleAlreadyAssigned).Once()
 
 	resp, err := s.api.Assign(s.ctx, req)
 
@@ -88,7 +88,7 @@ func (s *APISuite) TestAssignUserNotFound() {
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleNotFound).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrRoleNotFound).Once()
 
 	resp, err := s.api.Assign(s.ctx, req)
 
@@ -113,7 +113,7 @@ func (s *APISuite) TestAssignRoleNotFound() {
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleNotFound).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrRoleNotFound).Once()
 
 	resp, err := s.api.Assign(s.ctx, req)
 
@@ -138,7 +138,7 @@ func (s *APISuite) TestAssignInternalError() {
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrInternal).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrInternal).Once()
 
 	resp, err := s.api.Assign(s.ctx, req)
 

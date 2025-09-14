@@ -29,6 +29,7 @@ func (s *ServiceSuite) TestRegisterSuccess() {
 	}
 
 	s.userRepository.On("Create", mock.Anything, mock.AnythingOfType("model.User")).Return(expectedUser, nil)
+	s.userProducerService.On("ProduceUserCreated", mock.Anything, mock.AnythingOfType("model.UserCreated")).Return(nil)
 
 	result, err := s.service.Register(s.ctx, createUser)
 
@@ -39,6 +40,7 @@ func (s *ServiceSuite) TestRegisterSuccess() {
 	assert.Equal(s.T(), expectedUser.Email, result.Email)
 
 	s.userRepository.AssertExpectations(s.T())
+	s.userProducerService.AssertExpectations(s.T())
 }
 
 func (s *ServiceSuite) TestRegisterUserAlreadyExists() {
@@ -57,6 +59,8 @@ func (s *ServiceSuite) TestRegisterUserAlreadyExists() {
 	assert.Nil(s.T(), result)
 
 	s.userRepository.AssertExpectations(s.T())
+	// Producer не должен быть вызван, если пользователь не создан
+	s.userProducerService.AssertNotCalled(s.T(), "ProduceUserCreated")
 }
 
 func (s *ServiceSuite) TestRegisterInvalidData() {
@@ -73,6 +77,7 @@ func (s *ServiceSuite) TestRegisterInvalidData() {
 	assert.Nil(s.T(), result)
 
 	s.userRepository.AssertNotCalled(s.T(), "Create")
+	s.userProducerService.AssertNotCalled(s.T(), "ProduceUserCreated")
 }
 
 func (s *ServiceSuite) TestRegisterRepositoryError() {

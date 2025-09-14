@@ -23,7 +23,7 @@ func (_m *UserRoleServiceInterface) EXPECT() *UserRoleServiceInterface_Expecter 
 }
 
 // Assign provides a mock function with given fields: ctx, userID, roleID, assignedBy
-func (_m *UserRoleServiceInterface) Assign(ctx context.Context, userID string, roleID string, assignedBy string) error {
+func (_m *UserRoleServiceInterface) Assign(ctx context.Context, userID string, roleID string, assignedBy *string) error {
 	ret := _m.Called(ctx, userID, roleID, assignedBy)
 
 	if len(ret) == 0 {
@@ -31,7 +31,7 @@ func (_m *UserRoleServiceInterface) Assign(ctx context.Context, userID string, r
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, *string) error); ok {
 		r0 = rf(ctx, userID, roleID, assignedBy)
 	} else {
 		r0 = ret.Error(0)
@@ -49,14 +49,14 @@ type UserRoleServiceInterface_Assign_Call struct {
 //   - ctx context.Context
 //   - userID string
 //   - roleID string
-//   - assignedBy string
+//   - assignedBy *string
 func (_e *UserRoleServiceInterface_Expecter) Assign(ctx interface{}, userID interface{}, roleID interface{}, assignedBy interface{}) *UserRoleServiceInterface_Assign_Call {
 	return &UserRoleServiceInterface_Assign_Call{Call: _e.mock.On("Assign", ctx, userID, roleID, assignedBy)}
 }
 
-func (_c *UserRoleServiceInterface_Assign_Call) Run(run func(ctx context.Context, userID string, roleID string, assignedBy string)) *UserRoleServiceInterface_Assign_Call {
+func (_c *UserRoleServiceInterface_Assign_Call) Run(run func(ctx context.Context, userID string, roleID string, assignedBy *string)) *UserRoleServiceInterface_Assign_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string))
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(*string))
 	})
 	return _c
 }
@@ -66,7 +66,7 @@ func (_c *UserRoleServiceInterface_Assign_Call) Return(_a0 error) *UserRoleServi
 	return _c
 }
 
-func (_c *UserRoleServiceInterface_Assign_Call) RunAndReturn(run func(context.Context, string, string, string) error) *UserRoleServiceInterface_Assign_Call {
+func (_c *UserRoleServiceInterface_Assign_Call) RunAndReturn(run func(context.Context, string, string, *string) error) *UserRoleServiceInterface_Assign_Call {
 	_c.Call.Return(run)
 	return _c
 }

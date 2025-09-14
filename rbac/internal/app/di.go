@@ -8,10 +8,11 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/builder"
+	cacheBuilder "github.com/aleksandr-mv/school_schedule/platform/pkg/cache/builder"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/builder"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/migrator"
 	permissionAPI "github.com/aleksandr-mv/school_schedule/rbac/internal/api/permission/v1"
@@ -28,6 +29,7 @@ import (
 	permissionService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/permission"
 	roleService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/role"
 	rolePermissionService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/role_permission"
+	userConsumerService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/user_consumer"
 	userRoleService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/user_role"
 	permissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1"
 	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
@@ -47,6 +49,9 @@ type diContainer struct {
 	permissionService     service.PermissionServiceInterface
 	rolePermissionService service.RolePermissionServiceInterface
 	userRoleService       service.UserRoleServiceInterface
+	userConsumerService   service.UserConsumerService
+
+	kafkaBuilder *builder.KafkaBuilder
 
 	roleRepository           repository.RoleRepository
 	permissionRepository     repository.PermissionRepository
@@ -281,7 +286,7 @@ func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
 
 func (d *diContainer) RedisClient(ctx context.Context) (cache.RedisClient, error) {
 	if d.redisClient == nil {
-		redisBuilder := builder.NewRedisBuilder(d.cfg.Redis())
+		redisBuilder := cacheBuilder.NewRedisBuilder(d.cfg.Redis())
 		redigoPool, err := redisBuilder.BuildPool()
 		if err != nil {
 			return nil, err
@@ -328,4 +333,45 @@ func (d *diContainer) RunMigrations(ctx context.Context) error {
 	d.migrator = mig
 
 	return nil
+}
+
+func (d *diContainer) KafkaBuilder() *builder.KafkaBuilder {
+	if d.kafkaBuilder == nil {
+		d.kafkaBuilder = builder.NewKafkaBuilder(d.cfg.Kafka())
+	}
+	return d.kafkaBuilder
+}
+
+func (d *diContainer) UserConsumerService(ctx context.Context) (service.UserConsumerService, error) {
+	if d.userConsumerService == nil {
+		if !d.cfg.Kafka().IsEnabled() {
+			logger.Info(ctx, "⚠️ [Kafka] Kafka отключен, создаем no-op consumer")
+			d.userConsumerService = userConsumerService.NewNoOpService()
+			return d.userConsumerService, nil
+		}
+
+		userCreatedConsumer, err := d.KafkaBuilder().BuildConsumer("user_created")
+		if err != nil {
+			return nil, fmt.Errorf("get user created consumer: %w", err)
+		}
+
+		userRoleService, err := d.UserRoleService(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("get user role service: %w", err)
+		}
+
+		d.userConsumerService = userConsumerService.NewService(
+			userCreatedConsumer,
+			userRoleService,
+		)
+
+		closer.AddNamed("Kafka user_created consumer", func(ctx context.Context) error {
+			logger.Info(ctx, "📥 [Shutdown] Закрытие Kafka user_created consumer")
+			return nil // Consumer закрывается автоматически
+		})
+
+		logger.Info(ctx, "✅ [Kafka] UserCreated consumer создан")
+	}
+
+	return d.userConsumerService, nil
 }

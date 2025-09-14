@@ -2,19 +2,25 @@ package user
 
 import (
 	"github.com/aleksandr-mv/school_schedule/iam/internal/repository"
-	def "github.com/aleksandr-mv/school_schedule/iam/internal/service"
+	"github.com/aleksandr-mv/school_schedule/iam/internal/service"
 )
 
-var _ def.UserServiceInterface = (*UserService)(nil)
+var _ service.UserService = (*UserService)(nil)
 
 type UserService struct {
 	userRepository         repository.UserRepository
 	notificationRepository repository.NotificationRepository
+	userProducerService    service.UserProducerService
 }
 
-func NewService(userRepository repository.UserRepository, notificationRepository repository.NotificationRepository) *UserService {
+func NewService(
+	userRepository repository.UserRepository,
+	notificationRepository repository.NotificationRepository,
+	userProducerService service.UserProducerService,
+) *UserService {
 	return &UserService{
 		userRepository:         userRepository,
 		notificationRepository: notificationRepository,
+		userProducerService:    userProducerService,
 	}
 }

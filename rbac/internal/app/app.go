@@ -42,7 +42,53 @@ func New(ctx context.Context, cfg contracts.Provider) (*App, error) {
 }
 
 func (app *App) Start(ctx context.Context) error {
-	return app.runGRPCServer(ctx)
+	return app.Run(ctx)
+}
+
+func (app *App) Run(ctx context.Context) error {
+	errCh := make(chan error, 1)
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	go func() {
+		if err := app.runKafkaConsumer(ctx); err != nil {
+			errCh <- fmt.Errorf("kafka consumer crashed: %w", err)
+		}
+	}()
+
+	go func() {
+		if err := app.runGRPCServer(ctx); err != nil {
+			errCh <- fmt.Errorf("gRPC server crashed: %w", err)
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		logger.Info(ctx, "Shutdown signal received")
+	case err := <-errCh:
+		logger.Error(ctx, "Component crashed, shutting down", zap.Error(err))
+		cancel()
+		<-ctx.Done()
+		return err
+	}
+
+	return nil
+}
+
+func (app *App) runKafkaConsumer(ctx context.Context) error {
+	logger.Info(ctx, "🚀 [Kafka] Запуск Kafka consumer для UserCreated событий")
+
+	consumerService, err := app.diContainer.UserConsumerService(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get user consumer service: %w", err)
+	}
+
+	if err = consumerService.Run(ctx); err != nil {
+		return fmt.Errorf("failed to run user consumer: %w", err)
+	}
+
+	return nil
 }
 
 func (app *App) initDeps(ctx context.Context) error {

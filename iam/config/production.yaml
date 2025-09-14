@@ -91,3 +91,9 @@ redis:
     pool_timeout: "${REDIS_POOL_TIMEOUT}"
     idle_timeout: "${REDIS_IDLE_TIMEOUT}"
     idle_check_freq: "${REDIS_IDLE_CHECK_FREQ}"
+
+services:
+  rbac:
+    address: "${RBAC_ADDRESS}"
+    port: ${RBAC_PORT}
+    timeout: "${RBAC_TIMEOUT}"

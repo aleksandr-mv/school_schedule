@@ -49,5 +49,15 @@ func (s *UserService) Register(ctx context.Context, createUser *model.CreateUser
 		return nil, err
 	}
 
+	// Все новые пользователи получают роль admin по умолчанию
+	defaultRoleID := model.DefaultRoleID
+	if err := s.userProducerService.ProduceUserCreated(ctx, model.NewUserCreated(createdUser, defaultRoleID)); err != nil {
+		logger.Error(ctx,
+			"❌ [Service] Ошибка отправки события UserCreated",
+			zap.Error(err),
+			zap.String("operation", "user.Service.Register"),
+		)
+	}
+
 	return createdUser, nil
 }

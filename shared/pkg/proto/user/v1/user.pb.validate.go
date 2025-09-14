@@ -111,32 +111,8 @@ func (m *RegisterRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.RoleId != nil {
-
-		if err := m._validateUuid(m.GetRoleId()); err != nil {
-			err = RegisterRequestValidationError{
-				field:  "RoleId",
-				reason: "value must be a valid UUID",
-				cause:  err,
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-	}
-
 	if len(errors) > 0 {
 		return RegisterRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-func (m *RegisterRequest) _validateUuid(uuid string) error {
-	if matched := _user_uuidPattern.MatchString(uuid); !matched {
-		return errors.New("invalid uuid format")
 	}
 
 	return nil

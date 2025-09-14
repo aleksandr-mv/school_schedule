@@ -23,7 +23,6 @@ service UserService {
 message RegisterRequest {
   common.v1.UserInfo info = 1 [(validate.rules).message.required = true];
   string password = 2 [(validate.rules).string.min_len = 6];
-  optional string role_id = 3 [(validate.rules).string.uuid = true];
 }
 
 // Ответ на регистрацию

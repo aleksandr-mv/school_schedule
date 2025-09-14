@@ -10,7 +10,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
 )
 
-func (s *UserRoleService) Assign(ctx context.Context, userID, roleID, assignedBy string) error {
+func (s *UserRoleService) Assign(ctx context.Context, userID, roleID string, assignedBy *string) error {
 	ctx, span := tracing.StartSpan(ctx, "rbac.service.assign")
 	defer span.End()
 

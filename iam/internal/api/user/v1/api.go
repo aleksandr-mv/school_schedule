@@ -7,10 +7,10 @@ import (
 
 type API struct {
 	userV1.UnimplementedUserServiceServer
-	userService service.UserServiceInterface
+	userService service.UserService
 }
 
-func NewAPI(userService service.UserServiceInterface) *API {
+func NewAPI(userService service.UserService) *API {
 	return &API{
 		userService: userService,
 	}

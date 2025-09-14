@@ -20,12 +20,14 @@ import (
 	"github.com/aleksandr-mv/school_schedule/iam/internal/service"
 	authService "github.com/aleksandr-mv/school_schedule/iam/internal/service/auth"
 	userService "github.com/aleksandr-mv/school_schedule/iam/internal/service/user"
+	userProducerService "github.com/aleksandr-mv/school_schedule/iam/internal/service/user_producer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/builder"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
 	grpcclient "github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/client"
+	kafkaBuilder "github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/builder"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/migrator"
 	authv1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
@@ -39,14 +41,16 @@ type diContainer struct {
 	authV1 authv1.AuthServiceServer
 	userV1 userV1.UserServiceServer
 
-	authService service.AuthServiceInterface
-	userService service.UserServiceInterface
+	authService service.AuthService
+	userService service.UserService
 
 	rbacClient grpcClient.RBACClient
 
 	userRepository         repository.UserRepository
 	sessionRepository      repository.SessionRepository
 	notificationRepository repository.NotificationRepository
+
+	userProducerService service.UserProducerService
 
 	postgresPool *pgxpool.Pool
 	redisClient  cache.RedisClient
@@ -83,7 +87,7 @@ func (d *diContainer) UserV1API(ctx context.Context) (userV1.UserServiceServer, 
 	return d.userV1, nil
 }
 
-func (d *diContainer) AuthService(ctx context.Context) (service.AuthServiceInterface, error) {
+func (d *diContainer) AuthService(ctx context.Context) (service.AuthService, error) {
 	if d.authService == nil {
 		userRepo, err := d.UserRepository(ctx)
 		if err != nil {
@@ -111,7 +115,7 @@ func (d *diContainer) AuthService(ctx context.Context) (service.AuthServiceInter
 	return d.authService, nil
 }
 
-func (d *diContainer) UserService(ctx context.Context) (service.UserServiceInterface, error) {
+func (d *diContainer) UserService(ctx context.Context) (service.UserService, error) {
 	if d.userService == nil {
 		userRepo, err := d.UserRepository(ctx)
 		if err != nil {
@@ -123,7 +127,12 @@ func (d *diContainer) UserService(ctx context.Context) (service.UserServiceInter
 			return nil, err
 		}
 
-		d.userService = userService.NewService(userRepo, notificationRepo)
+		userProducerService, err := d.UserProducerService(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.userService = userService.NewService(userRepo, notificationRepo, userProducerService)
 	}
 
 	return d.userService, nil
@@ -287,4 +296,31 @@ func (d *diContainer) dialServiceConn(ctx context.Context, serviceName string) (
 	}
 
 	return conn, addr, nil
+}
+
+func (d *diContainer) UserProducerService(ctx context.Context) (service.UserProducerService, error) {
+	if d.userProducerService == nil {
+		if !d.cfg.Kafka().IsEnabled() {
+			logger.Info(ctx, "⚠️ [Kafka] Kafka отключен, создаем no-op producer")
+			d.userProducerService = userProducerService.NewNoOpService()
+			return d.userProducerService, nil
+		}
+
+		kafkaBuilder := kafkaBuilder.NewKafkaBuilder(d.cfg.Kafka())
+		userCreatedProducer, err := kafkaBuilder.BuildProducer("user_created")
+		if err != nil {
+			return nil, fmt.Errorf("failed to build user_created producer: %w", err)
+		}
+
+		d.userProducerService = userProducerService.NewService(userCreatedProducer)
+
+		closer.AddNamed("Kafka user_created producer", func(ctx context.Context) error {
+			logger.Info(ctx, "📤 [Shutdown] Закрытие Kafka user_created producer")
+			return nil // Producer закрывается автоматически
+		})
+
+		logger.Info(ctx, "✅ [Kafka] UserCreated producer создан")
+	}
+
+	return d.userProducerService, nil
 }

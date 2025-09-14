@@ -94,3 +94,12 @@ redis:
 
 session:
   ttl: "24h" 
+
+kafka:
+  brokers: "localhost:9092"
+  consumers:
+    user_created:
+      topic: "iam.user.created"
+      group_id: "rbac-user-created-consumer"
+      enabled: true
+  default_role_id: "default-user-role"

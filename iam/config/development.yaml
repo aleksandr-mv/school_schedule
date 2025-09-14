@@ -95,4 +95,15 @@ redis:
 session:
   ttl: "24h" 
 
+kafka:
+  brokers: "localhost:9092"
+  producers:
+    user_created:
+      topic: "iam.user.created"
+      enabled: true
 
+services:
+  rbac:
+    address: "localhost"
+    port: 50052
+    timeout: "5s"

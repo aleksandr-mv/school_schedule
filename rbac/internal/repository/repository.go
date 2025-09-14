@@ -22,7 +22,7 @@ type PermissionRepository interface {
 }
 
 type UserRoleRepository interface {
-	Assign(ctx context.Context, userID, roleID, assignedBy string) error
+	Assign(ctx context.Context, userID, roleID string, assignedBy *string) error
 	Revoke(ctx context.Context, userID, roleID string) error
 	GetUserRoles(ctx context.Context, userID string) ([]string, error)
 	GetRoleUsers(ctx context.Context, roleID string, limit int32, cursor string) ([]string, *string, error)

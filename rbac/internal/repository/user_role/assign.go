@@ -10,7 +10,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (r *userRoleRepository) Assign(ctx context.Context, userID, roleID, assignedBy string) error {
+func (r *userRoleRepository) Assign(ctx context.Context, userID, roleID string, assignedBy *string) error {
 	query := `INSERT INTO user_roles (user_id, role_id, assigned_by) VALUES ($1, $2, $3)`
 	result, err := r.pool.Exec(ctx, query, userID, roleID, assignedBy)
 	if err != nil {
