@@ -15,9 +15,7 @@ type ServiceSuite struct {
 	suite.Suite
 	ctx context.Context // nolint:containedctx
 
-	permissionRepository     *mocks.PermissionRepository
-	rolePermissionRepository *mocks.RolePermissionRepository
-	userRoleRepository       *mocks.UserRoleRepository
+	permissionRepository *mocks.PermissionRepository
 
 	service *permission.PermissionService
 }
@@ -30,16 +28,12 @@ func (s *ServiceSuite) SetupSuite() {
 	}
 
 	s.permissionRepository = mocks.NewPermissionRepository(s.T())
-	s.rolePermissionRepository = mocks.NewRolePermissionRepository(s.T())
-	s.userRoleRepository = mocks.NewUserRoleRepository(s.T())
 
-	s.service = permission.NewService(s.permissionRepository, s.rolePermissionRepository, s.userRoleRepository)
+	s.service = permission.NewService(s.permissionRepository)
 }
 
 func (s *ServiceSuite) SetupTest() {
 	s.permissionRepository.ExpectedCalls = nil
-	s.rolePermissionRepository.ExpectedCalls = nil
-	s.userRoleRepository.ExpectedCalls = nil
 }
 
 func (s *ServiceSuite) TearDownTest() {

@@ -8,12 +8,8 @@ import (
 
 // UserRole представляет связь пользователь-роль
 type UserRole struct {
-	UserID     uuid.UUID  `validate:"required"`
-	RoleID     uuid.UUID  `validate:"required"`
-	AssignedBy *uuid.UUID `validate:"required"`
+	UserID     uuid.UUID
+	RoleID     uuid.UUID
+	AssignedBy *uuid.UUID
 	AssignedAt time.Time
-}
-
-func (ur *UserRole) Validate() error {
-	return validate.Struct(ur)
 }

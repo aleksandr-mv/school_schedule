@@ -11,18 +11,11 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *PermissionService) ListPermissions(ctx context.Context, filter *model.ListPermissionsFilter) ([]*model.Permission, error) {
+func (s *PermissionService) List(ctx context.Context) ([]*model.Permission, error) {
 	ctx, span := tracing.StartSpan(ctx, "rbac.service.list_permissions")
 	defer span.End()
 
-	if err := filter.Validate(); err != nil {
-		logger.Error(ctx, "❌ [Service] Ошибка валидации фильтра прав доступа", zap.Error(err))
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		return nil, model.ErrInvalidCredentials
-	}
-
-	permissions, err := s.permissionRepo.List(ctx, filter)
+	permissions, err := s.permissionRepo.List(ctx)
 	if err != nil {
 		logger.Error(ctx, "❌ [Service] Ошибка получения списка прав доступа из репозитория", zap.Error(err))
 		span.RecordError(err)

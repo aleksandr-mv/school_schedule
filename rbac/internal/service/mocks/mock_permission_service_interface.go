@@ -22,185 +22,29 @@ func (_m *PermissionServiceInterface) EXPECT() *PermissionServiceInterface_Expec
 	return &PermissionServiceInterface_Expecter{mock: &_m.Mock}
 }
 
-// AssignPermissionToRole provides a mock function with given fields: ctx, roleID, permissionID
-func (_m *PermissionServiceInterface) AssignPermissionToRole(ctx context.Context, roleID string, permissionID string) error {
-	ret := _m.Called(ctx, roleID, permissionID)
+// List provides a mock function with given fields: ctx
+func (_m *PermissionServiceInterface) List(ctx context.Context) ([]*model.Permission, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AssignPermissionToRole")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
-		r0 = rf(ctx, roleID, permissionID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// PermissionServiceInterface_AssignPermissionToRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AssignPermissionToRole'
-type PermissionServiceInterface_AssignPermissionToRole_Call struct {
-	*mock.Call
-}
-
-// AssignPermissionToRole is a helper method to define mock.On call
-//   - ctx context.Context
-//   - roleID string
-//   - permissionID string
-func (_e *PermissionServiceInterface_Expecter) AssignPermissionToRole(ctx interface{}, roleID interface{}, permissionID interface{}) *PermissionServiceInterface_AssignPermissionToRole_Call {
-	return &PermissionServiceInterface_AssignPermissionToRole_Call{Call: _e.mock.On("AssignPermissionToRole", ctx, roleID, permissionID)}
-}
-
-func (_c *PermissionServiceInterface_AssignPermissionToRole_Call) Run(run func(ctx context.Context, roleID string, permissionID string)) *PermissionServiceInterface_AssignPermissionToRole_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionServiceInterface_AssignPermissionToRole_Call) Return(_a0 error) *PermissionServiceInterface_AssignPermissionToRole_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *PermissionServiceInterface_AssignPermissionToRole_Call) RunAndReturn(run func(context.Context, string, string) error) *PermissionServiceInterface_AssignPermissionToRole_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// CheckPermission provides a mock function with given fields: ctx, userID, resource, action
-func (_m *PermissionServiceInterface) CheckPermission(ctx context.Context, userID string, resource string, action string) error {
-	ret := _m.Called(ctx, userID, resource, action)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CheckPermission")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) error); ok {
-		r0 = rf(ctx, userID, resource, action)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// PermissionServiceInterface_CheckPermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckPermission'
-type PermissionServiceInterface_CheckPermission_Call struct {
-	*mock.Call
-}
-
-// CheckPermission is a helper method to define mock.On call
-//   - ctx context.Context
-//   - userID string
-//   - resource string
-//   - action string
-func (_e *PermissionServiceInterface_Expecter) CheckPermission(ctx interface{}, userID interface{}, resource interface{}, action interface{}) *PermissionServiceInterface_CheckPermission_Call {
-	return &PermissionServiceInterface_CheckPermission_Call{Call: _e.mock.On("CheckPermission", ctx, userID, resource, action)}
-}
-
-func (_c *PermissionServiceInterface_CheckPermission_Call) Run(run func(ctx context.Context, userID string, resource string, action string)) *PermissionServiceInterface_CheckPermission_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionServiceInterface_CheckPermission_Call) Return(_a0 error) *PermissionServiceInterface_CheckPermission_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *PermissionServiceInterface_CheckPermission_Call) RunAndReturn(run func(context.Context, string, string, string) error) *PermissionServiceInterface_CheckPermission_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetPermission provides a mock function with given fields: ctx, value
-func (_m *PermissionServiceInterface) GetPermission(ctx context.Context, value string) (*model.Permission, error) {
-	ret := _m.Called(ctx, value)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetPermission")
-	}
-
-	var r0 *model.Permission
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.Permission, error)); ok {
-		return rf(ctx, value)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *model.Permission); ok {
-		r0 = rf(ctx, value)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.Permission)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, value)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// PermissionServiceInterface_GetPermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPermission'
-type PermissionServiceInterface_GetPermission_Call struct {
-	*mock.Call
-}
-
-// GetPermission is a helper method to define mock.On call
-//   - ctx context.Context
-//   - value string
-func (_e *PermissionServiceInterface_Expecter) GetPermission(ctx interface{}, value interface{}) *PermissionServiceInterface_GetPermission_Call {
-	return &PermissionServiceInterface_GetPermission_Call{Call: _e.mock.On("GetPermission", ctx, value)}
-}
-
-func (_c *PermissionServiceInterface_GetPermission_Call) Run(run func(ctx context.Context, value string)) *PermissionServiceInterface_GetPermission_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionServiceInterface_GetPermission_Call) Return(_a0 *model.Permission, _a1 error) *PermissionServiceInterface_GetPermission_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *PermissionServiceInterface_GetPermission_Call) RunAndReturn(run func(context.Context, string) (*model.Permission, error)) *PermissionServiceInterface_GetPermission_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// ListPermissions provides a mock function with given fields: ctx, filter
-func (_m *PermissionServiceInterface) ListPermissions(ctx context.Context, filter *model.ListPermissionsFilter) ([]*model.Permission, error) {
-	ret := _m.Called(ctx, filter)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListPermissions")
+		panic("no return value specified for List")
 	}
 
 	var r0 []*model.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.ListPermissionsFilter) ([]*model.Permission, error)); ok {
-		return rf(ctx, filter)
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*model.Permission, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.ListPermissionsFilter) []*model.Permission); ok {
-		r0 = rf(ctx, filter)
+	if rf, ok := ret.Get(0).(func(context.Context) []*model.Permission); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*model.Permission)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.ListPermissionsFilter) error); ok {
-		r1 = rf(ctx, filter)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -208,197 +52,30 @@ func (_m *PermissionServiceInterface) ListPermissions(ctx context.Context, filte
 	return r0, r1
 }
 
-// PermissionServiceInterface_ListPermissions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListPermissions'
-type PermissionServiceInterface_ListPermissions_Call struct {
+// PermissionServiceInterface_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type PermissionServiceInterface_List_Call struct {
 	*mock.Call
 }
 
-// ListPermissions is a helper method to define mock.On call
+// List is a helper method to define mock.On call
 //   - ctx context.Context
-//   - filter *model.ListPermissionsFilter
-func (_e *PermissionServiceInterface_Expecter) ListPermissions(ctx interface{}, filter interface{}) *PermissionServiceInterface_ListPermissions_Call {
-	return &PermissionServiceInterface_ListPermissions_Call{Call: _e.mock.On("ListPermissions", ctx, filter)}
+func (_e *PermissionServiceInterface_Expecter) List(ctx interface{}) *PermissionServiceInterface_List_Call {
+	return &PermissionServiceInterface_List_Call{Call: _e.mock.On("List", ctx)}
 }
 
-func (_c *PermissionServiceInterface_ListPermissions_Call) Run(run func(ctx context.Context, filter *model.ListPermissionsFilter)) *PermissionServiceInterface_ListPermissions_Call {
+func (_c *PermissionServiceInterface_List_Call) Run(run func(ctx context.Context)) *PermissionServiceInterface_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.ListPermissionsFilter))
+		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *PermissionServiceInterface_ListPermissions_Call) Return(_a0 []*model.Permission, _a1 error) *PermissionServiceInterface_ListPermissions_Call {
+func (_c *PermissionServiceInterface_List_Call) Return(_a0 []*model.Permission, _a1 error) *PermissionServiceInterface_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *PermissionServiceInterface_ListPermissions_Call) RunAndReturn(run func(context.Context, *model.ListPermissionsFilter) ([]*model.Permission, error)) *PermissionServiceInterface_ListPermissions_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// ListPermissionsByRole provides a mock function with given fields: ctx, roleValue
-func (_m *PermissionServiceInterface) ListPermissionsByRole(ctx context.Context, roleValue string) ([]*model.Permission, error) {
-	ret := _m.Called(ctx, roleValue)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListPermissionsByRole")
-	}
-
-	var r0 []*model.Permission
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) ([]*model.Permission, error)); ok {
-		return rf(ctx, roleValue)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) []*model.Permission); ok {
-		r0 = rf(ctx, roleValue)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*model.Permission)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, roleValue)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// PermissionServiceInterface_ListPermissionsByRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListPermissionsByRole'
-type PermissionServiceInterface_ListPermissionsByRole_Call struct {
-	*mock.Call
-}
-
-// ListPermissionsByRole is a helper method to define mock.On call
-//   - ctx context.Context
-//   - roleValue string
-func (_e *PermissionServiceInterface_Expecter) ListPermissionsByRole(ctx interface{}, roleValue interface{}) *PermissionServiceInterface_ListPermissionsByRole_Call {
-	return &PermissionServiceInterface_ListPermissionsByRole_Call{Call: _e.mock.On("ListPermissionsByRole", ctx, roleValue)}
-}
-
-func (_c *PermissionServiceInterface_ListPermissionsByRole_Call) Run(run func(ctx context.Context, roleValue string)) *PermissionServiceInterface_ListPermissionsByRole_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionServiceInterface_ListPermissionsByRole_Call) Return(_a0 []*model.Permission, _a1 error) *PermissionServiceInterface_ListPermissionsByRole_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *PermissionServiceInterface_ListPermissionsByRole_Call) RunAndReturn(run func(context.Context, string) ([]*model.Permission, error)) *PermissionServiceInterface_ListPermissionsByRole_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// ListRolesByPermission provides a mock function with given fields: ctx, permissionValue
-func (_m *PermissionServiceInterface) ListRolesByPermission(ctx context.Context, permissionValue string) ([]*model.Role, error) {
-	ret := _m.Called(ctx, permissionValue)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListRolesByPermission")
-	}
-
-	var r0 []*model.Role
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) ([]*model.Role, error)); ok {
-		return rf(ctx, permissionValue)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) []*model.Role); ok {
-		r0 = rf(ctx, permissionValue)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*model.Role)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, permissionValue)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// PermissionServiceInterface_ListRolesByPermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRolesByPermission'
-type PermissionServiceInterface_ListRolesByPermission_Call struct {
-	*mock.Call
-}
-
-// ListRolesByPermission is a helper method to define mock.On call
-//   - ctx context.Context
-//   - permissionValue string
-func (_e *PermissionServiceInterface_Expecter) ListRolesByPermission(ctx interface{}, permissionValue interface{}) *PermissionServiceInterface_ListRolesByPermission_Call {
-	return &PermissionServiceInterface_ListRolesByPermission_Call{Call: _e.mock.On("ListRolesByPermission", ctx, permissionValue)}
-}
-
-func (_c *PermissionServiceInterface_ListRolesByPermission_Call) Run(run func(ctx context.Context, permissionValue string)) *PermissionServiceInterface_ListRolesByPermission_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionServiceInterface_ListRolesByPermission_Call) Return(_a0 []*model.Role, _a1 error) *PermissionServiceInterface_ListRolesByPermission_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *PermissionServiceInterface_ListRolesByPermission_Call) RunAndReturn(run func(context.Context, string) ([]*model.Role, error)) *PermissionServiceInterface_ListRolesByPermission_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// RevokePermissionFromRole provides a mock function with given fields: ctx, roleID, permissionID
-func (_m *PermissionServiceInterface) RevokePermissionFromRole(ctx context.Context, roleID string, permissionID string) error {
-	ret := _m.Called(ctx, roleID, permissionID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for RevokePermissionFromRole")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
-		r0 = rf(ctx, roleID, permissionID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// PermissionServiceInterface_RevokePermissionFromRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RevokePermissionFromRole'
-type PermissionServiceInterface_RevokePermissionFromRole_Call struct {
-	*mock.Call
-}
-
-// RevokePermissionFromRole is a helper method to define mock.On call
-//   - ctx context.Context
-//   - roleID string
-//   - permissionID string
-func (_e *PermissionServiceInterface_Expecter) RevokePermissionFromRole(ctx interface{}, roleID interface{}, permissionID interface{}) *PermissionServiceInterface_RevokePermissionFromRole_Call {
-	return &PermissionServiceInterface_RevokePermissionFromRole_Call{Call: _e.mock.On("RevokePermissionFromRole", ctx, roleID, permissionID)}
-}
-
-func (_c *PermissionServiceInterface_RevokePermissionFromRole_Call) Run(run func(ctx context.Context, roleID string, permissionID string)) *PermissionServiceInterface_RevokePermissionFromRole_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionServiceInterface_RevokePermissionFromRole_Call) Return(_a0 error) *PermissionServiceInterface_RevokePermissionFromRole_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *PermissionServiceInterface_RevokePermissionFromRole_Call) RunAndReturn(run func(context.Context, string, string) error) *PermissionServiceInterface_RevokePermissionFromRole_Call {
+func (_c *PermissionServiceInterface_List_Call) RunAndReturn(run func(context.Context) ([]*model.Permission, error)) *PermissionServiceInterface_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

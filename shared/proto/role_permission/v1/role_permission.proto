@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package role_permission.v1;
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "common/v1/annotations.proto";
+
+option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role_permission/v1;role_permission_v1";
+
+// =============================================================================
+// RolePermissionService (role_permission.v1)
+// =============================================================================
+
+service RolePermissionService {
+  // =============================================================================
+  // Управление связями роль-право
+  // =============================================================================
+
+  // Назначение права роли
+  rpc Assign(AssignRequest) returns (google.protobuf.Empty) {
+    option (common.v1.permission) = "role_permission:write";
+  }
+
+  // Отзыв права у роли
+  rpc Revoke(RevokeRequest) returns (google.protobuf.Empty) {
+    option (common.v1.permission) = "role_permission:write";
+  }
+}
+
+// =============================================================================
+// Messages
+// =============================================================================
+
+// =============================================================================
+// Assign
+// =============================================================================
+
+// Запрос на назначение права роли
+message AssignRequest {
+  string role_id = 1 [(validate.rules).string.uuid = true];
+  string permission_id = 2 [(validate.rules).string.uuid = true];
+}
+
+// =============================================================================
+// Revoke
+// =============================================================================
+
+// Запрос на отзыв права у роли
+message RevokeRequest {
+  string role_id = 1 [(validate.rules).string.uuid = true];
+  string permission_id = 2 [(validate.rules).string.uuid = true];
+}
+
+

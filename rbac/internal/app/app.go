@@ -20,6 +20,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
 	permissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1"
 	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
+	rolePermissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role_permission/v1"
 	userRoleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
@@ -189,7 +190,8 @@ func (app *App) initGRPCServer(ctx context.Context) error {
 		app.cfg.Transport().GRPCClientLimits().MaxRecvMsgSize(),
 		app.cfg.Transport().GRPCClientLimits().MaxSendMsgSize(),
 		tracing.UnaryServerInterceptor(app.cfg.App().Name()),
-		metric.UnaryServerInterceptor(ctx, app.cfg.Metric().BucketBoundaries()))
+		metric.UnaryServerInterceptor(ctx, app.cfg.Metric().BucketBoundaries()),
+	)
 
 	closer.AddNamed("gRPC server", func(ctx context.Context) error {
 		logger.Info(ctx, "⚡ [Shutdown] Остановка gRPC сервера")
@@ -207,6 +209,11 @@ func (app *App) initGRPCServer(ctx context.Context) error {
 		return fmt.Errorf("create permission v1 api: %w", err)
 	}
 
+	rolePermissionAPI, err := app.diContainer.RolePermissionV1API(ctx)
+	if err != nil {
+		return fmt.Errorf("create role_permission v1 api: %w", err)
+	}
+
 	userRoleAPI, err := app.diContainer.UserRoleV1API(ctx)
 	if err != nil {
 		return fmt.Errorf("create user_role v1 api: %w", err)
@@ -216,10 +223,12 @@ func (app *App) initGRPCServer(ctx context.Context) error {
 	health.RegisterService(app.grpcServer)
 	roleV1.RegisterRoleServiceServer(app.grpcServer, roleAPI)
 	permissionV1.RegisterPermissionServiceServer(app.grpcServer, permissionAPI)
+	rolePermissionV1.RegisterRolePermissionServiceServer(app.grpcServer, rolePermissionAPI)
 	userRoleV1.RegisterUserRoleServiceServer(app.grpcServer, userRoleAPI)
 
 	logger.Info(ctx, "✅ [App] Role API инициализирован")
 	logger.Info(ctx, "✅ [App] Permission API инициализирован")
+	logger.Info(ctx, "✅ [App] RolePermission API инициализирован")
 	logger.Info(ctx, "✅ [App] UserRole API инициализирован")
 	logger.Info(ctx, "✅ [gRPC] Сервер успешно инициализирован")
 
@@ -233,7 +242,7 @@ func (app *App) runGRPCServer(ctx context.Context) error {
 	)
 
 	err := app.grpcServer.Serve(app.listener)
-	if err != nil {
+	if err != nil && !errors.Is(err, net.ErrClosed) {
 		return err
 	}
 

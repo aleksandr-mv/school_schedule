@@ -22,12 +22,12 @@ func (_m *RolePermissionRepository) EXPECT() *RolePermissionRepository_Expecter 
 	return &RolePermissionRepository_Expecter{mock: &_m.Mock}
 }
 
-// AssignPermissionToRole provides a mock function with given fields: ctx, roleID, permissionID
-func (_m *RolePermissionRepository) AssignPermissionToRole(ctx context.Context, roleID string, permissionID string) error {
+// Assign provides a mock function with given fields: ctx, roleID, permissionID
+func (_m *RolePermissionRepository) Assign(ctx context.Context, roleID string, permissionID string) error {
 	ret := _m.Called(ctx, roleID, permissionID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AssignPermissionToRole")
+		panic("no return value specified for Assign")
 	}
 
 	var r0 error
@@ -40,109 +40,51 @@ func (_m *RolePermissionRepository) AssignPermissionToRole(ctx context.Context, 
 	return r0
 }
 
-// RolePermissionRepository_AssignPermissionToRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AssignPermissionToRole'
-type RolePermissionRepository_AssignPermissionToRole_Call struct {
+// RolePermissionRepository_Assign_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Assign'
+type RolePermissionRepository_Assign_Call struct {
 	*mock.Call
 }
 
-// AssignPermissionToRole is a helper method to define mock.On call
+// Assign is a helper method to define mock.On call
 //   - ctx context.Context
 //   - roleID string
 //   - permissionID string
-func (_e *RolePermissionRepository_Expecter) AssignPermissionToRole(ctx interface{}, roleID interface{}, permissionID interface{}) *RolePermissionRepository_AssignPermissionToRole_Call {
-	return &RolePermissionRepository_AssignPermissionToRole_Call{Call: _e.mock.On("AssignPermissionToRole", ctx, roleID, permissionID)}
+func (_e *RolePermissionRepository_Expecter) Assign(ctx interface{}, roleID interface{}, permissionID interface{}) *RolePermissionRepository_Assign_Call {
+	return &RolePermissionRepository_Assign_Call{Call: _e.mock.On("Assign", ctx, roleID, permissionID)}
 }
 
-func (_c *RolePermissionRepository_AssignPermissionToRole_Call) Run(run func(ctx context.Context, roleID string, permissionID string)) *RolePermissionRepository_AssignPermissionToRole_Call {
+func (_c *RolePermissionRepository_Assign_Call) Run(run func(ctx context.Context, roleID string, permissionID string)) *RolePermissionRepository_Assign_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *RolePermissionRepository_AssignPermissionToRole_Call) Return(_a0 error) *RolePermissionRepository_AssignPermissionToRole_Call {
+func (_c *RolePermissionRepository_Assign_Call) Return(_a0 error) *RolePermissionRepository_Assign_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *RolePermissionRepository_AssignPermissionToRole_Call) RunAndReturn(run func(context.Context, string, string) error) *RolePermissionRepository_AssignPermissionToRole_Call {
+func (_c *RolePermissionRepository_Assign_Call) RunAndReturn(run func(context.Context, string, string) error) *RolePermissionRepository_Assign_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// HasPermission provides a mock function with given fields: ctx, roleID, permissionID
-func (_m *RolePermissionRepository) HasPermission(ctx context.Context, roleID string, permissionID string) (bool, error) {
-	ret := _m.Called(ctx, roleID, permissionID)
+// GetRolePermissions provides a mock function with given fields: ctx, roleID
+func (_m *RolePermissionRepository) GetRolePermissions(ctx context.Context, roleID string) ([]*model.Permission, error) {
+	ret := _m.Called(ctx, roleID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for HasPermission")
-	}
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (bool, error)); ok {
-		return rf(ctx, roleID, permissionID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) bool); ok {
-		r0 = rf(ctx, roleID, permissionID)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, roleID, permissionID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RolePermissionRepository_HasPermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HasPermission'
-type RolePermissionRepository_HasPermission_Call struct {
-	*mock.Call
-}
-
-// HasPermission is a helper method to define mock.On call
-//   - ctx context.Context
-//   - roleID string
-//   - permissionID string
-func (_e *RolePermissionRepository_Expecter) HasPermission(ctx interface{}, roleID interface{}, permissionID interface{}) *RolePermissionRepository_HasPermission_Call {
-	return &RolePermissionRepository_HasPermission_Call{Call: _e.mock.On("HasPermission", ctx, roleID, permissionID)}
-}
-
-func (_c *RolePermissionRepository_HasPermission_Call) Run(run func(ctx context.Context, roleID string, permissionID string)) *RolePermissionRepository_HasPermission_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string))
-	})
-	return _c
-}
-
-func (_c *RolePermissionRepository_HasPermission_Call) Return(_a0 bool, _a1 error) *RolePermissionRepository_HasPermission_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *RolePermissionRepository_HasPermission_Call) RunAndReturn(run func(context.Context, string, string) (bool, error)) *RolePermissionRepository_HasPermission_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// ListPermissionsByRole provides a mock function with given fields: ctx, roleValue
-func (_m *RolePermissionRepository) ListPermissionsByRole(ctx context.Context, roleValue string) ([]*model.Permission, error) {
-	ret := _m.Called(ctx, roleValue)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListPermissionsByRole")
+		panic("no return value specified for GetRolePermissions")
 	}
 
 	var r0 []*model.Permission
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, string) ([]*model.Permission, error)); ok {
-		return rf(ctx, roleValue)
+		return rf(ctx, roleID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string) []*model.Permission); ok {
-		r0 = rf(ctx, roleValue)
+		r0 = rf(ctx, roleID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*model.Permission)
@@ -150,7 +92,7 @@ func (_m *RolePermissionRepository) ListPermissionsByRole(ctx context.Context, r
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, roleValue)
+		r1 = rf(ctx, roleID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -158,100 +100,41 @@ func (_m *RolePermissionRepository) ListPermissionsByRole(ctx context.Context, r
 	return r0, r1
 }
 
-// RolePermissionRepository_ListPermissionsByRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListPermissionsByRole'
-type RolePermissionRepository_ListPermissionsByRole_Call struct {
+// RolePermissionRepository_GetRolePermissions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetRolePermissions'
+type RolePermissionRepository_GetRolePermissions_Call struct {
 	*mock.Call
 }
 
-// ListPermissionsByRole is a helper method to define mock.On call
+// GetRolePermissions is a helper method to define mock.On call
 //   - ctx context.Context
-//   - roleValue string
-func (_e *RolePermissionRepository_Expecter) ListPermissionsByRole(ctx interface{}, roleValue interface{}) *RolePermissionRepository_ListPermissionsByRole_Call {
-	return &RolePermissionRepository_ListPermissionsByRole_Call{Call: _e.mock.On("ListPermissionsByRole", ctx, roleValue)}
+//   - roleID string
+func (_e *RolePermissionRepository_Expecter) GetRolePermissions(ctx interface{}, roleID interface{}) *RolePermissionRepository_GetRolePermissions_Call {
+	return &RolePermissionRepository_GetRolePermissions_Call{Call: _e.mock.On("GetRolePermissions", ctx, roleID)}
 }
 
-func (_c *RolePermissionRepository_ListPermissionsByRole_Call) Run(run func(ctx context.Context, roleValue string)) *RolePermissionRepository_ListPermissionsByRole_Call {
+func (_c *RolePermissionRepository_GetRolePermissions_Call) Run(run func(ctx context.Context, roleID string)) *RolePermissionRepository_GetRolePermissions_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *RolePermissionRepository_ListPermissionsByRole_Call) Return(_a0 []*model.Permission, _a1 error) *RolePermissionRepository_ListPermissionsByRole_Call {
+func (_c *RolePermissionRepository_GetRolePermissions_Call) Return(_a0 []*model.Permission, _a1 error) *RolePermissionRepository_GetRolePermissions_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *RolePermissionRepository_ListPermissionsByRole_Call) RunAndReturn(run func(context.Context, string) ([]*model.Permission, error)) *RolePermissionRepository_ListPermissionsByRole_Call {
+func (_c *RolePermissionRepository_GetRolePermissions_Call) RunAndReturn(run func(context.Context, string) ([]*model.Permission, error)) *RolePermissionRepository_GetRolePermissions_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// ListRolesByPermission provides a mock function with given fields: ctx, permissionValue
-func (_m *RolePermissionRepository) ListRolesByPermission(ctx context.Context, permissionValue string) ([]*model.Role, error) {
-	ret := _m.Called(ctx, permissionValue)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ListRolesByPermission")
-	}
-
-	var r0 []*model.Role
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) ([]*model.Role, error)); ok {
-		return rf(ctx, permissionValue)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) []*model.Role); ok {
-		r0 = rf(ctx, permissionValue)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*model.Role)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, permissionValue)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RolePermissionRepository_ListRolesByPermission_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRolesByPermission'
-type RolePermissionRepository_ListRolesByPermission_Call struct {
-	*mock.Call
-}
-
-// ListRolesByPermission is a helper method to define mock.On call
-//   - ctx context.Context
-//   - permissionValue string
-func (_e *RolePermissionRepository_Expecter) ListRolesByPermission(ctx interface{}, permissionValue interface{}) *RolePermissionRepository_ListRolesByPermission_Call {
-	return &RolePermissionRepository_ListRolesByPermission_Call{Call: _e.mock.On("ListRolesByPermission", ctx, permissionValue)}
-}
-
-func (_c *RolePermissionRepository_ListRolesByPermission_Call) Run(run func(ctx context.Context, permissionValue string)) *RolePermissionRepository_ListRolesByPermission_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *RolePermissionRepository_ListRolesByPermission_Call) Return(_a0 []*model.Role, _a1 error) *RolePermissionRepository_ListRolesByPermission_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *RolePermissionRepository_ListRolesByPermission_Call) RunAndReturn(run func(context.Context, string) ([]*model.Role, error)) *RolePermissionRepository_ListRolesByPermission_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// RevokePermissionFromRole provides a mock function with given fields: ctx, roleID, permissionID
-func (_m *RolePermissionRepository) RevokePermissionFromRole(ctx context.Context, roleID string, permissionID string) error {
+// Revoke provides a mock function with given fields: ctx, roleID, permissionID
+func (_m *RolePermissionRepository) Revoke(ctx context.Context, roleID string, permissionID string) error {
 	ret := _m.Called(ctx, roleID, permissionID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for RevokePermissionFromRole")
+		panic("no return value specified for Revoke")
 	}
 
 	var r0 error
@@ -264,32 +147,32 @@ func (_m *RolePermissionRepository) RevokePermissionFromRole(ctx context.Context
 	return r0
 }
 
-// RolePermissionRepository_RevokePermissionFromRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RevokePermissionFromRole'
-type RolePermissionRepository_RevokePermissionFromRole_Call struct {
+// RolePermissionRepository_Revoke_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Revoke'
+type RolePermissionRepository_Revoke_Call struct {
 	*mock.Call
 }
 
-// RevokePermissionFromRole is a helper method to define mock.On call
+// Revoke is a helper method to define mock.On call
 //   - ctx context.Context
 //   - roleID string
 //   - permissionID string
-func (_e *RolePermissionRepository_Expecter) RevokePermissionFromRole(ctx interface{}, roleID interface{}, permissionID interface{}) *RolePermissionRepository_RevokePermissionFromRole_Call {
-	return &RolePermissionRepository_RevokePermissionFromRole_Call{Call: _e.mock.On("RevokePermissionFromRole", ctx, roleID, permissionID)}
+func (_e *RolePermissionRepository_Expecter) Revoke(ctx interface{}, roleID interface{}, permissionID interface{}) *RolePermissionRepository_Revoke_Call {
+	return &RolePermissionRepository_Revoke_Call{Call: _e.mock.On("Revoke", ctx, roleID, permissionID)}
 }
 
-func (_c *RolePermissionRepository_RevokePermissionFromRole_Call) Run(run func(ctx context.Context, roleID string, permissionID string)) *RolePermissionRepository_RevokePermissionFromRole_Call {
+func (_c *RolePermissionRepository_Revoke_Call) Run(run func(ctx context.Context, roleID string, permissionID string)) *RolePermissionRepository_Revoke_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *RolePermissionRepository_RevokePermissionFromRole_Call) Return(_a0 error) *RolePermissionRepository_RevokePermissionFromRole_Call {
+func (_c *RolePermissionRepository_Revoke_Call) Return(_a0 error) *RolePermissionRepository_Revoke_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *RolePermissionRepository_RevokePermissionFromRole_Call) RunAndReturn(run func(context.Context, string, string) error) *RolePermissionRepository_RevokePermissionFromRole_Call {
+func (_c *RolePermissionRepository_Revoke_Call) RunAndReturn(run func(context.Context, string, string) error) *RolePermissionRepository_Revoke_Call {
 	_c.Call.Return(run)
 	return _c
 }

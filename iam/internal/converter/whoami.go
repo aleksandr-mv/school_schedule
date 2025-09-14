@@ -7,7 +7,8 @@ import (
 
 func WhoAMIToProto(i *model.WhoAMI) *authV1.WhoamiResponse {
 	return &authV1.WhoamiResponse{
-		Session: SessionToProto(&i.Session),
-		User:    UserToProto(&i.User),
+		Session:              SessionToProto(&i.Session),
+		User:                 UserToProto(&i.User),
+		RolesWithPermissions: RoleWithPermissionsSliceToProto(i.RolesWithPermissions),
 	}
 }

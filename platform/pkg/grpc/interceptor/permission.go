@@ -6,7 +6,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
@@ -54,16 +53,18 @@ func (i *PermissionInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterce
 
 // checkPermission проверяет права доступа пользователя
 func (i *PermissionInterceptor) checkPermission(ctx context.Context, permission string) error {
-	// Получаем права пользователя из контекста
-	permissions, ok := GetPermissionsFromContext(ctx)
+	// Получаем роли пользователя из контекста
+	roles, ok := ctx.Value("user-roles-with-permissions").([]*commonV1.RoleWithPermissions)
 	if !ok {
-		return status.Error(codes.Unauthenticated, "Права доступа не найдены в контексте")
+		return status.Error(codes.Unauthenticated, "Роли пользователя не найдены в контексте")
 	}
 
-	// Простая проверка прав (для большинства случаев достаточно)
-	for _, userPermission := range permissions {
-		if userPermission != nil && userPermission.Resource+":"+userPermission.Action == permission {
-			return nil
+	// Проверяем права доступа
+	for _, role := range roles {
+		for _, userPermission := range role.Permissions {
+			if userPermission != nil && userPermission.Resource+":"+userPermission.Action == permission {
+				return nil
+			}
 		}
 	}
 

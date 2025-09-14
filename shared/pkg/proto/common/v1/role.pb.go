@@ -100,11 +100,64 @@ func (x *Role) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// Роль с правами доступа
+type RoleWithPermissions struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Role          *Role                  `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
+	Permissions   []*Permission          `protobuf:"bytes,2,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RoleWithPermissions) Reset() {
+	*x = RoleWithPermissions{}
+	mi := &file_common_v1_role_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RoleWithPermissions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RoleWithPermissions) ProtoMessage() {}
+
+func (x *RoleWithPermissions) ProtoReflect() protoreflect.Message {
+	mi := &file_common_v1_role_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RoleWithPermissions.ProtoReflect.Descriptor instead.
+func (*RoleWithPermissions) Descriptor() ([]byte, []int) {
+	return file_common_v1_role_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RoleWithPermissions) GetRole() *Role {
+	if x != nil {
+		return x.Role
+	}
+	return nil
+}
+
+func (x *RoleWithPermissions) GetPermissions() []*Permission {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
 var File_common_v1_role_proto protoreflect.FileDescriptor
 
 const file_common_v1_role_proto_rawDesc = "" +
 	"\n" +
-	"\x14common/v1/role.proto\x12\tcommon.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"\xeb\x01\n" +
+	"\x14common/v1/role.proto\x12\tcommon.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\x1a\x1acommon/v1/permission.proto\"\xeb\x01\n" +
 	"\x04Role\x12\x18\n" +
 	"\x02id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x02id\x12\x1d\n" +
 	"\x04name\x18\x02 \x01(\tB\t\xfaB\x06r\x04\x10\x02\x182R\x04name\x12 \n" +
@@ -113,7 +166,10 @@ const file_common_v1_role_proto_rawDesc = "" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12>\n" +
 	"\n" +
 	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\tupdatedAt\x88\x01\x01B\r\n" +
-	"\v_updated_atBNZLgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
+	"\v_updated_at\"s\n" +
+	"\x13RoleWithPermissions\x12#\n" +
+	"\x04role\x18\x01 \x01(\v2\x0f.common.v1.RoleR\x04role\x127\n" +
+	"\vpermissions\x18\x02 \x03(\v2\x15.common.v1.PermissionR\vpermissionsBNZLgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
 
 var (
 	file_common_v1_role_proto_rawDescOnce sync.Once
@@ -127,19 +183,23 @@ func file_common_v1_role_proto_rawDescGZIP() []byte {
 	return file_common_v1_role_proto_rawDescData
 }
 
-var file_common_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_common_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_common_v1_role_proto_goTypes = []any{
 	(*Role)(nil),                  // 0: common.v1.Role
-	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*RoleWithPermissions)(nil),   // 1: common.v1.RoleWithPermissions
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*Permission)(nil),            // 3: common.v1.Permission
 }
 var file_common_v1_role_proto_depIdxs = []int32{
-	1, // 0: common.v1.Role.created_at:type_name -> google.protobuf.Timestamp
-	1, // 1: common.v1.Role.updated_at:type_name -> google.protobuf.Timestamp
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: common.v1.Role.created_at:type_name -> google.protobuf.Timestamp
+	2, // 1: common.v1.Role.updated_at:type_name -> google.protobuf.Timestamp
+	0, // 2: common.v1.RoleWithPermissions.role:type_name -> common.v1.Role
+	3, // 3: common.v1.RoleWithPermissions.permissions:type_name -> common.v1.Permission
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_common_v1_role_proto_init() }
@@ -147,6 +207,7 @@ func file_common_v1_role_proto_init() {
 	if File_common_v1_role_proto != nil {
 		return
 	}
+	file_common_v1_permission_proto_init()
 	file_common_v1_role_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -154,7 +215,7 @@ func file_common_v1_role_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_v1_role_proto_rawDesc), len(file_common_v1_role_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

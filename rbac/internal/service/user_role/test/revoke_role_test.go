@@ -7,26 +7,26 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *ServiceSuite) TestRevokeRoleSuccess() {
+func (s *ServiceSuite) TestRevokeSuccess() {
 	userID := "user123"
 	roleID := "role456"
 
-	s.userRoleRepository.On("RevokeRole", mock.Anything, userID, roleID).Return(nil)
+	s.userRoleRepository.On("Revoke", mock.Anything, userID, roleID).Return(nil)
 
-	err := s.service.RevokeRole(s.ctx, userID, roleID)
+	err := s.service.Revoke(s.ctx, userID, roleID)
 
 	assert.NoError(s.T(), err)
 
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestRevokeRoleNotAssigned() {
+func (s *ServiceSuite) TestRevokeNotAssigned() {
 	userID := "user123"
 	roleID := "role456"
 
-	s.userRoleRepository.On("RevokeRole", mock.Anything, userID, roleID).Return(model.ErrRoleNotAssigned)
+	s.userRoleRepository.On("Revoke", mock.Anything, userID, roleID).Return(model.ErrRoleNotAssigned)
 
-	err := s.service.RevokeRole(s.ctx, userID, roleID)
+	err := s.service.Revoke(s.ctx, userID, roleID)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrRoleNotAssigned, err)
@@ -34,13 +34,13 @@ func (s *ServiceSuite) TestRevokeRoleNotAssigned() {
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestRevokeRoleRepositoryError() {
+func (s *ServiceSuite) TestRevokeRepositoryError() {
 	userID := "user123"
 	roleID := "role456"
 
-	s.userRoleRepository.On("RevokeRole", mock.Anything, userID, roleID).Return(model.ErrInternal)
+	s.userRoleRepository.On("Revoke", mock.Anything, userID, roleID).Return(model.ErrInternal)
 
-	err := s.service.RevokeRole(s.ctx, userID, roleID)
+	err := s.service.Revoke(s.ctx, userID, roleID)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrInternal, err)

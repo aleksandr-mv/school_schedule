@@ -24,29 +24,29 @@ func (_m *RoleServiceInterface) EXPECT() *RoleServiceInterface_Expecter {
 	return &RoleServiceInterface_Expecter{mock: &_m.Mock}
 }
 
-// CreateRole provides a mock function with given fields: ctx, createRole
-func (_m *RoleServiceInterface) CreateRole(ctx context.Context, createRole *model.CreateRole) (uuid.UUID, error) {
-	ret := _m.Called(ctx, createRole)
+// Create provides a mock function with given fields: ctx, name, description
+func (_m *RoleServiceInterface) Create(ctx context.Context, name string, description string) (uuid.UUID, error) {
+	ret := _m.Called(ctx, name, description)
 
 	if len(ret) == 0 {
-		panic("no return value specified for CreateRole")
+		panic("no return value specified for Create")
 	}
 
 	var r0 uuid.UUID
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.CreateRole) (uuid.UUID, error)); ok {
-		return rf(ctx, createRole)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (uuid.UUID, error)); ok {
+		return rf(ctx, name, description)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.CreateRole) uuid.UUID); ok {
-		r0 = rf(ctx, createRole)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) uuid.UUID); ok {
+		r0 = rf(ctx, name, description)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(uuid.UUID)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.CreateRole) error); ok {
-		r1 = rf(ctx, createRole)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = rf(ctx, name, description)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -54,41 +54,42 @@ func (_m *RoleServiceInterface) CreateRole(ctx context.Context, createRole *mode
 	return r0, r1
 }
 
-// RoleServiceInterface_CreateRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateRole'
-type RoleServiceInterface_CreateRole_Call struct {
+// RoleServiceInterface_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type RoleServiceInterface_Create_Call struct {
 	*mock.Call
 }
 
-// CreateRole is a helper method to define mock.On call
+// Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - createRole *model.CreateRole
-func (_e *RoleServiceInterface_Expecter) CreateRole(ctx interface{}, createRole interface{}) *RoleServiceInterface_CreateRole_Call {
-	return &RoleServiceInterface_CreateRole_Call{Call: _e.mock.On("CreateRole", ctx, createRole)}
+//   - name string
+//   - description string
+func (_e *RoleServiceInterface_Expecter) Create(ctx interface{}, name interface{}, description interface{}) *RoleServiceInterface_Create_Call {
+	return &RoleServiceInterface_Create_Call{Call: _e.mock.On("Create", ctx, name, description)}
 }
 
-func (_c *RoleServiceInterface_CreateRole_Call) Run(run func(ctx context.Context, createRole *model.CreateRole)) *RoleServiceInterface_CreateRole_Call {
+func (_c *RoleServiceInterface_Create_Call) Run(run func(ctx context.Context, name string, description string)) *RoleServiceInterface_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.CreateRole))
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *RoleServiceInterface_CreateRole_Call) Return(_a0 uuid.UUID, _a1 error) *RoleServiceInterface_CreateRole_Call {
+func (_c *RoleServiceInterface_Create_Call) Return(_a0 uuid.UUID, _a1 error) *RoleServiceInterface_Create_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *RoleServiceInterface_CreateRole_Call) RunAndReturn(run func(context.Context, *model.CreateRole) (uuid.UUID, error)) *RoleServiceInterface_CreateRole_Call {
+func (_c *RoleServiceInterface_Create_Call) RunAndReturn(run func(context.Context, string, string) (uuid.UUID, error)) *RoleServiceInterface_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// DeleteRole provides a mock function with given fields: ctx, id
-func (_m *RoleServiceInterface) DeleteRole(ctx context.Context, id string) error {
+// Delete provides a mock function with given fields: ctx, id
+func (_m *RoleServiceInterface) Delete(ctx context.Context, id string) error {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for DeleteRole")
+		panic("no return value specified for Delete")
 	}
 
 	var r0 error
@@ -101,58 +102,58 @@ func (_m *RoleServiceInterface) DeleteRole(ctx context.Context, id string) error
 	return r0
 }
 
-// RoleServiceInterface_DeleteRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteRole'
-type RoleServiceInterface_DeleteRole_Call struct {
+// RoleServiceInterface_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type RoleServiceInterface_Delete_Call struct {
 	*mock.Call
 }
 
-// DeleteRole is a helper method to define mock.On call
+// Delete is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id string
-func (_e *RoleServiceInterface_Expecter) DeleteRole(ctx interface{}, id interface{}) *RoleServiceInterface_DeleteRole_Call {
-	return &RoleServiceInterface_DeleteRole_Call{Call: _e.mock.On("DeleteRole", ctx, id)}
+func (_e *RoleServiceInterface_Expecter) Delete(ctx interface{}, id interface{}) *RoleServiceInterface_Delete_Call {
+	return &RoleServiceInterface_Delete_Call{Call: _e.mock.On("Delete", ctx, id)}
 }
 
-func (_c *RoleServiceInterface_DeleteRole_Call) Run(run func(ctx context.Context, id string)) *RoleServiceInterface_DeleteRole_Call {
+func (_c *RoleServiceInterface_Delete_Call) Run(run func(ctx context.Context, id string)) *RoleServiceInterface_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *RoleServiceInterface_DeleteRole_Call) Return(_a0 error) *RoleServiceInterface_DeleteRole_Call {
+func (_c *RoleServiceInterface_Delete_Call) Return(_a0 error) *RoleServiceInterface_Delete_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *RoleServiceInterface_DeleteRole_Call) RunAndReturn(run func(context.Context, string) error) *RoleServiceInterface_DeleteRole_Call {
+func (_c *RoleServiceInterface_Delete_Call) RunAndReturn(run func(context.Context, string) error) *RoleServiceInterface_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetRole provides a mock function with given fields: ctx, value
-func (_m *RoleServiceInterface) GetRole(ctx context.Context, value string) (*model.Role, error) {
-	ret := _m.Called(ctx, value)
+// Get provides a mock function with given fields: ctx, id
+func (_m *RoleServiceInterface) Get(ctx context.Context, id string) (*model.EnrichedRole, error) {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetRole")
+		panic("no return value specified for Get")
 	}
 
-	var r0 *model.Role
+	var r0 *model.EnrichedRole
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.Role, error)); ok {
-		return rf(ctx, value)
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.EnrichedRole, error)); ok {
+		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *model.Role); ok {
-		r0 = rf(ctx, value)
+	if rf, ok := ret.Get(0).(func(context.Context, string) *model.EnrichedRole); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.Role)
+			r0 = ret.Get(0).(*model.EnrichedRole)
 		}
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, value)
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -160,58 +161,58 @@ func (_m *RoleServiceInterface) GetRole(ctx context.Context, value string) (*mod
 	return r0, r1
 }
 
-// RoleServiceInterface_GetRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetRole'
-type RoleServiceInterface_GetRole_Call struct {
+// RoleServiceInterface_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type RoleServiceInterface_Get_Call struct {
 	*mock.Call
 }
 
-// GetRole is a helper method to define mock.On call
+// Get is a helper method to define mock.On call
 //   - ctx context.Context
-//   - value string
-func (_e *RoleServiceInterface_Expecter) GetRole(ctx interface{}, value interface{}) *RoleServiceInterface_GetRole_Call {
-	return &RoleServiceInterface_GetRole_Call{Call: _e.mock.On("GetRole", ctx, value)}
+//   - id string
+func (_e *RoleServiceInterface_Expecter) Get(ctx interface{}, id interface{}) *RoleServiceInterface_Get_Call {
+	return &RoleServiceInterface_Get_Call{Call: _e.mock.On("Get", ctx, id)}
 }
 
-func (_c *RoleServiceInterface_GetRole_Call) Run(run func(ctx context.Context, value string)) *RoleServiceInterface_GetRole_Call {
+func (_c *RoleServiceInterface_Get_Call) Run(run func(ctx context.Context, id string)) *RoleServiceInterface_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *RoleServiceInterface_GetRole_Call) Return(_a0 *model.Role, _a1 error) *RoleServiceInterface_GetRole_Call {
+func (_c *RoleServiceInterface_Get_Call) Return(_a0 *model.EnrichedRole, _a1 error) *RoleServiceInterface_Get_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *RoleServiceInterface_GetRole_Call) RunAndReturn(run func(context.Context, string) (*model.Role, error)) *RoleServiceInterface_GetRole_Call {
+func (_c *RoleServiceInterface_Get_Call) RunAndReturn(run func(context.Context, string) (*model.EnrichedRole, error)) *RoleServiceInterface_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// ListRoles provides a mock function with given fields: ctx, nameFilter
-func (_m *RoleServiceInterface) ListRoles(ctx context.Context, nameFilter string) ([]*model.Role, error) {
-	ret := _m.Called(ctx, nameFilter)
+// List provides a mock function with given fields: ctx
+func (_m *RoleServiceInterface) List(ctx context.Context) ([]*model.Role, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for ListRoles")
+		panic("no return value specified for List")
 	}
 
 	var r0 []*model.Role
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) ([]*model.Role, error)); ok {
-		return rf(ctx, nameFilter)
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*model.Role, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) []*model.Role); ok {
-		r0 = rf(ctx, nameFilter)
+	if rf, ok := ret.Get(0).(func(context.Context) []*model.Role); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*model.Role)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, nameFilter)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -219,41 +220,40 @@ func (_m *RoleServiceInterface) ListRoles(ctx context.Context, nameFilter string
 	return r0, r1
 }
 
-// RoleServiceInterface_ListRoles_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRoles'
-type RoleServiceInterface_ListRoles_Call struct {
+// RoleServiceInterface_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type RoleServiceInterface_List_Call struct {
 	*mock.Call
 }
 
-// ListRoles is a helper method to define mock.On call
+// List is a helper method to define mock.On call
 //   - ctx context.Context
-//   - nameFilter string
-func (_e *RoleServiceInterface_Expecter) ListRoles(ctx interface{}, nameFilter interface{}) *RoleServiceInterface_ListRoles_Call {
-	return &RoleServiceInterface_ListRoles_Call{Call: _e.mock.On("ListRoles", ctx, nameFilter)}
+func (_e *RoleServiceInterface_Expecter) List(ctx interface{}) *RoleServiceInterface_List_Call {
+	return &RoleServiceInterface_List_Call{Call: _e.mock.On("List", ctx)}
 }
 
-func (_c *RoleServiceInterface_ListRoles_Call) Run(run func(ctx context.Context, nameFilter string)) *RoleServiceInterface_ListRoles_Call {
+func (_c *RoleServiceInterface_List_Call) Run(run func(ctx context.Context)) *RoleServiceInterface_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *RoleServiceInterface_ListRoles_Call) Return(_a0 []*model.Role, _a1 error) *RoleServiceInterface_ListRoles_Call {
+func (_c *RoleServiceInterface_List_Call) Return(_a0 []*model.Role, _a1 error) *RoleServiceInterface_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *RoleServiceInterface_ListRoles_Call) RunAndReturn(run func(context.Context, string) ([]*model.Role, error)) *RoleServiceInterface_ListRoles_Call {
+func (_c *RoleServiceInterface_List_Call) RunAndReturn(run func(context.Context) ([]*model.Role, error)) *RoleServiceInterface_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UpdateRole provides a mock function with given fields: ctx, updateRole
-func (_m *RoleServiceInterface) UpdateRole(ctx context.Context, updateRole *model.UpdateRole) error {
+// Update provides a mock function with given fields: ctx, updateRole
+func (_m *RoleServiceInterface) Update(ctx context.Context, updateRole *model.UpdateRole) error {
 	ret := _m.Called(ctx, updateRole)
 
 	if len(ret) == 0 {
-		panic("no return value specified for UpdateRole")
+		panic("no return value specified for Update")
 	}
 
 	var r0 error
@@ -266,31 +266,31 @@ func (_m *RoleServiceInterface) UpdateRole(ctx context.Context, updateRole *mode
 	return r0
 }
 
-// RoleServiceInterface_UpdateRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateRole'
-type RoleServiceInterface_UpdateRole_Call struct {
+// RoleServiceInterface_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type RoleServiceInterface_Update_Call struct {
 	*mock.Call
 }
 
-// UpdateRole is a helper method to define mock.On call
+// Update is a helper method to define mock.On call
 //   - ctx context.Context
 //   - updateRole *model.UpdateRole
-func (_e *RoleServiceInterface_Expecter) UpdateRole(ctx interface{}, updateRole interface{}) *RoleServiceInterface_UpdateRole_Call {
-	return &RoleServiceInterface_UpdateRole_Call{Call: _e.mock.On("UpdateRole", ctx, updateRole)}
+func (_e *RoleServiceInterface_Expecter) Update(ctx interface{}, updateRole interface{}) *RoleServiceInterface_Update_Call {
+	return &RoleServiceInterface_Update_Call{Call: _e.mock.On("Update", ctx, updateRole)}
 }
 
-func (_c *RoleServiceInterface_UpdateRole_Call) Run(run func(ctx context.Context, updateRole *model.UpdateRole)) *RoleServiceInterface_UpdateRole_Call {
+func (_c *RoleServiceInterface_Update_Call) Run(run func(ctx context.Context, updateRole *model.UpdateRole)) *RoleServiceInterface_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*model.UpdateRole))
 	})
 	return _c
 }
 
-func (_c *RoleServiceInterface_UpdateRole_Call) Return(_a0 error) *RoleServiceInterface_UpdateRole_Call {
+func (_c *RoleServiceInterface_Update_Call) Return(_a0 error) *RoleServiceInterface_Update_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *RoleServiceInterface_UpdateRole_Call) RunAndReturn(run func(context.Context, *model.UpdateRole) error) *RoleServiceInterface_UpdateRole_Call {
+func (_c *RoleServiceInterface_Update_Call) RunAndReturn(run func(context.Context, *model.UpdateRole) error) *RoleServiceInterface_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

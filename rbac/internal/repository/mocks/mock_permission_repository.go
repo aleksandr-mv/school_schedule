@@ -22,128 +22,9 @@ func (_m *PermissionRepository) EXPECT() *PermissionRepository_Expecter {
 	return &PermissionRepository_Expecter{mock: &_m.Mock}
 }
 
-// Get provides a mock function with given fields: ctx, value
-func (_m *PermissionRepository) Get(ctx context.Context, value string) (*model.Permission, error) {
-	ret := _m.Called(ctx, value)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Get")
-	}
-
-	var r0 *model.Permission
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.Permission, error)); ok {
-		return rf(ctx, value)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) *model.Permission); ok {
-		r0 = rf(ctx, value)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.Permission)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, value)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// PermissionRepository_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
-type PermissionRepository_Get_Call struct {
-	*mock.Call
-}
-
-// Get is a helper method to define mock.On call
-//   - ctx context.Context
-//   - value string
-func (_e *PermissionRepository_Expecter) Get(ctx interface{}, value interface{}) *PermissionRepository_Get_Call {
-	return &PermissionRepository_Get_Call{Call: _e.mock.On("Get", ctx, value)}
-}
-
-func (_c *PermissionRepository_Get_Call) Run(run func(ctx context.Context, value string)) *PermissionRepository_Get_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionRepository_Get_Call) Return(_a0 *model.Permission, _a1 error) *PermissionRepository_Get_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *PermissionRepository_Get_Call) RunAndReturn(run func(context.Context, string) (*model.Permission, error)) *PermissionRepository_Get_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetByResourceAndAction provides a mock function with given fields: ctx, resource, action
-func (_m *PermissionRepository) GetByResourceAndAction(ctx context.Context, resource string, action string) (*model.Permission, error) {
-	ret := _m.Called(ctx, resource, action)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetByResourceAndAction")
-	}
-
-	var r0 *model.Permission
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*model.Permission, error)); ok {
-		return rf(ctx, resource, action)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) *model.Permission); ok {
-		r0 = rf(ctx, resource, action)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.Permission)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, resource, action)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// PermissionRepository_GetByResourceAndAction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetByResourceAndAction'
-type PermissionRepository_GetByResourceAndAction_Call struct {
-	*mock.Call
-}
-
-// GetByResourceAndAction is a helper method to define mock.On call
-//   - ctx context.Context
-//   - resource string
-//   - action string
-func (_e *PermissionRepository_Expecter) GetByResourceAndAction(ctx interface{}, resource interface{}, action interface{}) *PermissionRepository_GetByResourceAndAction_Call {
-	return &PermissionRepository_GetByResourceAndAction_Call{Call: _e.mock.On("GetByResourceAndAction", ctx, resource, action)}
-}
-
-func (_c *PermissionRepository_GetByResourceAndAction_Call) Run(run func(ctx context.Context, resource string, action string)) *PermissionRepository_GetByResourceAndAction_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string))
-	})
-	return _c
-}
-
-func (_c *PermissionRepository_GetByResourceAndAction_Call) Return(_a0 *model.Permission, _a1 error) *PermissionRepository_GetByResourceAndAction_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *PermissionRepository_GetByResourceAndAction_Call) RunAndReturn(run func(context.Context, string, string) (*model.Permission, error)) *PermissionRepository_GetByResourceAndAction_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// List provides a mock function with given fields: ctx, filter
-func (_m *PermissionRepository) List(ctx context.Context, filter *model.ListPermissionsFilter) ([]*model.Permission, error) {
-	ret := _m.Called(ctx, filter)
+// List provides a mock function with given fields: ctx
+func (_m *PermissionRepository) List(ctx context.Context) ([]*model.Permission, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
@@ -151,19 +32,19 @@ func (_m *PermissionRepository) List(ctx context.Context, filter *model.ListPerm
 
 	var r0 []*model.Permission
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.ListPermissionsFilter) ([]*model.Permission, error)); ok {
-		return rf(ctx, filter)
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*model.Permission, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.ListPermissionsFilter) []*model.Permission); ok {
-		r0 = rf(ctx, filter)
+	if rf, ok := ret.Get(0).(func(context.Context) []*model.Permission); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*model.Permission)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.ListPermissionsFilter) error); ok {
-		r1 = rf(ctx, filter)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -178,14 +59,13 @@ type PermissionRepository_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - ctx context.Context
-//   - filter *model.ListPermissionsFilter
-func (_e *PermissionRepository_Expecter) List(ctx interface{}, filter interface{}) *PermissionRepository_List_Call {
-	return &PermissionRepository_List_Call{Call: _e.mock.On("List", ctx, filter)}
+func (_e *PermissionRepository_Expecter) List(ctx interface{}) *PermissionRepository_List_Call {
+	return &PermissionRepository_List_Call{Call: _e.mock.On("List", ctx)}
 }
 
-func (_c *PermissionRepository_List_Call) Run(run func(ctx context.Context, filter *model.ListPermissionsFilter)) *PermissionRepository_List_Call {
+func (_c *PermissionRepository_List_Call) Run(run func(ctx context.Context)) *PermissionRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.ListPermissionsFilter))
+		run(args[0].(context.Context))
 	})
 	return _c
 }
@@ -195,7 +75,7 @@ func (_c *PermissionRepository_List_Call) Return(_a0 []*model.Permission, _a1 er
 	return _c
 }
 
-func (_c *PermissionRepository_List_Call) RunAndReturn(run func(context.Context, *model.ListPermissionsFilter) ([]*model.Permission, error)) *PermissionRepository_List_Call {
+func (_c *PermissionRepository_List_Call) RunAndReturn(run func(context.Context) ([]*model.Permission, error)) *PermissionRepository_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

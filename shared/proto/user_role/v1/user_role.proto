@@ -14,22 +14,22 @@ option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/us
 // =============================================================================
 
 service UserRoleService {
-  // Назначение роли пользователю (для админки)
-  rpc AssignRole(AssignRoleRequest) returns (google.protobuf.Empty) {
+  // Назначение роли пользователю
+  rpc Assign(AssignRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "user_role:write";
   }
 
-  // Отзыв роли у пользователя (для админки)
-  rpc RevokeRole(RevokeRoleRequest) returns (google.protobuf.Empty) {
+  // Отзыв роли у пользователя
+  rpc Revoke(RevokeRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "user_role:write";
   }
 
-  // Получение ролей пользователя (для админки)
+  // Получение ролей пользователя
   rpc GetUserRoles(GetUserRolesRequest) returns (GetUserRolesResponse) {
     option (common.v1.permission) = "user_role:read";
   }
 
-  // Получение пользователей роли (для админки)
+  // Получение пользователей роли
   rpc GetRoleUsers(GetRoleUsersRequest) returns (GetRoleUsersResponse) {
     option (common.v1.permission) = "user_role:read";
   }
@@ -40,22 +40,22 @@ service UserRoleService {
 // =============================================================================
 
 // =============================================================================
-// AssignRole
+// Assign
 // =============================================================================
 
 // Запрос на назначение роли пользователю
-message AssignRoleRequest {
+message AssignRequest {
   string user_id = 1 [(validate.rules).string.uuid = true];
   string role_id = 2 [(validate.rules).string.uuid = true];
   optional string assigned_by = 3 [(validate.rules).string.uuid = true];
 }
 
 // =============================================================================
-// RevokeRole
+// Revoke
 // =============================================================================
 
 // Запрос на отзыв роли у пользователя
-message RevokeRoleRequest {
+message RevokeRequest {
   string user_id = 1 [(validate.rules).string.uuid = true];
   string role_id = 2 [(validate.rules).string.uuid = true];
 }
@@ -71,7 +71,7 @@ message GetUserRolesRequest {
 
 // Ответ с ролями пользователя
 message GetUserRolesResponse {
-  repeated common.v1.Role data = 1;
+  repeated common.v1.RoleWithPermissions data = 1;
 }
 
 // =============================================================================
@@ -89,8 +89,7 @@ message GetRoleUsersRequest {
 // Ответ с пользователями роли
 message GetRoleUsersResponse {
   repeated string user_ids = 1 [(validate.rules).repeated.items.string.uuid = true];
-  int32 total_count = 2;  // Общее количество пользователей с этой ролью
-  int32 limit = 3;        // Лимит записей на страницу
-  optional string next_cursor = 4; // Курсор для следующей страницы (если есть)
-  bool has_more = 5;      // Есть ли еще записи
+  int32 limit = 2;        // Лимит записей на страницу
+  optional string next_cursor = 3; // Курсор для следующей страницы (если есть)
+  bool has_more = 4;      // Есть ли еще записи
 }

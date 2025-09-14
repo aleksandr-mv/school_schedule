@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
+	client "github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc/mocks"
 	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/mocks"
 	"github.com/aleksandr-mv/school_schedule/iam/internal/service/auth"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
@@ -19,6 +20,7 @@ type ServiceSuite struct {
 	userRepository         *mocks.UserRepository
 	notificationRepository *mocks.NotificationRepository
 	sessionRepository      *mocks.SessionRepository
+	rbacClient             *client.RBACClient
 
 	service *auth.AuthService
 }
@@ -33,14 +35,16 @@ func (s *ServiceSuite) SetupSuite() {
 	s.userRepository = mocks.NewUserRepository(s.T())
 	s.notificationRepository = mocks.NewNotificationRepository(s.T())
 	s.sessionRepository = mocks.NewSessionRepository(s.T())
+	s.rbacClient = client.NewRBACClient(s.T())
 
-	s.service = auth.NewService(s.userRepository, s.notificationRepository, s.sessionRepository, 24*time.Hour)
+	s.service = auth.NewService(s.userRepository, s.notificationRepository, s.sessionRepository, s.rbacClient, 24*time.Hour)
 }
 
 func (s *ServiceSuite) SetupTest() {
 	s.userRepository.ExpectedCalls = nil
 	s.notificationRepository.ExpectedCalls = nil
 	s.sessionRepository.ExpectedCalls = nil
+	s.rbacClient.ExpectedCalls = nil
 }
 
 func (s *ServiceSuite) TearDownTest() {

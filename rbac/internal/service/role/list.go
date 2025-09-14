@@ -11,11 +11,11 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *RoleService) ListRoles(ctx context.Context, nameFilter string) ([]*model.Role, error) {
+func (s *RoleService) List(ctx context.Context) ([]*model.Role, error) {
 	ctx, span := tracing.StartSpan(ctx, "rbac.service.list_roles")
 	defer span.End()
 
-	roles, err := s.roleRepo.List(ctx, nameFilter)
+	roles, err := s.roleRepo.List(ctx)
 	if err != nil {
 		logger.Error(ctx, "❌ [Service] Ошибка получения списка ролей из репозитория", zap.Error(err))
 		span.RecordError(err)

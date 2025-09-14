@@ -24,8 +24,8 @@ const (
 	userContextKey contextKey = "user"
 	// sessionIDContextKey ключ для хранения session ID в контексте
 	sessionIDContextKey contextKey = "session-id"
-	// permissionsContextKey ключ для хранения прав пользователя в контексте
-	permissionsContextKey contextKey = "permissions"
+	// userRolesWithPermissionsContextKey ключ для хранения ролей с правами пользователя в контексте
+	userRolesWithPermissionsContextKey contextKey = "user-roles-with-permissions"
 )
 
 // IAMClient интерфейс для аутентификации пользователей
@@ -89,10 +89,10 @@ func (i *AuthInterceptor) authenticate(ctx context.Context) (context.Context, er
 		return nil, status.Error(codes.Unauthenticated, "invalid session")
 	}
 
-	// Добавляем пользователя, session ID и права в контекст
+	// Добавляем пользователя, session ID и роли с правами в контекст
 	authCtx := context.WithValue(ctx, userContextKey, whoamiRes.User)
 	authCtx = context.WithValue(authCtx, sessionIDContextKey, sessionID)
-	authCtx = context.WithValue(authCtx, permissionsContextKey, whoamiRes.Permissions)
+	authCtx = context.WithValue(authCtx, userRolesWithPermissionsContextKey, whoamiRes.RolesWithPermissions)
 
 	return authCtx, nil
 }
@@ -103,20 +103,57 @@ func GetUserFromContext(ctx context.Context) (*commonV1.User, bool) {
 	return user, ok
 }
 
-// GetPermissionsFromContext извлекает права пользователя из контекста
-func GetPermissionsFromContext(ctx context.Context) ([]*commonV1.Permission, bool) {
-	permissions, ok := ctx.Value(permissionsContextKey).([]*commonV1.Permission)
-	return permissions, ok
-}
-
 // GetUserContextKey возвращает ключ контекста для пользователя
 func GetUserContextKey() contextKey {
 	return userContextKey
 }
 
-// GetPermissionsContextKey возвращает ключ контекста для прав пользователя
-func GetPermissionsContextKey() contextKey {
-	return permissionsContextKey
+// GetUserRolesWithPermissionsContextKey возвращает ключ контекста для ролей с правами пользователя
+func GetUserRolesWithPermissionsContextKey() contextKey {
+	return userRolesWithPermissionsContextKey
+}
+
+// GetUserRolesWithPermissionsFromContext извлекает роли с правами пользователя из контекста
+func GetUserRolesWithPermissionsFromContext(ctx context.Context) ([]*commonV1.RoleWithPermissions, bool) {
+	rolesWithPermissions, ok := ctx.Value(userRolesWithPermissionsContextKey).([]*commonV1.RoleWithPermissions)
+	return rolesWithPermissions, ok
+}
+
+// GetUserRolesFromContext извлекает только роли пользователя из контекста
+func GetUserRolesFromContext(ctx context.Context) ([]*commonV1.Role, bool) {
+	rolesWithPermissions, ok := GetUserRolesWithPermissionsFromContext(ctx)
+	if !ok {
+		return nil, false
+	}
+
+	roles := make([]*commonV1.Role, 0, len(rolesWithPermissions))
+	for _, rwp := range rolesWithPermissions {
+		roles = append(roles, rwp.Role)
+	}
+
+	return roles, true
+}
+
+// GetUserPermissionsFromContext извлекает все права пользователя из контекста
+func GetUserPermissionsFromContext(ctx context.Context) ([]*commonV1.Permission, bool) {
+	rolesWithPermissions, ok := GetUserRolesWithPermissionsFromContext(ctx)
+	if !ok {
+		return nil, false
+	}
+
+	permissionsMap := make(map[string]*commonV1.Permission)
+	for _, rwp := range rolesWithPermissions {
+		for _, permission := range rwp.Permissions {
+			permissionsMap[permission.Id] = permission
+		}
+	}
+
+	permissions := make([]*commonV1.Permission, 0, len(permissionsMap))
+	for _, permission := range permissionsMap {
+		permissions = append(permissions, permission)
+	}
+
+	return permissions, true
 }
 
 // GetSessionIDFromContext извлекает session ID из контекста

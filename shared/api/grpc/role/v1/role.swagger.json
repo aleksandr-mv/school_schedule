@@ -45,7 +45,7 @@
         }
       }
     },
-    "v1CreateRoleResponse": {
+    "v1CreateResponse": {
       "type": "object",
       "properties": {
         "roleId": {
@@ -54,28 +54,16 @@
       },
       "title": "Ответ с ID созданной роли"
     },
-    "v1GetIdentifier": {
+    "v1GetResponse": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
+        "data": {
+          "$ref": "#/definitions/v1RoleWithPermissions"
         }
       },
-      "title": "Универсальный идентификатор для поиска по ID или имени"
+      "title": "Ответ с ролью и её правами"
     },
-    "v1GetRoleResponse": {
-      "type": "object",
-      "properties": {
-        "role": {
-          "$ref": "#/definitions/v1Role"
-        }
-      },
-      "title": "Ответ с данными роли"
-    },
-    "v1ListRolesResponse": {
+    "v1ListResponse": {
       "type": "object",
       "properties": {
         "data": {
@@ -87,6 +75,21 @@
         }
       },
       "title": "Ответ со списком ролей"
+    },
+    "v1Permission": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        }
+      },
+      "title": "Право доступа"
     },
     "v1Role": {
       "type": "object",
@@ -110,6 +113,22 @@
         }
       },
       "title": "Роль пользователя"
+    },
+    "v1RoleWithPermissions": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v1Role"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Permission"
+          }
+        }
+      },
+      "title": "Роль с правами доступа"
     }
   }
 }

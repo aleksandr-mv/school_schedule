@@ -8,10 +8,8 @@ package permission_v1
 
 import (
 	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -24,28 +22,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Запрос на получение права доступа по ID
-type GetPermissionRequest struct {
+// Запрос на получение списка прав доступа
+type ListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PermissionId  string                 `protobuf:"bytes,1,opt,name=permission_id,json=permissionId,proto3" json:"permission_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetPermissionRequest) Reset() {
-	*x = GetPermissionRequest{}
+func (x *ListRequest) Reset() {
+	*x = ListRequest{}
 	mi := &file_permission_v1_permission_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetPermissionRequest) String() string {
+func (x *ListRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPermissionRequest) ProtoMessage() {}
+func (*ListRequest) ProtoMessage() {}
 
-func (x *GetPermissionRequest) ProtoReflect() protoreflect.Message {
+func (x *ListRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_permission_v1_permission_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -57,40 +54,33 @@ func (x *GetPermissionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPermissionRequest.ProtoReflect.Descriptor instead.
-func (*GetPermissionRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListRequest.ProtoReflect.Descriptor instead.
+func (*ListRequest) Descriptor() ([]byte, []int) {
 	return file_permission_v1_permission_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetPermissionRequest) GetPermissionId() string {
-	if x != nil {
-		return x.PermissionId
-	}
-	return ""
-}
-
-// Ответ с данными права доступа
-type GetPermissionResponse struct {
+// Ответ со списком прав доступа
+type ListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Permission    *v1.Permission         `protobuf:"bytes,1,opt,name=permission,proto3" json:"permission,omitempty"`
+	Data          []*v1.Permission       `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetPermissionResponse) Reset() {
-	*x = GetPermissionResponse{}
+func (x *ListResponse) Reset() {
+	*x = ListResponse{}
 	mi := &file_permission_v1_permission_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetPermissionResponse) String() string {
+func (x *ListResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPermissionResponse) ProtoMessage() {}
+func (*ListResponse) ProtoMessage() {}
 
-func (x *GetPermissionResponse) ProtoReflect() protoreflect.Message {
+func (x *ListResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_permission_v1_permission_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -102,405 +92,12 @@ func (x *GetPermissionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPermissionResponse.ProtoReflect.Descriptor instead.
-func (*GetPermissionResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ListResponse.ProtoReflect.Descriptor instead.
+func (*ListResponse) Descriptor() ([]byte, []int) {
 	return file_permission_v1_permission_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetPermissionResponse) GetPermission() *v1.Permission {
-	if x != nil {
-		return x.Permission
-	}
-	return nil
-}
-
-// Запрос на получение списка прав доступа
-type ListPermissionsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Опциональные фильтры
-	RoleId         *string `protobuf:"bytes,1,opt,name=role_id,json=roleId,proto3,oneof" json:"role_id,omitempty"`
-	ResourceFilter *string `protobuf:"bytes,2,opt,name=resource_filter,json=resourceFilter,proto3,oneof" json:"resource_filter,omitempty"`
-	ActionFilter   *string `protobuf:"bytes,3,opt,name=action_filter,json=actionFilter,proto3,oneof" json:"action_filter,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *ListPermissionsRequest) Reset() {
-	*x = ListPermissionsRequest{}
-	mi := &file_permission_v1_permission_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListPermissionsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListPermissionsRequest) ProtoMessage() {}
-
-func (x *ListPermissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListPermissionsRequest.ProtoReflect.Descriptor instead.
-func (*ListPermissionsRequest) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *ListPermissionsRequest) GetRoleId() string {
-	if x != nil && x.RoleId != nil {
-		return *x.RoleId
-	}
-	return ""
-}
-
-func (x *ListPermissionsRequest) GetResourceFilter() string {
-	if x != nil && x.ResourceFilter != nil {
-		return *x.ResourceFilter
-	}
-	return ""
-}
-
-func (x *ListPermissionsRequest) GetActionFilter() string {
-	if x != nil && x.ActionFilter != nil {
-		return *x.ActionFilter
-	}
-	return ""
-}
-
-// Ответ со списком прав доступа
-type ListPermissionsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []*v1.Permission       `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListPermissionsResponse) Reset() {
-	*x = ListPermissionsResponse{}
-	mi := &file_permission_v1_permission_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListPermissionsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListPermissionsResponse) ProtoMessage() {}
-
-func (x *ListPermissionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListPermissionsResponse.ProtoReflect.Descriptor instead.
-func (*ListPermissionsResponse) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *ListPermissionsResponse) GetData() []*v1.Permission {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
-// Запрос на назначение права роли
-type AssignPermissionToRoleRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoleId        string                 `protobuf:"bytes,1,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
-	PermissionId  string                 `protobuf:"bytes,2,opt,name=permission_id,json=permissionId,proto3" json:"permission_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AssignPermissionToRoleRequest) Reset() {
-	*x = AssignPermissionToRoleRequest{}
-	mi := &file_permission_v1_permission_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AssignPermissionToRoleRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AssignPermissionToRoleRequest) ProtoMessage() {}
-
-func (x *AssignPermissionToRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AssignPermissionToRoleRequest.ProtoReflect.Descriptor instead.
-func (*AssignPermissionToRoleRequest) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *AssignPermissionToRoleRequest) GetRoleId() string {
-	if x != nil {
-		return x.RoleId
-	}
-	return ""
-}
-
-func (x *AssignPermissionToRoleRequest) GetPermissionId() string {
-	if x != nil {
-		return x.PermissionId
-	}
-	return ""
-}
-
-// Запрос на отзыв права у роли
-type RevokePermissionFromRoleRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoleId        string                 `protobuf:"bytes,1,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
-	PermissionId  string                 `protobuf:"bytes,2,opt,name=permission_id,json=permissionId,proto3" json:"permission_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RevokePermissionFromRoleRequest) Reset() {
-	*x = RevokePermissionFromRoleRequest{}
-	mi := &file_permission_v1_permission_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RevokePermissionFromRoleRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RevokePermissionFromRoleRequest) ProtoMessage() {}
-
-func (x *RevokePermissionFromRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RevokePermissionFromRoleRequest.ProtoReflect.Descriptor instead.
-func (*RevokePermissionFromRoleRequest) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *RevokePermissionFromRoleRequest) GetRoleId() string {
-	if x != nil {
-		return x.RoleId
-	}
-	return ""
-}
-
-func (x *RevokePermissionFromRoleRequest) GetPermissionId() string {
-	if x != nil {
-		return x.PermissionId
-	}
-	return ""
-}
-
-// Запрос на получение прав роли
-type ListPermissionsByRoleRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Value         *v1.GetIdentifier      `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListPermissionsByRoleRequest) Reset() {
-	*x = ListPermissionsByRoleRequest{}
-	mi := &file_permission_v1_permission_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListPermissionsByRoleRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListPermissionsByRoleRequest) ProtoMessage() {}
-
-func (x *ListPermissionsByRoleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListPermissionsByRoleRequest.ProtoReflect.Descriptor instead.
-func (*ListPermissionsByRoleRequest) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *ListPermissionsByRoleRequest) GetValue() *v1.GetIdentifier {
-	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
-// Ответ с правами роли
-type ListPermissionsByRoleResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []*v1.Permission       `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListPermissionsByRoleResponse) Reset() {
-	*x = ListPermissionsByRoleResponse{}
-	mi := &file_permission_v1_permission_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListPermissionsByRoleResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListPermissionsByRoleResponse) ProtoMessage() {}
-
-func (x *ListPermissionsByRoleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListPermissionsByRoleResponse.ProtoReflect.Descriptor instead.
-func (*ListPermissionsByRoleResponse) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *ListPermissionsByRoleResponse) GetData() []*v1.Permission {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
-// Запрос на получение ролей по праву
-type ListRolesByPermissionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Value         *v1.GetIdentifier      `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListRolesByPermissionRequest) Reset() {
-	*x = ListRolesByPermissionRequest{}
-	mi := &file_permission_v1_permission_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListRolesByPermissionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListRolesByPermissionRequest) ProtoMessage() {}
-
-func (x *ListRolesByPermissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListRolesByPermissionRequest.ProtoReflect.Descriptor instead.
-func (*ListRolesByPermissionRequest) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ListRolesByPermissionRequest) GetValue() *v1.GetIdentifier {
-	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
-// Ответ с ролями по праву
-type ListRolesByPermissionResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []*v1.Role             `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListRolesByPermissionResponse) Reset() {
-	*x = ListRolesByPermissionResponse{}
-	mi := &file_permission_v1_permission_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListRolesByPermissionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListRolesByPermissionResponse) ProtoMessage() {}
-
-func (x *ListRolesByPermissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_permission_v1_permission_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListRolesByPermissionResponse.ProtoReflect.Descriptor instead.
-func (*ListRolesByPermissionResponse) Descriptor() ([]byte, []int) {
-	return file_permission_v1_permission_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *ListRolesByPermissionResponse) GetData() []*v1.Role {
+func (x *ListResponse) GetData() []*v1.Permission {
 	if x != nil {
 		return x.Data
 	}
@@ -511,44 +108,12 @@ var File_permission_v1_permission_proto protoreflect.FileDescriptor
 
 const file_permission_v1_permission_proto_rawDesc = "" +
 	"\n" +
-	"\x1epermission/v1/permission.proto\x12\rpermission.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x1acommon/v1/permission.proto\x1a\x14common/v1/role.proto\x1a\x1acommon/v1/identifier.proto\x1a\x1bcommon/v1/annotations.proto\"E\n" +
-	"\x14GetPermissionRequest\x12-\n" +
-	"\rpermission_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\fpermissionId\"X\n" +
-	"\x15GetPermissionResponse\x12?\n" +
-	"\n" +
-	"permission\x18\x01 \x01(\v2\x15.common.v1.PermissionB\b\xfaB\x05\x8a\x01\x02\x10\x01R\n" +
-	"permission\"\xca\x01\n" +
-	"\x16ListPermissionsRequest\x12&\n" +
-	"\arole_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01H\x00R\x06roleId\x88\x01\x01\x12,\n" +
-	"\x0fresource_filter\x18\x02 \x01(\tH\x01R\x0eresourceFilter\x88\x01\x01\x12(\n" +
-	"\raction_filter\x18\x03 \x01(\tH\x02R\factionFilter\x88\x01\x01B\n" +
-	"\n" +
-	"\b_role_idB\x12\n" +
-	"\x10_resource_filterB\x10\n" +
-	"\x0e_action_filter\"D\n" +
-	"\x17ListPermissionsResponse\x12)\n" +
-	"\x04data\x18\x01 \x03(\v2\x15.common.v1.PermissionR\x04data\"q\n" +
-	"\x1dAssignPermissionToRoleRequest\x12!\n" +
-	"\arole_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\x12-\n" +
-	"\rpermission_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\fpermissionId\"s\n" +
-	"\x1fRevokePermissionFromRoleRequest\x12!\n" +
-	"\arole_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\x12-\n" +
-	"\rpermission_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\fpermissionId\"X\n" +
-	"\x1cListPermissionsByRoleRequest\x128\n" +
-	"\x05value\x18\x01 \x01(\v2\x18.common.v1.GetIdentifierB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x05value\"J\n" +
-	"\x1dListPermissionsByRoleResponse\x12)\n" +
-	"\x04data\x18\x01 \x03(\v2\x15.common.v1.PermissionR\x04data\"X\n" +
-	"\x1cListRolesByPermissionRequest\x128\n" +
-	"\x05value\x18\x01 \x01(\v2\x18.common.v1.GetIdentifierB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x05value\"D\n" +
-	"\x1dListRolesByPermissionResponse\x12#\n" +
-	"\x04data\x18\x01 \x03(\v2\x0f.common.v1.RoleR\x04data2\xff\x05\n" +
-	"\x11PermissionService\x12o\n" +
-	"\rGetPermission\x12#.permission.v1.GetPermissionRequest\x1a$.permission.v1.GetPermissionResponse\"\x13\x8a\xb5\x18\x0fpermission:read\x12u\n" +
-	"\x0fListPermissions\x12%.permission.v1.ListPermissionsRequest\x1a&.permission.v1.ListPermissionsResponse\"\x13\x8a\xb5\x18\x0fpermission:read\x12t\n" +
-	"\x16AssignPermissionToRole\x12,.permission.v1.AssignPermissionToRoleRequest\x1a\x16.google.protobuf.Empty\"\x14\x8a\xb5\x18\x10permission:write\x12x\n" +
-	"\x18RevokePermissionFromRole\x12..permission.v1.RevokePermissionFromRoleRequest\x1a\x16.google.protobuf.Empty\"\x14\x8a\xb5\x18\x10permission:write\x12\x87\x01\n" +
-	"\x15ListPermissionsByRole\x12+.permission.v1.ListPermissionsByRoleRequest\x1a,.permission.v1.ListPermissionsByRoleResponse\"\x13\x8a\xb5\x18\x0fpermission:read\x12\x87\x01\n" +
-	"\x15ListRolesByPermission\x12+.permission.v1.ListRolesByPermissionRequest\x1a,.permission.v1.ListRolesByPermissionResponse\"\x13\x8a\xb5\x18\x0fpermission:readBVZTgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1;permission_v1b\x06proto3"
+	"\x1epermission/v1/permission.proto\x12\rpermission.v1\x1a\x1acommon/v1/permission.proto\x1a\x1bcommon/v1/annotations.proto\"\r\n" +
+	"\vListRequest\"9\n" +
+	"\fListResponse\x12)\n" +
+	"\x04data\x18\x01 \x03(\v2\x15.common.v1.PermissionR\x04data2i\n" +
+	"\x11PermissionService\x12T\n" +
+	"\x04List\x12\x1a.permission.v1.ListRequest\x1a\x1b.permission.v1.ListResponse\"\x13\x8a\xb5\x18\x0fpermission:readBVZTgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1;permission_v1b\x06proto3"
 
 var (
 	file_permission_v1_permission_proto_rawDescOnce sync.Once
@@ -562,47 +127,21 @@ func file_permission_v1_permission_proto_rawDescGZIP() []byte {
 	return file_permission_v1_permission_proto_rawDescData
 }
 
-var file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_permission_v1_permission_proto_goTypes = []any{
-	(*GetPermissionRequest)(nil),            // 0: permission.v1.GetPermissionRequest
-	(*GetPermissionResponse)(nil),           // 1: permission.v1.GetPermissionResponse
-	(*ListPermissionsRequest)(nil),          // 2: permission.v1.ListPermissionsRequest
-	(*ListPermissionsResponse)(nil),         // 3: permission.v1.ListPermissionsResponse
-	(*AssignPermissionToRoleRequest)(nil),   // 4: permission.v1.AssignPermissionToRoleRequest
-	(*RevokePermissionFromRoleRequest)(nil), // 5: permission.v1.RevokePermissionFromRoleRequest
-	(*ListPermissionsByRoleRequest)(nil),    // 6: permission.v1.ListPermissionsByRoleRequest
-	(*ListPermissionsByRoleResponse)(nil),   // 7: permission.v1.ListPermissionsByRoleResponse
-	(*ListRolesByPermissionRequest)(nil),    // 8: permission.v1.ListRolesByPermissionRequest
-	(*ListRolesByPermissionResponse)(nil),   // 9: permission.v1.ListRolesByPermissionResponse
-	(*v1.Permission)(nil),                   // 10: common.v1.Permission
-	(*v1.GetIdentifier)(nil),                // 11: common.v1.GetIdentifier
-	(*v1.Role)(nil),                         // 12: common.v1.Role
-	(*emptypb.Empty)(nil),                   // 13: google.protobuf.Empty
+	(*ListRequest)(nil),   // 0: permission.v1.ListRequest
+	(*ListResponse)(nil),  // 1: permission.v1.ListResponse
+	(*v1.Permission)(nil), // 2: common.v1.Permission
 }
 var file_permission_v1_permission_proto_depIdxs = []int32{
-	10, // 0: permission.v1.GetPermissionResponse.permission:type_name -> common.v1.Permission
-	10, // 1: permission.v1.ListPermissionsResponse.data:type_name -> common.v1.Permission
-	11, // 2: permission.v1.ListPermissionsByRoleRequest.value:type_name -> common.v1.GetIdentifier
-	10, // 3: permission.v1.ListPermissionsByRoleResponse.data:type_name -> common.v1.Permission
-	11, // 4: permission.v1.ListRolesByPermissionRequest.value:type_name -> common.v1.GetIdentifier
-	12, // 5: permission.v1.ListRolesByPermissionResponse.data:type_name -> common.v1.Role
-	0,  // 6: permission.v1.PermissionService.GetPermission:input_type -> permission.v1.GetPermissionRequest
-	2,  // 7: permission.v1.PermissionService.ListPermissions:input_type -> permission.v1.ListPermissionsRequest
-	4,  // 8: permission.v1.PermissionService.AssignPermissionToRole:input_type -> permission.v1.AssignPermissionToRoleRequest
-	5,  // 9: permission.v1.PermissionService.RevokePermissionFromRole:input_type -> permission.v1.RevokePermissionFromRoleRequest
-	6,  // 10: permission.v1.PermissionService.ListPermissionsByRole:input_type -> permission.v1.ListPermissionsByRoleRequest
-	8,  // 11: permission.v1.PermissionService.ListRolesByPermission:input_type -> permission.v1.ListRolesByPermissionRequest
-	1,  // 12: permission.v1.PermissionService.GetPermission:output_type -> permission.v1.GetPermissionResponse
-	3,  // 13: permission.v1.PermissionService.ListPermissions:output_type -> permission.v1.ListPermissionsResponse
-	13, // 14: permission.v1.PermissionService.AssignPermissionToRole:output_type -> google.protobuf.Empty
-	13, // 15: permission.v1.PermissionService.RevokePermissionFromRole:output_type -> google.protobuf.Empty
-	7,  // 16: permission.v1.PermissionService.ListPermissionsByRole:output_type -> permission.v1.ListPermissionsByRoleResponse
-	9,  // 17: permission.v1.PermissionService.ListRolesByPermission:output_type -> permission.v1.ListRolesByPermissionResponse
-	12, // [12:18] is the sub-list for method output_type
-	6,  // [6:12] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	2, // 0: permission.v1.ListResponse.data:type_name -> common.v1.Permission
+	0, // 1: permission.v1.PermissionService.List:input_type -> permission.v1.ListRequest
+	1, // 2: permission.v1.PermissionService.List:output_type -> permission.v1.ListResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_permission_v1_permission_proto_init() }
@@ -610,14 +149,13 @@ func file_permission_v1_permission_proto_init() {
 	if File_permission_v1_permission_proto != nil {
 		return
 	}
-	file_permission_v1_permission_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_permission_v1_permission_proto_rawDesc), len(file_permission_v1_permission_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

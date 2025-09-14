@@ -10,13 +10,14 @@ import (
 	permissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1"
 )
 
-func (api *API) ListPermissions(ctx context.Context, req *permissionV1.ListPermissionsRequest) (*permissionV1.ListPermissionsResponse, error) {
-	filter := converter.ListPermissionsToDomain(req)
-	permissions, err := api.permissionService.ListPermissions(ctx, filter)
+func (api *API) List(ctx context.Context, req *permissionV1.ListRequest) (*permissionV1.ListResponse, error) {
+	permissions, err := api.permissionService.List(ctx)
 	if err != nil {
 		logger.Error(ctx, "❌ [API] Ошибка получения списка прав доступа", zap.Error(err))
-		return nil, mapError(ctx, err)
+		return nil, mapError(err)
 	}
 
-	return converter.PermissionsToListResponse(permissions), nil
+	return &permissionV1.ListResponse{
+		Data: converter.PermissionsToProto(permissions),
+	}, nil
 }

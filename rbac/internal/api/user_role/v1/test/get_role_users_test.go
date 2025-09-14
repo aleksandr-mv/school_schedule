@@ -10,14 +10,13 @@ import (
 	userRoleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
-func (s *APISuite) TestGetRoleUsersSuccess() {
+func (s *APISuite) TestGetUsersSuccess() {
 	roleID := "role123"
 	limit := int32(10)
 	cursor := "cursor123"
 	nextCursor := "nextCursor456"
 
 	expectedUsers := []string{"user1", "user2", "user3"}
-	expectedTotal := int32(3)
 
 	req := &userRoleV1.GetRoleUsersRequest{
 		RoleId: roleID,
@@ -25,16 +24,16 @@ func (s *APISuite) TestGetRoleUsersSuccess() {
 		Cursor: &cursor,
 	}
 
-	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedUsers, expectedTotal, &nextCursor, nil).Once()
+	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedUsers, &nextCursor, nil).Once()
 
 	resp, err := s.api.GetRoleUsers(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	assert.Len(s.T(), resp.UserIds, len(expectedUsers))
-	assert.Equal(s.T(), expectedTotal, resp.TotalCount)
 	assert.NotNil(s.T(), resp.NextCursor)
 	assert.Equal(s.T(), nextCursor, *resp.NextCursor)
+	assert.True(s.T(), resp.HasMore)
 
 	for i, user := range resp.UserIds {
 		assert.Equal(s.T(), expectedUsers[i], user)
@@ -43,12 +42,11 @@ func (s *APISuite) TestGetRoleUsersSuccess() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestGetRoleUsersSuccessWithoutCursor() {
+func (s *APISuite) TestGetUsersSuccessWithoutCursor() {
 	roleID := "role123"
 	limit := int32(10)
 
 	expectedUsers := []string{"user1", "user2", "user3"}
-	expectedTotal := int32(3)
 
 	req := &userRoleV1.GetRoleUsersRequest{
 		RoleId: roleID,
@@ -56,15 +54,15 @@ func (s *APISuite) TestGetRoleUsersSuccessWithoutCursor() {
 		Cursor: nil,
 	}
 
-	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedUsers, expectedTotal, nil, nil).Once()
+	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedUsers, nil, nil).Once()
 
 	resp, err := s.api.GetRoleUsers(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	assert.Len(s.T(), resp.UserIds, len(expectedUsers))
-	assert.Equal(s.T(), expectedTotal, resp.TotalCount)
 	assert.Nil(s.T(), resp.NextCursor)
+	assert.False(s.T(), resp.HasMore)
 
 	for i, user := range resp.UserIds {
 		assert.Equal(s.T(), expectedUsers[i], user)
@@ -73,12 +71,11 @@ func (s *APISuite) TestGetRoleUsersSuccessWithoutCursor() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestGetRoleUsersEmptyResult() {
+func (s *APISuite) TestGetUsersEmptyResult() {
 	roleID := "role123"
 	limit := int32(10)
 
 	expectedUsers := []string{}
-	expectedTotal := int32(0)
 
 	req := &userRoleV1.GetRoleUsersRequest{
 		RoleId: roleID,
@@ -86,20 +83,20 @@ func (s *APISuite) TestGetRoleUsersEmptyResult() {
 		Cursor: nil,
 	}
 
-	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedUsers, expectedTotal, nil, nil).Once()
+	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedUsers, nil, nil).Once()
 
 	resp, err := s.api.GetRoleUsers(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	assert.Len(s.T(), resp.UserIds, 0)
-	assert.Equal(s.T(), expectedTotal, resp.TotalCount)
 	assert.Nil(s.T(), resp.NextCursor)
+	assert.False(s.T(), resp.HasMore)
 
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestGetRoleUsersRoleNotFound() {
+func (s *APISuite) TestGetUsersRoleNotFound() {
 	roleID := "role123"
 	limit := int32(10)
 
@@ -109,7 +106,7 @@ func (s *APISuite) TestGetRoleUsersRoleNotFound() {
 		Cursor: nil,
 	}
 
-	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, int32(0), nil, model.ErrRoleNotFound).Once()
+	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil, model.ErrRoleNotFound).Once()
 
 	resp, err := s.api.GetRoleUsers(s.ctx, req)
 
@@ -123,7 +120,7 @@ func (s *APISuite) TestGetRoleUsersRoleNotFound() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestGetRoleUsersInternalError() {
+func (s *APISuite) TestGetUsersInternalError() {
 	roleID := "role123"
 	limit := int32(10)
 
@@ -133,7 +130,7 @@ func (s *APISuite) TestGetRoleUsersInternalError() {
 		Cursor: nil,
 	}
 
-	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, int32(0), nil, model.ErrInternal).Once()
+	s.userRoleService.On("GetRoleUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil, model.ErrInternal).Once()
 
 	resp, err := s.api.GetRoleUsers(s.ctx, req)
 

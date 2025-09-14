@@ -13,85 +13,52 @@ import (
 	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
 )
 
-func (s *APISuite) TestListRolesSuccess() {
+func (s *APISuite) TestListSuccess() {
 	role1 := &model.Role{
 		ID:          uuid.New(),
 		Name:        "admin",
 		Description: "Administrator role",
 		CreatedAt:   time.Now(),
-		UpdatedAt:   nil,
 	}
 	role2 := &model.Role{
 		ID:          uuid.New(),
 		Name:        "user",
 		Description: "User role",
 		CreatedAt:   time.Now(),
-		UpdatedAt:   nil,
 	}
+
 	expectedRoles := []*model.Role{role1, role2}
 
-	req := &roleV1.ListRolesRequest{
-		NameFilter: nil,
-	}
+	req := &roleV1.ListRequest{}
 
-	s.roleService.On("ListRoles", mock.Anything, mock.Anything).Return(expectedRoles, nil).Once()
+	s.roleService.On("List", mock.Anything).Return(expectedRoles, nil).Once()
 
-	resp, err := s.api.ListRoles(s.ctx, req)
+	resp, err := s.api.List(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	assert.Len(s.T(), resp.Data, 2)
 
-	for i, role := range resp.Data {
-		assert.Equal(s.T(), expectedRoles[i].ID.String(), role.Id)
-		assert.Equal(s.T(), expectedRoles[i].Name, role.Name)
-		assert.Equal(s.T(), expectedRoles[i].Description, role.Description)
-	}
+	// Проверяем первую роль
+	assert.Equal(s.T(), role1.ID.String(), resp.Data[0].Id)
+	assert.Equal(s.T(), role1.Name, resp.Data[0].Name)
+	assert.Equal(s.T(), role1.Description, resp.Data[0].Description)
+
+	// Проверяем вторую роль
+	assert.Equal(s.T(), role2.ID.String(), resp.Data[1].Id)
+	assert.Equal(s.T(), role2.Name, resp.Data[1].Name)
+	assert.Equal(s.T(), role2.Description, resp.Data[1].Description)
 
 	s.roleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestListRolesSuccessWithFilter() {
-	role1 := &model.Role{
-		ID:          uuid.New(),
-		Name:        "admin",
-		Description: "Administrator role",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   nil,
-	}
-	expectedRoles := []*model.Role{role1}
-	adminFilter := "admin"
-
-	req := &roleV1.ListRolesRequest{
-		NameFilter: &adminFilter,
-	}
-
-	s.roleService.On("ListRoles", mock.Anything, mock.Anything).Return(expectedRoles, nil).Once()
-
-	resp, err := s.api.ListRoles(s.ctx, req)
-
-	assert.NoError(s.T(), err)
-	assert.NotNil(s.T(), resp)
-	assert.Len(s.T(), resp.Data, 1)
-
-	assert.Equal(s.T(), expectedRoles[0].ID.String(), resp.Data[0].Id)
-	assert.Equal(s.T(), expectedRoles[0].Name, resp.Data[0].Name)
-	assert.Equal(s.T(), expectedRoles[0].Description, resp.Data[0].Description)
-
-	s.roleService.AssertExpectations(s.T())
-}
-
-func (s *APISuite) TestListRolesEmptyResult() {
+func (s *APISuite) TestListEmptyResult() {
 	expectedRoles := []*model.Role{}
-	nonexistentFilter := "nonexistent"
+	req := &roleV1.ListRequest{}
 
-	req := &roleV1.ListRolesRequest{
-		NameFilter: &nonexistentFilter,
-	}
+	s.roleService.On("List", mock.Anything).Return(expectedRoles, nil).Once()
 
-	s.roleService.On("ListRoles", mock.Anything, mock.Anything).Return(expectedRoles, nil).Once()
-
-	resp, err := s.api.ListRoles(s.ctx, req)
+	resp, err := s.api.List(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
@@ -100,14 +67,12 @@ func (s *APISuite) TestListRolesEmptyResult() {
 	s.roleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestListRolesInternalError() {
-	req := &roleV1.ListRolesRequest{
-		NameFilter: nil,
-	}
+func (s *APISuite) TestListInternalError() {
+	req := &roleV1.ListRequest{}
 
-	s.roleService.On("ListRoles", mock.Anything, mock.Anything).Return(nil, model.ErrInternal).Once()
+	s.roleService.On("List", mock.Anything).Return(nil, model.ErrInternal).Once()
 
-	resp, err := s.api.ListRoles(s.ctx, req)
+	resp, err := s.api.List(s.ctx, req)
 
 	assert.Error(s.T(), err)
 	assert.Nil(s.T(), resp)
@@ -117,4 +82,11 @@ func (s *APISuite) TestListRolesInternalError() {
 	assert.Equal(s.T(), codes.Internal, grpcErr.Code())
 
 	s.roleService.AssertExpectations(s.T())
+}
+
+func (s *APISuite) TestListValidation_ValidRequest() {
+	req := &roleV1.ListRequest{}
+
+	err := req.Validate()
+	assert.NoError(s.T(), err)
 }

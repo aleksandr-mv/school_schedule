@@ -25,7 +25,7 @@ packages:
     config:
       include-regex: ".*Repository"
 
-  # gRPC клиенты
-  github.com/Alexander-Mandzhiev/microservices-course/order/internal/client/grpc:
+  # gRPC клиенты IAM
+  github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc:
     config:
       include-regex: ".*Client"

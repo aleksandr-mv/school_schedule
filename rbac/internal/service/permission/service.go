@@ -8,17 +8,11 @@ import (
 var _ service.PermissionServiceInterface = (*PermissionService)(nil)
 
 type PermissionService struct {
-	permissionRepo     repository.PermissionRepository
-	rolePermissionRepo repository.RolePermissionRepository
-	userRoleRepo       repository.UserRoleRepository
+	permissionRepo repository.PermissionRepository
 }
 
-func NewService(permissionRepo repository.PermissionRepository,
-	rolePermissionRepo repository.RolePermissionRepository,
-	userRoleRepo repository.UserRoleRepository) *PermissionService {
+func NewService(permissionRepo repository.PermissionRepository) *PermissionService {
 	return &PermissionService{
-		permissionRepo:     permissionRepo,
-		rolePermissionRepo: rolePermissionRepo,
-		userRoleRepo:       userRoleRepo,
+		permissionRepo: permissionRepo,
 	}
 }

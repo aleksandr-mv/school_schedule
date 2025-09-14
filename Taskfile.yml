@@ -44,7 +44,7 @@ vars:
 
   # Модули и сервисы
   MODULES: platform shared iam rbac
-  SERVICES: core,cache,eventbus,iam,logs,metrics,otel,tracing
+  SERVICES: core,cache,eventbus,iam,logs,metrics,otel,rbac,tracing
   GRPC_SERVER_ADDR: 'localhost:50051'
 
 # =============================================================================
@@ -562,6 +562,21 @@ tasks:
       - echo "[task] 🛑 Останавливаем metrics контейнеры"
       - docker compose -p school_schedule down --volumes
 
+  up-cache:
+    desc: "Поднять cache сервис (Redis) с зависимостями"
+    dir: deploy/compose/cache
+    cmds:
+      - task: env:generate
+      - echo "[task] 🚀 Поднимаем cache сервис"
+      - docker compose -p school_schedule up --build --detach
+
+  down-cache:
+    desc: "Остановить и удалить cache сервис с зависимостями"
+    dir: deploy/compose/cache
+    cmds:
+      - echo "[task] 🛑 Останавливаем cache сервис"
+      - docker compose -p school_schedule down --volumes
+
 # =============================================================================
 # DOCKER COMPOSE - УПРАВЛЕНИЕ ВСЕМИ СЕРВИСАМИ
 # =============================================================================
@@ -570,6 +585,7 @@ tasks:
     desc: "Поднять все сервисы по очереди вместе с зависимостями"
     cmds:
       - task: up-core
+      - task: up-cache
       - task: up-eventbus
       - task: up-tracing
       - task: up-logs
@@ -585,6 +601,7 @@ tasks:
       - task: down-otel
       - task: down-rbac
       - task: down-iam
+      - task: down-cache
       - task: down-metrics
       - task: down-logs
       - task: down-tracing

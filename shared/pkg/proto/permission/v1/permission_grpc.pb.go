@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,30 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PermissionService_GetPermission_FullMethodName            = "/permission.v1.PermissionService/GetPermission"
-	PermissionService_ListPermissions_FullMethodName          = "/permission.v1.PermissionService/ListPermissions"
-	PermissionService_AssignPermissionToRole_FullMethodName   = "/permission.v1.PermissionService/AssignPermissionToRole"
-	PermissionService_RevokePermissionFromRole_FullMethodName = "/permission.v1.PermissionService/RevokePermissionFromRole"
-	PermissionService_ListPermissionsByRole_FullMethodName    = "/permission.v1.PermissionService/ListPermissionsByRole"
-	PermissionService_ListRolesByPermission_FullMethodName    = "/permission.v1.PermissionService/ListRolesByPermission"
+	PermissionService_List_FullMethodName = "/permission.v1.PermissionService/List"
 )
 
 // PermissionServiceClient is the client API for PermissionService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PermissionServiceClient interface {
-	// Получение права доступа по ID (для админки/отладки)
-	GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*GetPermissionResponse, error)
-	// Получение списка всех прав доступа (для админки/отладки)
-	ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsResponse, error)
-	// Назначение права роли (для админки)
-	AssignPermissionToRole(ctx context.Context, in *AssignPermissionToRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Отзыв права у роли (для админки)
-	RevokePermissionFromRole(ctx context.Context, in *RevokePermissionFromRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Получение прав роли (для админки)
-	ListPermissionsByRole(ctx context.Context, in *ListPermissionsByRoleRequest, opts ...grpc.CallOption) (*ListPermissionsByRoleResponse, error)
-	// Получение ролей по праву (для админки/аудита)
-	ListRolesByPermission(ctx context.Context, in *ListRolesByPermissionRequest, opts ...grpc.CallOption) (*ListRolesByPermissionResponse, error)
+	// Получение списка прав доступа
+	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 }
 
 type permissionServiceClient struct {
@@ -54,60 +38,10 @@ func NewPermissionServiceClient(cc grpc.ClientConnInterface) PermissionServiceCl
 	return &permissionServiceClient{cc}
 }
 
-func (c *permissionServiceClient) GetPermission(ctx context.Context, in *GetPermissionRequest, opts ...grpc.CallOption) (*GetPermissionResponse, error) {
+func (c *permissionServiceClient) List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPermissionResponse)
-	err := c.cc.Invoke(ctx, PermissionService_GetPermission_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *permissionServiceClient) ListPermissions(ctx context.Context, in *ListPermissionsRequest, opts ...grpc.CallOption) (*ListPermissionsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListPermissionsResponse)
-	err := c.cc.Invoke(ctx, PermissionService_ListPermissions_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *permissionServiceClient) AssignPermissionToRole(ctx context.Context, in *AssignPermissionToRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PermissionService_AssignPermissionToRole_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *permissionServiceClient) RevokePermissionFromRole(ctx context.Context, in *RevokePermissionFromRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PermissionService_RevokePermissionFromRole_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *permissionServiceClient) ListPermissionsByRole(ctx context.Context, in *ListPermissionsByRoleRequest, opts ...grpc.CallOption) (*ListPermissionsByRoleResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListPermissionsByRoleResponse)
-	err := c.cc.Invoke(ctx, PermissionService_ListPermissionsByRole_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *permissionServiceClient) ListRolesByPermission(ctx context.Context, in *ListRolesByPermissionRequest, opts ...grpc.CallOption) (*ListRolesByPermissionResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListRolesByPermissionResponse)
-	err := c.cc.Invoke(ctx, PermissionService_ListRolesByPermission_FullMethodName, in, out, cOpts...)
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, PermissionService_List_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -118,18 +52,8 @@ func (c *permissionServiceClient) ListRolesByPermission(ctx context.Context, in 
 // All implementations must embed UnimplementedPermissionServiceServer
 // for forward compatibility.
 type PermissionServiceServer interface {
-	// Получение права доступа по ID (для админки/отладки)
-	GetPermission(context.Context, *GetPermissionRequest) (*GetPermissionResponse, error)
-	// Получение списка всех прав доступа (для админки/отладки)
-	ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsResponse, error)
-	// Назначение права роли (для админки)
-	AssignPermissionToRole(context.Context, *AssignPermissionToRoleRequest) (*emptypb.Empty, error)
-	// Отзыв права у роли (для админки)
-	RevokePermissionFromRole(context.Context, *RevokePermissionFromRoleRequest) (*emptypb.Empty, error)
-	// Получение прав роли (для админки)
-	ListPermissionsByRole(context.Context, *ListPermissionsByRoleRequest) (*ListPermissionsByRoleResponse, error)
-	// Получение ролей по праву (для админки/аудита)
-	ListRolesByPermission(context.Context, *ListRolesByPermissionRequest) (*ListRolesByPermissionResponse, error)
+	// Получение списка прав доступа
+	List(context.Context, *ListRequest) (*ListResponse, error)
 	mustEmbedUnimplementedPermissionServiceServer()
 }
 
@@ -140,23 +64,8 @@ type PermissionServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPermissionServiceServer struct{}
 
-func (UnimplementedPermissionServiceServer) GetPermission(context.Context, *GetPermissionRequest) (*GetPermissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPermission not implemented")
-}
-func (UnimplementedPermissionServiceServer) ListPermissions(context.Context, *ListPermissionsRequest) (*ListPermissionsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListPermissions not implemented")
-}
-func (UnimplementedPermissionServiceServer) AssignPermissionToRole(context.Context, *AssignPermissionToRoleRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AssignPermissionToRole not implemented")
-}
-func (UnimplementedPermissionServiceServer) RevokePermissionFromRole(context.Context, *RevokePermissionFromRoleRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RevokePermissionFromRole not implemented")
-}
-func (UnimplementedPermissionServiceServer) ListPermissionsByRole(context.Context, *ListPermissionsByRoleRequest) (*ListPermissionsByRoleResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListPermissionsByRole not implemented")
-}
-func (UnimplementedPermissionServiceServer) ListRolesByPermission(context.Context, *ListRolesByPermissionRequest) (*ListRolesByPermissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListRolesByPermission not implemented")
+func (UnimplementedPermissionServiceServer) List(context.Context, *ListRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 func (UnimplementedPermissionServiceServer) mustEmbedUnimplementedPermissionServiceServer() {}
 func (UnimplementedPermissionServiceServer) testEmbeddedByValue()                           {}
@@ -179,110 +88,20 @@ func RegisterPermissionServiceServer(s grpc.ServiceRegistrar, srv PermissionServ
 	s.RegisterService(&PermissionService_ServiceDesc, srv)
 }
 
-func _PermissionService_GetPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPermissionRequest)
+func _PermissionService_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PermissionServiceServer).GetPermission(ctx, in)
+		return srv.(PermissionServiceServer).List(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PermissionService_GetPermission_FullMethodName,
+		FullMethod: PermissionService_List_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServiceServer).GetPermission(ctx, req.(*GetPermissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PermissionService_ListPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListPermissionsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PermissionServiceServer).ListPermissions(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PermissionService_ListPermissions_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServiceServer).ListPermissions(ctx, req.(*ListPermissionsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PermissionService_AssignPermissionToRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AssignPermissionToRoleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PermissionServiceServer).AssignPermissionToRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PermissionService_AssignPermissionToRole_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServiceServer).AssignPermissionToRole(ctx, req.(*AssignPermissionToRoleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PermissionService_RevokePermissionFromRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RevokePermissionFromRoleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PermissionServiceServer).RevokePermissionFromRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PermissionService_RevokePermissionFromRole_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServiceServer).RevokePermissionFromRole(ctx, req.(*RevokePermissionFromRoleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PermissionService_ListPermissionsByRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListPermissionsByRoleRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PermissionServiceServer).ListPermissionsByRole(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PermissionService_ListPermissionsByRole_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServiceServer).ListPermissionsByRole(ctx, req.(*ListPermissionsByRoleRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PermissionService_ListRolesByPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListRolesByPermissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PermissionServiceServer).ListRolesByPermission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PermissionService_ListRolesByPermission_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PermissionServiceServer).ListRolesByPermission(ctx, req.(*ListRolesByPermissionRequest))
+		return srv.(PermissionServiceServer).List(ctx, req.(*ListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -295,28 +114,8 @@ var PermissionService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PermissionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetPermission",
-			Handler:    _PermissionService_GetPermission_Handler,
-		},
-		{
-			MethodName: "ListPermissions",
-			Handler:    _PermissionService_ListPermissions_Handler,
-		},
-		{
-			MethodName: "AssignPermissionToRole",
-			Handler:    _PermissionService_AssignPermissionToRole_Handler,
-		},
-		{
-			MethodName: "RevokePermissionFromRole",
-			Handler:    _PermissionService_RevokePermissionFromRole_Handler,
-		},
-		{
-			MethodName: "ListPermissionsByRole",
-			Handler:    _PermissionService_ListPermissionsByRole_Handler,
-		},
-		{
-			MethodName: "ListRolesByPermission",
-			Handler:    _PermissionService_ListRolesByPermission_Handler,
+			MethodName: "List",
+			Handler:    _PermissionService_List_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

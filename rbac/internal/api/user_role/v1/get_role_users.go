@@ -10,20 +10,19 @@ import (
 )
 
 func (api *API) GetRoleUsers(ctx context.Context, req *userRoleV1.GetRoleUsersRequest) (*userRoleV1.GetRoleUsersResponse, error) {
-	limit := int32(10)
-	if req.Limit != nil {
-		limit = *req.Limit
+	limit := req.GetLimit()
+	if limit == 0 {
+		limit = 10
 	}
 
-	userIDs, totalCount, nextCursor, err := api.userRoleService.GetRoleUsers(ctx, req.RoleId, limit, req.Cursor)
+	userIDs, nextCursor, err := api.userRoleService.GetRoleUsers(ctx, req.RoleId, limit, req.GetCursor())
 	if err != nil {
 		logger.Error(ctx, "❌ [API] Ошибка получения пользователей роли", zap.Error(err))
-		return nil, mapError(ctx, err)
+		return nil, mapError(err)
 	}
 
 	return &userRoleV1.GetRoleUsersResponse{
 		UserIds:    userIDs,
-		TotalCount: totalCount,
 		Limit:      limit,
 		NextCursor: nextCursor,
 		HasMore:    nextCursor != nil,

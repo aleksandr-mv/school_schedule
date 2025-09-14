@@ -45,41 +45,7 @@
         }
       }
     },
-    "v1GetIdentifier": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      },
-      "title": "Универсальный идентификатор для поиска по ID или имени"
-    },
-    "v1GetPermissionResponse": {
-      "type": "object",
-      "properties": {
-        "permission": {
-          "$ref": "#/definitions/v1Permission"
-        }
-      },
-      "title": "Ответ с данными права доступа"
-    },
-    "v1ListPermissionsByRoleResponse": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1Permission"
-          }
-        }
-      },
-      "title": "Ответ с правами роли"
-    },
-    "v1ListPermissionsResponse": {
+    "v1ListResponse": {
       "type": "object",
       "properties": {
         "data": {
@@ -91,19 +57,6 @@
         }
       },
       "title": "Ответ со списком прав доступа"
-    },
-    "v1ListRolesByPermissionResponse": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1Role"
-          }
-        }
-      },
-      "title": "Ответ с ролями по праву"
     },
     "v1Permission": {
       "type": "object",
@@ -119,29 +72,6 @@
         }
       },
       "title": "Право доступа"
-    },
-    "v1Role": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "title": "Роль пользователя"
     }
   }
 }

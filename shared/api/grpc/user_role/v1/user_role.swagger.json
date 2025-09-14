@@ -54,11 +54,6 @@
             "type": "string"
           }
         },
-        "totalCount": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Общее количество пользователей с этой ролью"
-        },
         "limit": {
           "type": "integer",
           "format": "int32",
@@ -82,11 +77,26 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Role"
+            "$ref": "#/definitions/v1RoleWithPermissions"
           }
         }
       },
       "title": "Ответ с ролями пользователя"
+    },
+    "v1Permission": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        }
+      },
+      "title": "Право доступа"
     },
     "v1Role": {
       "type": "object",
@@ -110,6 +120,22 @@
         }
       },
       "title": "Роль пользователя"
+    },
+    "v1RoleWithPermissions": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v1Role"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Permission"
+          }
+        }
+      },
+      "title": "Роль с правами доступа"
     }
   }
 }

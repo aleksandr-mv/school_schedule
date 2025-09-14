@@ -21,7 +21,8 @@ func (r *roleRepository) Update(ctx context.Context, updateRole *model.UpdateRol
 	queryBuilder := sq.StatementBuilder.
 		Update("roles").
 		Set("updated_at", "NOW()").
-		Where(sq.Eq{"id": updateRole.ID})
+		Where(sq.Eq{"id": updateRole.ID}).
+		Where(sq.Eq{"deleted_at": nil})
 
 	for key, value := range updates {
 		queryBuilder = queryBuilder.Set(key, value)

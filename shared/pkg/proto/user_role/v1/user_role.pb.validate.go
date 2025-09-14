@@ -38,22 +38,22 @@ var (
 // define the regex for a UUID once up-front
 var _user_role_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
-// Validate checks the field values on AssignRoleRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *AssignRoleRequest) Validate() error {
+// Validate checks the field values on AssignRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AssignRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AssignRoleRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// AssignRoleRequestMultiError, or nil if none found.
-func (m *AssignRoleRequest) ValidateAll() error {
+// ValidateAll checks the field values on AssignRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AssignRequestMultiError, or
+// nil if none found.
+func (m *AssignRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AssignRoleRequest) validate(all bool) error {
+func (m *AssignRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -61,7 +61,7 @@ func (m *AssignRoleRequest) validate(all bool) error {
 	var errors []error
 
 	if err := m._validateUuid(m.GetUserId()); err != nil {
-		err = AssignRoleRequestValidationError{
+		err = AssignRequestValidationError{
 			field:  "UserId",
 			reason: "value must be a valid UUID",
 			cause:  err,
@@ -73,7 +73,7 @@ func (m *AssignRoleRequest) validate(all bool) error {
 	}
 
 	if err := m._validateUuid(m.GetRoleId()); err != nil {
-		err = AssignRoleRequestValidationError{
+		err = AssignRequestValidationError{
 			field:  "RoleId",
 			reason: "value must be a valid UUID",
 			cause:  err,
@@ -87,7 +87,7 @@ func (m *AssignRoleRequest) validate(all bool) error {
 	if m.AssignedBy != nil {
 
 		if err := m._validateUuid(m.GetAssignedBy()); err != nil {
-			err = AssignRoleRequestValidationError{
+			err = AssignRequestValidationError{
 				field:  "AssignedBy",
 				reason: "value must be a valid UUID",
 				cause:  err,
@@ -101,13 +101,13 @@ func (m *AssignRoleRequest) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AssignRoleRequestMultiError(errors)
+		return AssignRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-func (m *AssignRoleRequest) _validateUuid(uuid string) error {
+func (m *AssignRequest) _validateUuid(uuid string) error {
 	if matched := _user_role_uuidPattern.MatchString(uuid); !matched {
 		return errors.New("invalid uuid format")
 	}
@@ -115,13 +115,13 @@ func (m *AssignRoleRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
-// AssignRoleRequestMultiError is an error wrapping multiple validation errors
-// returned by AssignRoleRequest.ValidateAll() if the designated constraints
+// AssignRequestMultiError is an error wrapping multiple validation errors
+// returned by AssignRequest.ValidateAll() if the designated constraints
 // aren't met.
-type AssignRoleRequestMultiError []error
+type AssignRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AssignRoleRequestMultiError) Error() string {
+func (m AssignRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -130,11 +130,11 @@ func (m AssignRoleRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AssignRoleRequestMultiError) AllErrors() []error { return m }
+func (m AssignRequestMultiError) AllErrors() []error { return m }
 
-// AssignRoleRequestValidationError is the validation error returned by
-// AssignRoleRequest.Validate if the designated constraints aren't met.
-type AssignRoleRequestValidationError struct {
+// AssignRequestValidationError is the validation error returned by
+// AssignRequest.Validate if the designated constraints aren't met.
+type AssignRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -142,24 +142,22 @@ type AssignRoleRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e AssignRoleRequestValidationError) Field() string { return e.field }
+func (e AssignRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AssignRoleRequestValidationError) Reason() string { return e.reason }
+func (e AssignRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AssignRoleRequestValidationError) Cause() error { return e.cause }
+func (e AssignRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AssignRoleRequestValidationError) Key() bool { return e.key }
+func (e AssignRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AssignRoleRequestValidationError) ErrorName() string {
-	return "AssignRoleRequestValidationError"
-}
+func (e AssignRequestValidationError) ErrorName() string { return "AssignRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e AssignRoleRequestValidationError) Error() string {
+func (e AssignRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -171,14 +169,14 @@ func (e AssignRoleRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAssignRoleRequest.%s: %s%s",
+		"invalid %sAssignRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AssignRoleRequestValidationError{}
+var _ error = AssignRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -186,24 +184,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AssignRoleRequestValidationError{}
+} = AssignRequestValidationError{}
 
-// Validate checks the field values on RevokeRoleRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *RevokeRoleRequest) Validate() error {
+// Validate checks the field values on RevokeRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RevokeRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on RevokeRoleRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// RevokeRoleRequestMultiError, or nil if none found.
-func (m *RevokeRoleRequest) ValidateAll() error {
+// ValidateAll checks the field values on RevokeRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RevokeRequestMultiError, or
+// nil if none found.
+func (m *RevokeRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *RevokeRoleRequest) validate(all bool) error {
+func (m *RevokeRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -211,7 +209,7 @@ func (m *RevokeRoleRequest) validate(all bool) error {
 	var errors []error
 
 	if err := m._validateUuid(m.GetUserId()); err != nil {
-		err = RevokeRoleRequestValidationError{
+		err = RevokeRequestValidationError{
 			field:  "UserId",
 			reason: "value must be a valid UUID",
 			cause:  err,
@@ -223,7 +221,7 @@ func (m *RevokeRoleRequest) validate(all bool) error {
 	}
 
 	if err := m._validateUuid(m.GetRoleId()); err != nil {
-		err = RevokeRoleRequestValidationError{
+		err = RevokeRequestValidationError{
 			field:  "RoleId",
 			reason: "value must be a valid UUID",
 			cause:  err,
@@ -235,13 +233,13 @@ func (m *RevokeRoleRequest) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return RevokeRoleRequestMultiError(errors)
+		return RevokeRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-func (m *RevokeRoleRequest) _validateUuid(uuid string) error {
+func (m *RevokeRequest) _validateUuid(uuid string) error {
 	if matched := _user_role_uuidPattern.MatchString(uuid); !matched {
 		return errors.New("invalid uuid format")
 	}
@@ -249,13 +247,13 @@ func (m *RevokeRoleRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
-// RevokeRoleRequestMultiError is an error wrapping multiple validation errors
-// returned by RevokeRoleRequest.ValidateAll() if the designated constraints
+// RevokeRequestMultiError is an error wrapping multiple validation errors
+// returned by RevokeRequest.ValidateAll() if the designated constraints
 // aren't met.
-type RevokeRoleRequestMultiError []error
+type RevokeRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m RevokeRoleRequestMultiError) Error() string {
+func (m RevokeRequestMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -264,11 +262,11 @@ func (m RevokeRoleRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m RevokeRoleRequestMultiError) AllErrors() []error { return m }
+func (m RevokeRequestMultiError) AllErrors() []error { return m }
 
-// RevokeRoleRequestValidationError is the validation error returned by
-// RevokeRoleRequest.Validate if the designated constraints aren't met.
-type RevokeRoleRequestValidationError struct {
+// RevokeRequestValidationError is the validation error returned by
+// RevokeRequest.Validate if the designated constraints aren't met.
+type RevokeRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -276,24 +274,22 @@ type RevokeRoleRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e RevokeRoleRequestValidationError) Field() string { return e.field }
+func (e RevokeRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e RevokeRoleRequestValidationError) Reason() string { return e.reason }
+func (e RevokeRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e RevokeRoleRequestValidationError) Cause() error { return e.cause }
+func (e RevokeRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e RevokeRoleRequestValidationError) Key() bool { return e.key }
+func (e RevokeRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e RevokeRoleRequestValidationError) ErrorName() string {
-	return "RevokeRoleRequestValidationError"
-}
+func (e RevokeRequestValidationError) ErrorName() string { return "RevokeRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e RevokeRoleRequestValidationError) Error() string {
+func (e RevokeRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -305,14 +301,14 @@ func (e RevokeRoleRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRevokeRoleRequest.%s: %s%s",
+		"invalid %sRevokeRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = RevokeRoleRequestValidationError{}
+var _ error = RevokeRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -320,7 +316,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = RevokeRoleRequestValidationError{}
+} = RevokeRequestValidationError{}
 
 // Validate checks the field values on GetUserRolesRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -759,8 +755,6 @@ func (m *GetRoleUsersResponse) validate(all bool) error {
 		}
 
 	}
-
-	// no validation rules for TotalCount
 
 	// no validation rules for Limit
 

@@ -7,77 +7,71 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *ServiceSuite) TestGetRoleUsersSuccess() {
+func (s *ServiceSuite) TestGetUsersSuccess() {
 	roleID := "role123"
 	limit := int32(10)
 	cursor := "cursor123"
 	nextCursor := "nextCursor456"
 
 	expectedUsers := []string{"user1", "user2", "user3"}
-	expectedTotal := int32(3)
 
-	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, &cursor).Return(expectedUsers, expectedTotal, &nextCursor, nil)
+	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, cursor).Return(expectedUsers, &nextCursor, nil)
 
-	users, total, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, &cursor)
+	users, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, cursor)
 
 	assert.NoError(s.T(), err)
 	assert.Len(s.T(), users, 3)
 	assert.Equal(s.T(), expectedUsers, users)
-	assert.Equal(s.T(), expectedTotal, total)
 	assert.NotNil(s.T(), nextCursorResult)
 	assert.Equal(s.T(), nextCursor, *nextCursorResult)
 
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestGetRoleUsersWithoutCursor() {
+func (s *ServiceSuite) TestGetUsersWithoutCursor() {
 	roleID := "role123"
 	limit := int32(10)
 
 	expectedUsers := []string{"user1", "user2"}
-	expectedTotal := int32(2)
 
-	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, (*string)(nil)).Return(expectedUsers, expectedTotal, nil, nil)
+	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, "").Return(expectedUsers, nil, nil)
 
-	users, total, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, nil)
+	users, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, "")
 
 	assert.NoError(s.T(), err)
 	assert.Len(s.T(), users, 2)
 	assert.Equal(s.T(), expectedUsers, users)
-	assert.Equal(s.T(), expectedTotal, total)
 	assert.Nil(s.T(), nextCursorResult)
 
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestGetRoleUsersEmptyResult() {
+func (s *ServiceSuite) TestGetUsersEmptyResult() {
 	roleID := "role123"
 	limit := int32(10)
 
-	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, (*string)(nil)).Return([]string{}, int32(0), nil, nil)
+	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, "").Return([]string{}, nil, nil)
 
-	users, total, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, nil)
+	users, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, "")
 
 	assert.NoError(s.T(), err)
 	assert.Len(s.T(), users, 0)
-	assert.Equal(s.T(), int32(0), total)
 	assert.Nil(s.T(), nextCursorResult)
 
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestGetRoleUsersRepositoryError() {
+func (s *ServiceSuite) TestGetUsersRepositoryError() {
 	roleID := "role123"
 	limit := int32(10)
 
-	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, (*string)(nil)).Return(nil, int32(0), nil, model.ErrInternal)
+	s.userRoleRepository.On("GetRoleUsers", mock.Anything, roleID, limit, "").Return(nil, nil, model.ErrInternal)
 
-	users, total, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, nil)
+	users, nextCursorResult, err := s.service.GetRoleUsers(s.ctx, roleID, limit, "")
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrInternal, err)
 	assert.Nil(s.T(), users)
-	assert.Equal(s.T(), int32(0), total)
 	assert.Nil(s.T(), nextCursorResult)
 
 	s.userRoleRepository.AssertExpectations(s.T())

@@ -16,8 +16,10 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/migrator"
 	permissionAPI "github.com/aleksandr-mv/school_schedule/rbac/internal/api/permission/v1"
 	roleAPI "github.com/aleksandr-mv/school_schedule/rbac/internal/api/role/v1"
+	rolePermissionAPI "github.com/aleksandr-mv/school_schedule/rbac/internal/api/role_permission/v1"
 	userRoleAPI "github.com/aleksandr-mv/school_schedule/rbac/internal/api/user_role/v1"
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository"
+	enrichedRoleRepo "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/enriched_role"
 	permissionRepo "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/permission"
 	roleRepo "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/role"
 	rolePermissionRepo "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/role_permission"
@@ -25,27 +27,32 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/service"
 	permissionService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/permission"
 	roleService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/role"
+	rolePermissionService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/role_permission"
 	userRoleService "github.com/aleksandr-mv/school_schedule/rbac/internal/service/user_role"
 	permissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1"
 	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
+	rolePermissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role_permission/v1"
 	userRoleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
 type diContainer struct {
 	cfg contracts.Provider
 
-	roleV1       roleV1.RoleServiceServer
-	permissionV1 permissionV1.PermissionServiceServer
-	userRoleV1   userRoleV1.UserRoleServiceServer
+	roleV1           roleV1.RoleServiceServer
+	permissionV1     permissionV1.PermissionServiceServer
+	rolePermissionV1 rolePermissionV1.RolePermissionServiceServer
+	userRoleV1       userRoleV1.UserRoleServiceServer
 
-	roleService       service.RoleServiceInterface
-	permissionService service.PermissionServiceInterface
-	userRoleService   service.UserRoleServiceInterface
+	roleService           service.RoleServiceInterface
+	permissionService     service.PermissionServiceInterface
+	rolePermissionService service.RolePermissionServiceInterface
+	userRoleService       service.UserRoleServiceInterface
 
 	roleRepository           repository.RoleRepository
 	permissionRepository     repository.PermissionRepository
 	userRoleRepository       repository.UserRoleRepository
 	rolePermissionRepository repository.RolePermissionRepository
+	enrichedRoleRepository   repository.EnrichedRoleRepository
 
 	postgresPool *pgxpool.Pool
 	redisClient  cache.RedisClient
@@ -82,6 +89,19 @@ func (d *diContainer) PermissionV1API(ctx context.Context) (permissionV1.Permiss
 	return d.permissionV1, nil
 }
 
+func (d *diContainer) RolePermissionV1API(ctx context.Context) (rolePermissionV1.RolePermissionServiceServer, error) {
+	if d.rolePermissionV1 == nil {
+		rolePermissionService, err := d.RolePermissionService(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.rolePermissionV1 = rolePermissionAPI.NewAPI(rolePermissionService)
+	}
+
+	return d.rolePermissionV1, nil
+}
+
 func (d *diContainer) UserRoleV1API(ctx context.Context) (userRoleV1.UserRoleServiceServer, error) {
 	if d.userRoleV1 == nil {
 		userRoleService, err := d.UserRoleService(ctx)
@@ -102,7 +122,19 @@ func (d *diContainer) RoleService(ctx context.Context) (service.RoleServiceInter
 			return nil, err
 		}
 
-		d.roleService = roleService.NewService(roleRepo)
+		rolePermissionRepo, err := d.RolePermissionRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		enrichedRoleRepo, err := d.EnrichedRoleRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		enrichedRoleTTL := d.cfg.Session().TTL()
+
+		d.roleService = roleService.NewService(roleRepo, rolePermissionRepo, enrichedRoleRepo, enrichedRoleTTL)
 	}
 
 	return d.roleService, nil
@@ -115,20 +147,23 @@ func (d *diContainer) PermissionService(ctx context.Context) (service.Permission
 			return nil, err
 		}
 
+		d.permissionService = permissionService.NewService(permissionRepo)
+	}
+
+	return d.permissionService, nil
+}
+
+func (d *diContainer) RolePermissionService(ctx context.Context) (service.RolePermissionServiceInterface, error) {
+	if d.rolePermissionService == nil {
 		rolePermissionRepo, err := d.RolePermissionRepository(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		userRoleRepo, err := d.UserRoleRepository(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		d.permissionService = permissionService.NewService(permissionRepo, rolePermissionRepo, userRoleRepo)
+		d.rolePermissionService = rolePermissionService.NewService(rolePermissionRepo)
 	}
 
-	return d.permissionService, nil
+	return d.rolePermissionService, nil
 }
 
 func (d *diContainer) UserRoleService(ctx context.Context) (service.UserRoleServiceInterface, error) {
@@ -138,7 +173,12 @@ func (d *diContainer) UserRoleService(ctx context.Context) (service.UserRoleServ
 			return nil, err
 		}
 
-		d.userRoleService = userRoleService.NewService(userRoleRepo)
+		roleService, err := d.RoleService(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.userRoleService = userRoleService.NewService(userRoleRepo, roleService)
 	}
 
 	return d.userRoleService, nil
@@ -196,6 +236,19 @@ func (d *diContainer) RolePermissionRepository(ctx context.Context) (repository.
 	return d.rolePermissionRepository, nil
 }
 
+func (d *diContainer) EnrichedRoleRepository(ctx context.Context) (repository.EnrichedRoleRepository, error) {
+	if d.enrichedRoleRepository == nil {
+		redisClient, err := d.RedisClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.enrichedRoleRepository = enrichedRoleRepo.NewRepository(redisClient)
+	}
+
+	return d.enrichedRoleRepository, nil
+}
+
 func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
 	if d.postgresPool == nil {
 		dsn := d.cfg.Database().PostgresDSN()
@@ -235,7 +288,7 @@ func (d *diContainer) RedisClient(ctx context.Context) (cache.RedisClient, error
 		}
 
 		pool := d.cfg.Redis().Pool()
-		client := redis.NewClient(redigoPool, nil, pool.PoolTimeout())
+		client := redis.NewClient(redigoPool, logger.Logger(), pool.PoolTimeout())
 
 		if err = client.Ping(ctx); err != nil {
 			return nil, fmt.Errorf("redis ping failed: %w", err)

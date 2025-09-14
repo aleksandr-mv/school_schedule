@@ -11,7 +11,7 @@ import (
 	permissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1"
 )
 
-func (s *APISuite) TestListPermissionsSuccess() {
+func (s *APISuite) TestListSuccess() {
 	permission1 := &model.Permission{
 		ID:       uuid.New(),
 		Resource: "users",
@@ -24,11 +24,11 @@ func (s *APISuite) TestListPermissionsSuccess() {
 	}
 	expectedPermissions := []*model.Permission{permission1, permission2}
 
-	req := &permissionV1.ListPermissionsRequest{}
+	req := &permissionV1.ListRequest{}
 
-	s.permissionService.On("ListPermissions", mock.Anything, mock.Anything).Return(expectedPermissions, nil).Once()
+	s.permissionService.On("List", mock.Anything, mock.Anything).Return(expectedPermissions, nil).Once()
 
-	resp, err := s.api.ListPermissions(s.ctx, req)
+	resp, err := s.api.List(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
@@ -43,73 +43,14 @@ func (s *APISuite) TestListPermissionsSuccess() {
 	s.permissionService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestListPermissionsWithResourceFilter() {
-	permission1 := &model.Permission{
-		ID:       uuid.New(),
-		Resource: "users",
-		Action:   "read",
-	}
-	expectedPermissions := []*model.Permission{permission1}
-	resourceFilter := "users"
-
-	req := &permissionV1.ListPermissionsRequest{
-		ResourceFilter: &resourceFilter,
-	}
-
-	s.permissionService.On("ListPermissions", mock.Anything, mock.Anything).Return(expectedPermissions, nil).Once()
-
-	resp, err := s.api.ListPermissions(s.ctx, req)
-
-	assert.NoError(s.T(), err)
-	assert.NotNil(s.T(), resp)
-	assert.Len(s.T(), resp.Data, 1)
-
-	assert.Equal(s.T(), expectedPermissions[0].ID.String(), resp.Data[0].Id)
-	assert.Equal(s.T(), expectedPermissions[0].Resource, resp.Data[0].Resource)
-	assert.Equal(s.T(), expectedPermissions[0].Action, resp.Data[0].Action)
-
-	s.permissionService.AssertExpectations(s.T())
-}
-
-func (s *APISuite) TestListPermissionsWithActionFilter() {
-	permission1 := &model.Permission{
-		ID:       uuid.New(),
-		Resource: "users",
-		Action:   "read",
-	}
-	expectedPermissions := []*model.Permission{permission1}
-	actionFilter := "read"
-
-	req := &permissionV1.ListPermissionsRequest{
-		ActionFilter: &actionFilter,
-	}
-
-	s.permissionService.On("ListPermissions", mock.Anything, mock.Anything).Return(expectedPermissions, nil).Once()
-
-	resp, err := s.api.ListPermissions(s.ctx, req)
-
-	assert.NoError(s.T(), err)
-	assert.NotNil(s.T(), resp)
-	assert.Len(s.T(), resp.Data, 1)
-
-	assert.Equal(s.T(), expectedPermissions[0].ID.String(), resp.Data[0].Id)
-	assert.Equal(s.T(), expectedPermissions[0].Resource, resp.Data[0].Resource)
-	assert.Equal(s.T(), expectedPermissions[0].Action, resp.Data[0].Action)
-
-	s.permissionService.AssertExpectations(s.T())
-}
-
-func (s *APISuite) TestListPermissionsEmptyResult() {
+func (s *APISuite) TestListEmptyResult() {
 	expectedPermissions := []*model.Permission{}
-	resourceFilter := "nonexistent"
 
-	req := &permissionV1.ListPermissionsRequest{
-		ResourceFilter: &resourceFilter,
-	}
+	req := &permissionV1.ListRequest{}
 
-	s.permissionService.On("ListPermissions", mock.Anything, mock.Anything).Return(expectedPermissions, nil).Once()
+	s.permissionService.On("List", mock.Anything, mock.Anything).Return(expectedPermissions, nil).Once()
 
-	resp, err := s.api.ListPermissions(s.ctx, req)
+	resp, err := s.api.List(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
@@ -118,12 +59,12 @@ func (s *APISuite) TestListPermissionsEmptyResult() {
 	s.permissionService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestListPermissionsInternalError() {
-	req := &permissionV1.ListPermissionsRequest{}
+func (s *APISuite) TestListInternalError() {
+	req := &permissionV1.ListRequest{}
 
-	s.permissionService.On("ListPermissions", mock.Anything, mock.Anything).Return(nil, model.ErrInternal).Once()
+	s.permissionService.On("List", mock.Anything, mock.Anything).Return(nil, model.ErrInternal).Once()
 
-	resp, err := s.api.ListPermissions(s.ctx, req)
+	resp, err := s.api.List(s.ctx, req)
 
 	assert.Error(s.T(), err)
 	assert.Nil(s.T(), resp)

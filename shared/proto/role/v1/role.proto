@@ -6,7 +6,6 @@ import "google/protobuf/empty.proto";
 import "validate/validate.proto";
 import "common/v1/role.proto";
 import "common/v1/annotations.proto";
-import "common/v1/identifier.proto";
 
 option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1;role_v1";
 
@@ -16,93 +15,92 @@ option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/ro
 
 service RoleService {
   // Создание новой роли
-  rpc CreateRole(CreateRoleRequest) returns (CreateRoleResponse) {
+  rpc Create(CreateRequest) returns (CreateResponse) {
     option (common.v1.permission) = "role:write";
   }
 
-  // Получение роли по ID или имени
-  rpc GetRole(GetRoleRequest) returns (GetRoleResponse) {
-    option (common.v1.permission) = "role:read";
-  }
-
   // Обновление роли
-  rpc UpdateRole(UpdateRoleRequest) returns (google.protobuf.Empty) {
+  rpc Update(UpdateRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "role:write";
   }
 
   // Удаление роли
-  rpc DeleteRole(DeleteRoleRequest) returns (google.protobuf.Empty) {
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "role:write";
   }
 
-  // Получение списка всех ролей
-  rpc ListRoles(ListRolesRequest) returns (ListRolesResponse) {
+  // Получение роли по ID
+  rpc Get(GetRequest) returns (GetResponse) {
+    option (common.v1.permission) = "role:read";
+  }
+
+  // Получение списка ролей
+  rpc List(ListRequest) returns (ListResponse) {
     option (common.v1.permission) = "role:read";
   }
 
 }
 
 // =============================================================================
-// CreateRole
+// Create
 // =============================================================================
 
 // Запрос на создание новой роли
-message CreateRoleRequest {
+message CreateRequest {
   string name = 1 [(validate.rules).string.min_len = 2, (validate.rules).string.max_len = 50];
   string description = 2;
 }
 
 // Ответ с ID созданной роли
-message CreateRoleResponse {
+message CreateResponse {
   string role_id = 1 [(validate.rules).string.uuid = true];
 }
 
-// =============================================================================
-// GetRole
-// =============================================================================
-
-// Запрос на получение роли по ID или имени
-message GetRoleRequest {
-  common.v1.GetIdentifier value = 1 [(validate.rules).message.required = true];
-}
-
-// Ответ с данными роли
-message GetRoleResponse {
-  common.v1.Role role = 1 [(validate.rules).message.required = true];
-}
 
 // =============================================================================
-// UpdateRole
+// Update
 // =============================================================================
 
 // Запрос на обновление роли
-message UpdateRoleRequest {
+message UpdateRequest {
   string role_id = 1 [(validate.rules).string.uuid = true];
   optional string name = 2 [(validate.rules).string.min_len = 2, (validate.rules).string.max_len = 50];
   optional string description = 3;
 }
 
 // =============================================================================
-// DeleteRole
+// Delete
 // =============================================================================
 
 // Запрос на удаление роли по ID
-message DeleteRoleRequest {
+message DeleteRequest {
   string role_id = 1 [(validate.rules).string.uuid = true];
 }
 
 // =============================================================================
-// ListRoles
+// Get
+// =============================================================================
+
+// Запрос на получение роли по ID
+message GetRequest {
+  string role_id = 1 [(validate.rules).string.uuid = true];
+}
+
+// Ответ с ролью и её правами
+message GetResponse {
+  common.v1.RoleWithPermissions data = 1;
+}
+
+// =============================================================================
+// List
 // =============================================================================
 
 // Запрос на получение списка ролей
-message ListRolesRequest {
-  // Опциональные фильтры
-  optional string name_filter = 1;
+message ListRequest {
 }
 
 // Ответ со списком ролей
-message ListRolesResponse {
+message ListResponse {
   repeated common.v1.Role data = 1;
 }
 

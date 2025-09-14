@@ -11,15 +11,16 @@ import (
 	repoModel "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/model"
 )
 
-func (r *rolePermissionRepository) ListPermissionsByRole(ctx context.Context, value string) ([]*model.Permission, error) {
-	query := `SELECT p.id, p.resource, p.action 
-		FROM permissions p 
-		JOIN role_permissions rp ON p.id = rp.permission_id 
-		JOIN roles r ON rp.role_id = r.id
-		WHERE r.id::text = $1 OR r.name = $1
-		ORDER BY p.resource, p.action`
+func (r *rolePermissionRepository) GetRolePermissions(ctx context.Context, roleID string) ([]*model.Permission, error) {
+	query := `
+		SELECT p.id, p.resource, p.action
+		FROM permissions p
+		JOIN role_permissions rp ON p.id = rp.permission_id
+		WHERE rp.role_id = $1
+		ORDER BY p.resource, p.action
+	`
 
-	rows, err := r.pool.Query(ctx, query, value)
+	rows, err := r.pool.Query(ctx, query, roleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get role permissions: %w", err)
 	}

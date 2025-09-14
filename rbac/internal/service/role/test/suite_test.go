@@ -3,6 +3,7 @@ package role_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 
@@ -15,7 +16,9 @@ type ServiceSuite struct {
 	suite.Suite
 	ctx context.Context // nolint:containedctx
 
-	roleRepository *mocks.RoleRepository
+	roleRepository           *mocks.RoleRepository
+	rolePermissionRepository *mocks.RolePermissionRepository
+	enrichedRoleRepository   *mocks.EnrichedRoleRepository
 
 	service *role.RoleService
 }
@@ -28,12 +31,18 @@ func (s *ServiceSuite) SetupSuite() {
 	}
 
 	s.roleRepository = mocks.NewRoleRepository(s.T())
+	s.rolePermissionRepository = mocks.NewRolePermissionRepository(s.T())
 
-	s.service = role.NewService(s.roleRepository)
+	// Создаем моки для всех зависимостей
+	s.enrichedRoleRepository = mocks.NewEnrichedRoleRepository(s.T())
+
+	s.service = role.NewService(s.roleRepository, s.rolePermissionRepository, s.enrichedRoleRepository, time.Hour)
 }
 
 func (s *ServiceSuite) SetupTest() {
 	s.roleRepository.ExpectedCalls = nil
+	s.rolePermissionRepository.ExpectedCalls = nil
+	s.enrichedRoleRepository.ExpectedCalls = nil
 }
 
 func (s *ServiceSuite) TearDownTest() {

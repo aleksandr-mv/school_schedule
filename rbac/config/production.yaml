@@ -91,15 +91,3 @@ redis:
     pool_timeout: "${REDIS_POOL_TIMEOUT}"
     idle_timeout: "${REDIS_IDLE_TIMEOUT}"
     idle_check_freq: "${REDIS_IDLE_CHECK_FREQ}"
-
-# RBAC специфичные настройки
-rbac:
-  cache:
-    enabled: ${RBAC_CACHE_ENABLED}
-    ttl: "${RBAC_CACHE_TTL}"
-    role_ttl: "${RBAC_ROLE_CACHE_TTL}"
-    permission_ttl: "${RBAC_PERMISSION_CACHE_TTL}"
-  rate_limit:
-    enabled: ${RBAC_RATE_LIMIT_ENABLED}
-    requests_per_minute: ${RBAC_RATE_LIMIT_RPM}
-    burst: ${RBAC_RATE_LIMIT_BURST}

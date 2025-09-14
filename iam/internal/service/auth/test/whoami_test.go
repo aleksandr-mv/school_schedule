@@ -41,6 +41,7 @@ func (s *ServiceSuite) TestWhoamiSuccess() {
 	}
 
 	s.sessionRepository.On("Get", mock.Anything, sessionID).Return(expectedWhoami, nil)
+	s.rbacClient.On("GetUserRoles", mock.Anything, userID).Return([]*model.RoleWithPermissions{}, nil)
 
 	result, err := s.service.Whoami(s.ctx, sessionID)
 
@@ -52,6 +53,7 @@ func (s *ServiceSuite) TestWhoamiSuccess() {
 	assert.Equal(s.T(), expectedWhoami.User.Email, result.User.Email)
 
 	s.sessionRepository.AssertExpectations(s.T())
+	s.rbacClient.AssertExpectations(s.T())
 }
 
 func (s *ServiceSuite) TestWhoamiSessionNotFound() {

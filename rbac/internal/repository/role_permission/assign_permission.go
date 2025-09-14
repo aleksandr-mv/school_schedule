@@ -11,7 +11,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (r *rolePermissionRepository) AssignPermissionToRole(ctx context.Context, roleID, permissionID string) error {
+func (r *rolePermissionRepository) Assign(ctx context.Context, roleID, permissionID string) error {
 	query, args, err := sq.StatementBuilder.
 		Insert("role_permissions").
 		Columns("role_id", "permission_id").

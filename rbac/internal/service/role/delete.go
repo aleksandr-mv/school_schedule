@@ -10,7 +10,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
 )
 
-func (s *RoleService) DeleteRole(ctx context.Context, id string) error {
+func (s *RoleService) Delete(ctx context.Context, id string) error {
 	ctx, span := tracing.StartSpan(ctx, "rbac.service.delete_role")
 	defer span.End()
 

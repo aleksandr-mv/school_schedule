@@ -25,7 +25,7 @@ const (
 )
 
 // Запрос на назначение роли пользователю
-type AssignRoleRequest struct {
+type AssignRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	RoleId        string                 `protobuf:"bytes,2,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
@@ -34,20 +34,20 @@ type AssignRoleRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AssignRoleRequest) Reset() {
-	*x = AssignRoleRequest{}
+func (x *AssignRequest) Reset() {
+	*x = AssignRequest{}
 	mi := &file_user_role_v1_user_role_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AssignRoleRequest) String() string {
+func (x *AssignRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AssignRoleRequest) ProtoMessage() {}
+func (*AssignRequest) ProtoMessage() {}
 
-func (x *AssignRoleRequest) ProtoReflect() protoreflect.Message {
+func (x *AssignRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_user_role_v1_user_role_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -59,26 +59,26 @@ func (x *AssignRoleRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AssignRoleRequest.ProtoReflect.Descriptor instead.
-func (*AssignRoleRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use AssignRequest.ProtoReflect.Descriptor instead.
+func (*AssignRequest) Descriptor() ([]byte, []int) {
 	return file_user_role_v1_user_role_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *AssignRoleRequest) GetUserId() string {
+func (x *AssignRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *AssignRoleRequest) GetRoleId() string {
+func (x *AssignRequest) GetRoleId() string {
 	if x != nil {
 		return x.RoleId
 	}
 	return ""
 }
 
-func (x *AssignRoleRequest) GetAssignedBy() string {
+func (x *AssignRequest) GetAssignedBy() string {
 	if x != nil && x.AssignedBy != nil {
 		return *x.AssignedBy
 	}
@@ -86,7 +86,7 @@ func (x *AssignRoleRequest) GetAssignedBy() string {
 }
 
 // Запрос на отзыв роли у пользователя
-type RevokeRoleRequest struct {
+type RevokeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	RoleId        string                 `protobuf:"bytes,2,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
@@ -94,20 +94,20 @@ type RevokeRoleRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RevokeRoleRequest) Reset() {
-	*x = RevokeRoleRequest{}
+func (x *RevokeRequest) Reset() {
+	*x = RevokeRequest{}
 	mi := &file_user_role_v1_user_role_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RevokeRoleRequest) String() string {
+func (x *RevokeRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RevokeRoleRequest) ProtoMessage() {}
+func (*RevokeRequest) ProtoMessage() {}
 
-func (x *RevokeRoleRequest) ProtoReflect() protoreflect.Message {
+func (x *RevokeRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_user_role_v1_user_role_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -119,19 +119,19 @@ func (x *RevokeRoleRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RevokeRoleRequest.ProtoReflect.Descriptor instead.
-func (*RevokeRoleRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RevokeRequest.ProtoReflect.Descriptor instead.
+func (*RevokeRequest) Descriptor() ([]byte, []int) {
 	return file_user_role_v1_user_role_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *RevokeRoleRequest) GetUserId() string {
+func (x *RevokeRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *RevokeRoleRequest) GetRoleId() string {
+func (x *RevokeRequest) GetRoleId() string {
 	if x != nil {
 		return x.RoleId
 	}
@@ -185,8 +185,8 @@ func (x *GetUserRolesRequest) GetUserId() string {
 
 // Ответ с ролями пользователя
 type GetUserRolesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          []*v1.Role             `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Data          []*v1.RoleWithPermissions `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -221,7 +221,7 @@ func (*GetUserRolesResponse) Descriptor() ([]byte, []int) {
 	return file_user_role_v1_user_role_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetUserRolesResponse) GetData() []*v1.Role {
+func (x *GetUserRolesResponse) GetData() []*v1.RoleWithPermissions {
 	if x != nil {
 		return x.Data
 	}
@@ -294,10 +294,9 @@ func (x *GetRoleUsersRequest) GetCursor() string {
 type GetRoleUsersResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserIds       []string               `protobuf:"bytes,1,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
-	TotalCount    int32                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`      // Общее количество пользователей с этой ролью
-	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`                                  // Лимит записей на страницу
-	NextCursor    *string                `protobuf:"bytes,4,opt,name=next_cursor,json=nextCursor,proto3,oneof" json:"next_cursor,omitempty"` // Курсор для следующей страницы (если есть)
-	HasMore       bool                   `protobuf:"varint,5,opt,name=has_more,json=hasMore,proto3" json:"has_more,omitempty"`               // Есть ли еще записи
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`                                  // Лимит записей на страницу
+	NextCursor    *string                `protobuf:"bytes,3,opt,name=next_cursor,json=nextCursor,proto3,oneof" json:"next_cursor,omitempty"` // Курсор для следующей страницы (если есть)
+	HasMore       bool                   `protobuf:"varint,4,opt,name=has_more,json=hasMore,proto3" json:"has_more,omitempty"`               // Есть ли еще записи
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -339,13 +338,6 @@ func (x *GetRoleUsersResponse) GetUserIds() []string {
 	return nil
 }
 
-func (x *GetRoleUsersResponse) GetTotalCount() int32 {
-	if x != nil {
-		return x.TotalCount
-	}
-	return 0
-}
-
 func (x *GetRoleUsersResponse) GetLimit() int32 {
 	if x != nil {
 		return x.Limit
@@ -371,41 +363,37 @@ var File_user_role_v1_user_role_proto protoreflect.FileDescriptor
 
 const file_user_role_v1_user_role_proto_rawDesc = "" +
 	"\n" +
-	"\x1cuser_role/v1/user_role.proto\x12\fuser_role.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/role.proto\x1a\x1bcommon/v1/annotations.proto\"\x99\x01\n" +
-	"\x11AssignRoleRequest\x12!\n" +
+	"\x1cuser_role/v1/user_role.proto\x12\fuser_role.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/role.proto\x1a\x1bcommon/v1/annotations.proto\"\x95\x01\n" +
+	"\rAssignRequest\x12!\n" +
 	"\auser_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06userId\x12!\n" +
 	"\arole_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\x12.\n" +
 	"\vassigned_by\x18\x03 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01H\x00R\n" +
 	"assignedBy\x88\x01\x01B\x0e\n" +
-	"\f_assigned_by\"Y\n" +
-	"\x11RevokeRoleRequest\x12!\n" +
+	"\f_assigned_by\"U\n" +
+	"\rRevokeRequest\x12!\n" +
 	"\auser_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06userId\x12!\n" +
 	"\arole_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\"8\n" +
 	"\x13GetUserRolesRequest\x12!\n" +
-	"\auser_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06userId\";\n" +
-	"\x14GetUserRolesResponse\x12#\n" +
-	"\x04data\x18\x01 \x03(\v2\x0f.common.v1.RoleR\x04data\"\x90\x01\n" +
+	"\auser_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06userId\"J\n" +
+	"\x14GetUserRolesResponse\x122\n" +
+	"\x04data\x18\x01 \x03(\v2\x1e.common.v1.RoleWithPermissionsR\x04data\"\x90\x01\n" +
 	"\x13GetRoleUsersRequest\x12!\n" +
 	"\arole_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\x12$\n" +
 	"\x05limit\x18\x02 \x01(\x05B\t\xfaB\x06\x1a\x04\x18d(\x01H\x00R\x05limit\x88\x01\x01\x12\x1b\n" +
 	"\x06cursor\x18\x03 \x01(\tH\x01R\x06cursor\x88\x01\x01B\b\n" +
 	"\x06_limitB\t\n" +
-	"\a_cursor\"\xc8\x01\n" +
+	"\a_cursor\"\xa7\x01\n" +
 	"\x14GetRoleUsersResponse\x12(\n" +
 	"\buser_ids\x18\x01 \x03(\tB\r\xfaB\n" +
-	"\x92\x01\a\"\x05r\x03\xb0\x01\x01R\auserIds\x12\x1f\n" +
-	"\vtotal_count\x18\x02 \x01(\x05R\n" +
-	"totalCount\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12$\n" +
-	"\vnext_cursor\x18\x04 \x01(\tH\x00R\n" +
+	"\x92\x01\a\"\x05r\x03\xb0\x01\x01R\auserIds\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12$\n" +
+	"\vnext_cursor\x18\x03 \x01(\tH\x00R\n" +
 	"nextCursor\x88\x01\x01\x12\x19\n" +
-	"\bhas_more\x18\x05 \x01(\bR\ahasMoreB\x0e\n" +
-	"\f_next_cursor2\x9f\x03\n" +
-	"\x0fUserRoleService\x12Z\n" +
-	"\n" +
-	"AssignRole\x12\x1f.user_role.v1.AssignRoleRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12Z\n" +
-	"\n" +
-	"RevokeRole\x12\x1f.user_role.v1.RevokeRoleRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12i\n" +
+	"\bhas_more\x18\x04 \x01(\bR\ahasMoreB\x0e\n" +
+	"\f_next_cursor2\x8f\x03\n" +
+	"\x0fUserRoleService\x12R\n" +
+	"\x06Assign\x12\x1b.user_role.v1.AssignRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12R\n" +
+	"\x06Revoke\x12\x1b.user_role.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12i\n" +
 	"\fGetUserRoles\x12!.user_role.v1.GetUserRolesRequest\x1a\".user_role.v1.GetUserRolesResponse\"\x12\x8a\xb5\x18\x0euser_role:read\x12i\n" +
 	"\fGetRoleUsers\x12!.user_role.v1.GetRoleUsersRequest\x1a\".user_role.v1.GetRoleUsersResponse\"\x12\x8a\xb5\x18\x0euser_role:readBTZRgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1;user_role_v1b\x06proto3"
 
@@ -423,23 +411,23 @@ func file_user_role_v1_user_role_proto_rawDescGZIP() []byte {
 
 var file_user_role_v1_user_role_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_user_role_v1_user_role_proto_goTypes = []any{
-	(*AssignRoleRequest)(nil),    // 0: user_role.v1.AssignRoleRequest
-	(*RevokeRoleRequest)(nil),    // 1: user_role.v1.RevokeRoleRequest
-	(*GetUserRolesRequest)(nil),  // 2: user_role.v1.GetUserRolesRequest
-	(*GetUserRolesResponse)(nil), // 3: user_role.v1.GetUserRolesResponse
-	(*GetRoleUsersRequest)(nil),  // 4: user_role.v1.GetRoleUsersRequest
-	(*GetRoleUsersResponse)(nil), // 5: user_role.v1.GetRoleUsersResponse
-	(*v1.Role)(nil),              // 6: common.v1.Role
-	(*emptypb.Empty)(nil),        // 7: google.protobuf.Empty
+	(*AssignRequest)(nil),          // 0: user_role.v1.AssignRequest
+	(*RevokeRequest)(nil),          // 1: user_role.v1.RevokeRequest
+	(*GetUserRolesRequest)(nil),    // 2: user_role.v1.GetUserRolesRequest
+	(*GetUserRolesResponse)(nil),   // 3: user_role.v1.GetUserRolesResponse
+	(*GetRoleUsersRequest)(nil),    // 4: user_role.v1.GetRoleUsersRequest
+	(*GetRoleUsersResponse)(nil),   // 5: user_role.v1.GetRoleUsersResponse
+	(*v1.RoleWithPermissions)(nil), // 6: common.v1.RoleWithPermissions
+	(*emptypb.Empty)(nil),          // 7: google.protobuf.Empty
 }
 var file_user_role_v1_user_role_proto_depIdxs = []int32{
-	6, // 0: user_role.v1.GetUserRolesResponse.data:type_name -> common.v1.Role
-	0, // 1: user_role.v1.UserRoleService.AssignRole:input_type -> user_role.v1.AssignRoleRequest
-	1, // 2: user_role.v1.UserRoleService.RevokeRole:input_type -> user_role.v1.RevokeRoleRequest
+	6, // 0: user_role.v1.GetUserRolesResponse.data:type_name -> common.v1.RoleWithPermissions
+	0, // 1: user_role.v1.UserRoleService.Assign:input_type -> user_role.v1.AssignRequest
+	1, // 2: user_role.v1.UserRoleService.Revoke:input_type -> user_role.v1.RevokeRequest
 	2, // 3: user_role.v1.UserRoleService.GetUserRoles:input_type -> user_role.v1.GetUserRolesRequest
 	4, // 4: user_role.v1.UserRoleService.GetRoleUsers:input_type -> user_role.v1.GetRoleUsersRequest
-	7, // 5: user_role.v1.UserRoleService.AssignRole:output_type -> google.protobuf.Empty
-	7, // 6: user_role.v1.UserRoleService.RevokeRole:output_type -> google.protobuf.Empty
+	7, // 5: user_role.v1.UserRoleService.Assign:output_type -> google.protobuf.Empty
+	7, // 6: user_role.v1.UserRoleService.Revoke:output_type -> google.protobuf.Empty
 	3, // 7: user_role.v1.UserRoleService.GetUserRoles:output_type -> user_role.v1.GetUserRolesResponse
 	5, // 8: user_role.v1.UserRoleService.GetRoleUsers:output_type -> user_role.v1.GetRoleUsersResponse
 	5, // [5:9] is the sub-list for method output_type

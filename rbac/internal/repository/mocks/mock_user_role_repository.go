@@ -5,7 +5,6 @@ package mocks
 import (
 	context "context"
 
-	model "github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -22,16 +21,16 @@ func (_m *UserRoleRepository) EXPECT() *UserRoleRepository_Expecter {
 	return &UserRoleRepository_Expecter{mock: &_m.Mock}
 }
 
-// AssignRole provides a mock function with given fields: ctx, userID, roleID, assignedBy
-func (_m *UserRoleRepository) AssignRole(ctx context.Context, userID string, roleID string, assignedBy *string) error {
+// Assign provides a mock function with given fields: ctx, userID, roleID, assignedBy
+func (_m *UserRoleRepository) Assign(ctx context.Context, userID string, roleID string, assignedBy string) error {
 	ret := _m.Called(ctx, userID, roleID, assignedBy)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AssignRole")
+		panic("no return value specified for Assign")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, *string) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) error); ok {
 		r0 = rf(ctx, userID, roleID, assignedBy)
 	} else {
 		r0 = ret.Error(0)
@@ -40,39 +39,39 @@ func (_m *UserRoleRepository) AssignRole(ctx context.Context, userID string, rol
 	return r0
 }
 
-// UserRoleRepository_AssignRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AssignRole'
-type UserRoleRepository_AssignRole_Call struct {
+// UserRoleRepository_Assign_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Assign'
+type UserRoleRepository_Assign_Call struct {
 	*mock.Call
 }
 
-// AssignRole is a helper method to define mock.On call
+// Assign is a helper method to define mock.On call
 //   - ctx context.Context
 //   - userID string
 //   - roleID string
-//   - assignedBy *string
-func (_e *UserRoleRepository_Expecter) AssignRole(ctx interface{}, userID interface{}, roleID interface{}, assignedBy interface{}) *UserRoleRepository_AssignRole_Call {
-	return &UserRoleRepository_AssignRole_Call{Call: _e.mock.On("AssignRole", ctx, userID, roleID, assignedBy)}
+//   - assignedBy string
+func (_e *UserRoleRepository_Expecter) Assign(ctx interface{}, userID interface{}, roleID interface{}, assignedBy interface{}) *UserRoleRepository_Assign_Call {
+	return &UserRoleRepository_Assign_Call{Call: _e.mock.On("Assign", ctx, userID, roleID, assignedBy)}
 }
 
-func (_c *UserRoleRepository_AssignRole_Call) Run(run func(ctx context.Context, userID string, roleID string, assignedBy *string)) *UserRoleRepository_AssignRole_Call {
+func (_c *UserRoleRepository_Assign_Call) Run(run func(ctx context.Context, userID string, roleID string, assignedBy string)) *UserRoleRepository_Assign_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(*string))
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string))
 	})
 	return _c
 }
 
-func (_c *UserRoleRepository_AssignRole_Call) Return(_a0 error) *UserRoleRepository_AssignRole_Call {
+func (_c *UserRoleRepository_Assign_Call) Return(_a0 error) *UserRoleRepository_Assign_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *UserRoleRepository_AssignRole_Call) RunAndReturn(run func(context.Context, string, string, *string) error) *UserRoleRepository_AssignRole_Call {
+func (_c *UserRoleRepository_Assign_Call) RunAndReturn(run func(context.Context, string, string, string) error) *UserRoleRepository_Assign_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetRoleUsers provides a mock function with given fields: ctx, roleID, limit, cursor
-func (_m *UserRoleRepository) GetRoleUsers(ctx context.Context, roleID string, limit int32, cursor *string) ([]string, int32, *string, error) {
+func (_m *UserRoleRepository) GetRoleUsers(ctx context.Context, roleID string, limit int32, cursor string) ([]string, *string, error) {
 	ret := _m.Called(ctx, roleID, limit, cursor)
 
 	if len(ret) == 0 {
@@ -80,13 +79,12 @@ func (_m *UserRoleRepository) GetRoleUsers(ctx context.Context, roleID string, l
 	}
 
 	var r0 []string
-	var r1 int32
-	var r2 *string
-	var r3 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, int32, *string) ([]string, int32, *string, error)); ok {
+	var r1 *string
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, int32, string) ([]string, *string, error)); ok {
 		return rf(ctx, roleID, limit, cursor)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, int32, *string) []string); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, int32, string) []string); ok {
 		r0 = rf(ctx, roleID, limit, cursor)
 	} else {
 		if ret.Get(0) != nil {
@@ -94,27 +92,21 @@ func (_m *UserRoleRepository) GetRoleUsers(ctx context.Context, roleID string, l
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, int32, *string) int32); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, int32, string) *string); ok {
 		r1 = rf(ctx, roleID, limit, cursor)
 	} else {
-		r1 = ret.Get(1).(int32)
-	}
-
-	if rf, ok := ret.Get(2).(func(context.Context, string, int32, *string) *string); ok {
-		r2 = rf(ctx, roleID, limit, cursor)
-	} else {
-		if ret.Get(2) != nil {
-			r2 = ret.Get(2).(*string)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*string)
 		}
 	}
 
-	if rf, ok := ret.Get(3).(func(context.Context, string, int32, *string) error); ok {
-		r3 = rf(ctx, roleID, limit, cursor)
+	if rf, ok := ret.Get(2).(func(context.Context, string, int32, string) error); ok {
+		r2 = rf(ctx, roleID, limit, cursor)
 	} else {
-		r3 = ret.Error(3)
+		r2 = ret.Error(2)
 	}
 
-	return r0, r1, r2, r3
+	return r0, r1, r2
 }
 
 // UserRoleRepository_GetRoleUsers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetRoleUsers'
@@ -126,46 +118,46 @@ type UserRoleRepository_GetRoleUsers_Call struct {
 //   - ctx context.Context
 //   - roleID string
 //   - limit int32
-//   - cursor *string
+//   - cursor string
 func (_e *UserRoleRepository_Expecter) GetRoleUsers(ctx interface{}, roleID interface{}, limit interface{}, cursor interface{}) *UserRoleRepository_GetRoleUsers_Call {
 	return &UserRoleRepository_GetRoleUsers_Call{Call: _e.mock.On("GetRoleUsers", ctx, roleID, limit, cursor)}
 }
 
-func (_c *UserRoleRepository_GetRoleUsers_Call) Run(run func(ctx context.Context, roleID string, limit int32, cursor *string)) *UserRoleRepository_GetRoleUsers_Call {
+func (_c *UserRoleRepository_GetRoleUsers_Call) Run(run func(ctx context.Context, roleID string, limit int32, cursor string)) *UserRoleRepository_GetRoleUsers_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(int32), args[3].(*string))
+		run(args[0].(context.Context), args[1].(string), args[2].(int32), args[3].(string))
 	})
 	return _c
 }
 
-func (_c *UserRoleRepository_GetRoleUsers_Call) Return(_a0 []string, _a1 int32, _a2 *string, _a3 error) *UserRoleRepository_GetRoleUsers_Call {
-	_c.Call.Return(_a0, _a1, _a2, _a3)
+func (_c *UserRoleRepository_GetRoleUsers_Call) Return(_a0 []string, _a1 *string, _a2 error) *UserRoleRepository_GetRoleUsers_Call {
+	_c.Call.Return(_a0, _a1, _a2)
 	return _c
 }
 
-func (_c *UserRoleRepository_GetRoleUsers_Call) RunAndReturn(run func(context.Context, string, int32, *string) ([]string, int32, *string, error)) *UserRoleRepository_GetRoleUsers_Call {
+func (_c *UserRoleRepository_GetRoleUsers_Call) RunAndReturn(run func(context.Context, string, int32, string) ([]string, *string, error)) *UserRoleRepository_GetRoleUsers_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetUserRoles provides a mock function with given fields: ctx, userID
-func (_m *UserRoleRepository) GetUserRoles(ctx context.Context, userID string) ([]*model.Role, error) {
+func (_m *UserRoleRepository) GetUserRoles(ctx context.Context, userID string) ([]string, error) {
 	ret := _m.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetUserRoles")
 	}
 
-	var r0 []*model.Role
+	var r0 []string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) ([]*model.Role, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) ([]string, error)); ok {
 		return rf(ctx, userID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) []*model.Role); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) []string); ok {
 		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*model.Role)
+			r0 = ret.Get(0).([]string)
 		}
 	}
 
@@ -197,80 +189,22 @@ func (_c *UserRoleRepository_GetUserRoles_Call) Run(run func(ctx context.Context
 	return _c
 }
 
-func (_c *UserRoleRepository_GetUserRoles_Call) Return(_a0 []*model.Role, _a1 error) *UserRoleRepository_GetUserRoles_Call {
+func (_c *UserRoleRepository_GetUserRoles_Call) Return(_a0 []string, _a1 error) *UserRoleRepository_GetUserRoles_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *UserRoleRepository_GetUserRoles_Call) RunAndReturn(run func(context.Context, string) ([]*model.Role, error)) *UserRoleRepository_GetUserRoles_Call {
+func (_c *UserRoleRepository_GetUserRoles_Call) RunAndReturn(run func(context.Context, string) ([]string, error)) *UserRoleRepository_GetUserRoles_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// HasRole provides a mock function with given fields: ctx, userID, roleID
-func (_m *UserRoleRepository) HasRole(ctx context.Context, userID string, roleID string) (bool, error) {
+// Revoke provides a mock function with given fields: ctx, userID, roleID
+func (_m *UserRoleRepository) Revoke(ctx context.Context, userID string, roleID string) error {
 	ret := _m.Called(ctx, userID, roleID)
 
 	if len(ret) == 0 {
-		panic("no return value specified for HasRole")
-	}
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (bool, error)); ok {
-		return rf(ctx, userID, roleID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) bool); ok {
-		r0 = rf(ctx, userID, roleID)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, userID, roleID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// UserRoleRepository_HasRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HasRole'
-type UserRoleRepository_HasRole_Call struct {
-	*mock.Call
-}
-
-// HasRole is a helper method to define mock.On call
-//   - ctx context.Context
-//   - userID string
-//   - roleID string
-func (_e *UserRoleRepository_Expecter) HasRole(ctx interface{}, userID interface{}, roleID interface{}) *UserRoleRepository_HasRole_Call {
-	return &UserRoleRepository_HasRole_Call{Call: _e.mock.On("HasRole", ctx, userID, roleID)}
-}
-
-func (_c *UserRoleRepository_HasRole_Call) Run(run func(ctx context.Context, userID string, roleID string)) *UserRoleRepository_HasRole_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(string))
-	})
-	return _c
-}
-
-func (_c *UserRoleRepository_HasRole_Call) Return(_a0 bool, _a1 error) *UserRoleRepository_HasRole_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *UserRoleRepository_HasRole_Call) RunAndReturn(run func(context.Context, string, string) (bool, error)) *UserRoleRepository_HasRole_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// RevokeRole provides a mock function with given fields: ctx, userID, roleID
-func (_m *UserRoleRepository) RevokeRole(ctx context.Context, userID string, roleID string) error {
-	ret := _m.Called(ctx, userID, roleID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for RevokeRole")
+		panic("no return value specified for Revoke")
 	}
 
 	var r0 error
@@ -283,32 +217,32 @@ func (_m *UserRoleRepository) RevokeRole(ctx context.Context, userID string, rol
 	return r0
 }
 
-// UserRoleRepository_RevokeRole_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RevokeRole'
-type UserRoleRepository_RevokeRole_Call struct {
+// UserRoleRepository_Revoke_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Revoke'
+type UserRoleRepository_Revoke_Call struct {
 	*mock.Call
 }
 
-// RevokeRole is a helper method to define mock.On call
+// Revoke is a helper method to define mock.On call
 //   - ctx context.Context
 //   - userID string
 //   - roleID string
-func (_e *UserRoleRepository_Expecter) RevokeRole(ctx interface{}, userID interface{}, roleID interface{}) *UserRoleRepository_RevokeRole_Call {
-	return &UserRoleRepository_RevokeRole_Call{Call: _e.mock.On("RevokeRole", ctx, userID, roleID)}
+func (_e *UserRoleRepository_Expecter) Revoke(ctx interface{}, userID interface{}, roleID interface{}) *UserRoleRepository_Revoke_Call {
+	return &UserRoleRepository_Revoke_Call{Call: _e.mock.On("Revoke", ctx, userID, roleID)}
 }
 
-func (_c *UserRoleRepository_RevokeRole_Call) Run(run func(ctx context.Context, userID string, roleID string)) *UserRoleRepository_RevokeRole_Call {
+func (_c *UserRoleRepository_Revoke_Call) Run(run func(ctx context.Context, userID string, roleID string)) *UserRoleRepository_Revoke_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *UserRoleRepository_RevokeRole_Call) Return(_a0 error) *UserRoleRepository_RevokeRole_Call {
+func (_c *UserRoleRepository_Revoke_Call) Return(_a0 error) *UserRoleRepository_Revoke_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *UserRoleRepository_RevokeRole_Call) RunAndReturn(run func(context.Context, string, string) error) *UserRoleRepository_RevokeRole_Call {
+func (_c *UserRoleRepository_Revoke_Call) RunAndReturn(run func(context.Context, string, string) error) *UserRoleRepository_Revoke_Call {
 	_c.Call.Return(run)
 	return _c
 }

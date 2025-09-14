@@ -115,6 +115,22 @@
       },
       "title": "Роль пользователя"
     },
+    "v1RoleWithPermissions": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/v1Role"
+        },
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Permission"
+          }
+        }
+      },
+      "title": "Роль с правами доступа"
+    },
     "v1Session": {
       "type": "object",
       "properties": {
@@ -184,18 +200,11 @@
         "user": {
           "$ref": "#/definitions/v1User"
         },
-        "roles": {
+        "rolesWithPermissions": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Role"
-          }
-        },
-        "permissions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1Permission"
+            "$ref": "#/definitions/v1RoleWithPermissions"
           }
         }
       },

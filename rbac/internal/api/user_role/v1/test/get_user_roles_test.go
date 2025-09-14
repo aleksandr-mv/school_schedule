@@ -25,7 +25,10 @@ func (s *APISuite) TestGetUserRolesSuccess() {
 		Name:      "user",
 		CreatedAt: time.Now(),
 	}
-	expectedRoles := []*model.Role{role1, role2}
+	expectedRoles := []*model.EnrichedRole{
+		{Role: *role1, Permissions: []*model.Permission{}},
+		{Role: *role2, Permissions: []*model.Permission{}},
+	}
 
 	req := &userRoleV1.GetUserRolesRequest{
 		UserId: userID,
@@ -40,8 +43,8 @@ func (s *APISuite) TestGetUserRolesSuccess() {
 	assert.Len(s.T(), resp.Data, len(expectedRoles))
 
 	for i, role := range resp.Data {
-		assert.Equal(s.T(), expectedRoles[i].ID.String(), role.Id)
-		assert.Equal(s.T(), expectedRoles[i].Name, role.Name)
+		assert.Equal(s.T(), expectedRoles[i].Role.ID.String(), role.Role.Id)
+		assert.Equal(s.T(), expectedRoles[i].Role.Name, role.Role.Name)
 	}
 
 	s.userRoleService.AssertExpectations(s.T())
@@ -49,7 +52,7 @@ func (s *APISuite) TestGetUserRolesSuccess() {
 
 func (s *APISuite) TestGetUserRolesEmptyResult() {
 	userID := "user123"
-	expectedRoles := []*model.Role{}
+	expectedRoles := []*model.EnrichedRole{}
 
 	req := &userRoleV1.GetUserRolesRequest{
 		UserId: userID,

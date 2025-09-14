@@ -2,11 +2,7 @@ syntax = "proto3";
 
 package permission.v1;
 
-import "google/protobuf/empty.proto";
-import "validate/validate.proto";
 import "common/v1/permission.proto";
-import "common/v1/role.proto";
-import "common/v1/identifier.proto";
 import "common/v1/annotations.proto";
 
 option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1;permission_v1";
@@ -17,41 +13,11 @@ option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/pe
 
 service PermissionService {
   // =============================================================================
-  // Управление правами
+  // Управление правами доступа
   // =============================================================================
-  
-  // Получение права доступа по ID (для админки/отладки)
-  rpc GetPermission(GetPermissionRequest) returns (GetPermissionResponse) {
-    option (common.v1.permission) = "permission:read";
-  }
 
-  // Получение списка всех прав доступа (для админки/отладки)
-  rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsResponse) {
-    option (common.v1.permission) = "permission:read";
-  }
-
-
-  // =============================================================================
-  // Управление связями роль-право
-  // =============================================================================
-  
-  // Назначение права роли (для админки)
-  rpc AssignPermissionToRole(AssignPermissionToRoleRequest) returns (google.protobuf.Empty) {
-    option (common.v1.permission) = "permission:write";
-  }
-
-  // Отзыв права у роли (для админки)
-  rpc RevokePermissionFromRole(RevokePermissionFromRoleRequest) returns (google.protobuf.Empty) {
-    option (common.v1.permission) = "permission:write";
-  }
-
-  // Получение прав роли (для админки)
-  rpc ListPermissionsByRole(ListPermissionsByRoleRequest) returns (ListPermissionsByRoleResponse) {
-    option (common.v1.permission) = "permission:read";
-  }
-
-  // Получение ролей по праву (для админки/аудита)
-  rpc ListRolesByPermission(ListRolesByPermissionRequest) returns (ListRolesByPermissionResponse) {
+  // Получение списка прав доступа
+  rpc List(ListRequest) returns (ListResponse) {
     option (common.v1.permission) = "permission:read";
   }
 }
@@ -61,81 +27,15 @@ service PermissionService {
 // =============================================================================
 
 // =============================================================================
-// GetPermission
-// =============================================================================
-
-// Запрос на получение права доступа по ID
-message GetPermissionRequest {
-  string permission_id = 1 [(validate.rules).string.uuid = true];
-}
-
-// Ответ с данными права доступа
-message GetPermissionResponse {
-  common.v1.Permission permission = 1 [(validate.rules).message.required = true];
-}
-
-// =============================================================================
-// ListPermissions
+// List
 // =============================================================================
 
 // Запрос на получение списка прав доступа
-message ListPermissionsRequest {
-  // Опциональные фильтры
-  optional string role_id = 1 [(validate.rules).string.uuid = true];
-  optional string resource_filter = 2;
-  optional string action_filter = 3;
+message ListRequest {
+  // Пустое сообщение для получения всех прав
 }
 
 // Ответ со списком прав доступа
-message ListPermissionsResponse {
+message ListResponse {
   repeated common.v1.Permission data = 1;
-}
-
-
-// =============================================================================
-// AssignPermissionToRole
-// =============================================================================
-
-// Запрос на назначение права роли
-message AssignPermissionToRoleRequest {
-  string role_id = 1 [(validate.rules).string.uuid = true];
-  string permission_id = 2 [(validate.rules).string.uuid = true];
-}
-
-// =============================================================================
-// RevokePermissionFromRole
-// =============================================================================
-
-// Запрос на отзыв права у роли
-message RevokePermissionFromRoleRequest {
-  string role_id = 1 [(validate.rules).string.uuid = true];
-  string permission_id = 2 [(validate.rules).string.uuid = true];
-}
-
-// =============================================================================
-// ListPermissionsByRole
-// =============================================================================
-
-// Запрос на получение прав роли
-message ListPermissionsByRoleRequest {
-  common.v1.GetIdentifier value = 1 [(validate.rules).message.required = true];
-}
-
-// Ответ с правами роли
-message ListPermissionsByRoleResponse {
-  repeated common.v1.Permission data = 1;
-}
-
-// =============================================================================
-// ListRolesByPermission
-// =============================================================================
-
-// Запрос на получение ролей по праву
-message ListRolesByPermissionRequest {
-  common.v1.GetIdentifier value = 1 [(validate.rules).message.required = true];
-}
-
-// Ответ с ролями по праву
-message ListRolesByPermissionResponse {
-  repeated common.v1.Role data = 1;
 }

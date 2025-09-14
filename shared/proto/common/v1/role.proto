@@ -4,6 +4,7 @@ package common.v1;
 
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
+import "common/v1/permission.proto";
 
 option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1";
 
@@ -18,4 +19,10 @@ message Role {
   string description = 3;
   google.protobuf.Timestamp created_at = 4;
   optional google.protobuf.Timestamp updated_at = 5;
+}
+
+// Роль с правами доступа
+message RoleWithPermissions {
+  Role role = 1;
+  repeated Permission permissions = 2;
 }

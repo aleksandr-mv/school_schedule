@@ -7,7 +7,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (r *rolePermissionRepository) RevokePermissionFromRole(ctx context.Context, roleID, permissionID string) error {
+func (r *rolePermissionRepository) Revoke(ctx context.Context, roleID, permissionID string) error {
 	query := `DELETE FROM role_permissions WHERE role_id = $1 AND permission_id = $2`
 
 	result, err := r.pool.Exec(ctx, query, roleID, permissionID)

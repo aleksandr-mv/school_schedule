@@ -5,6 +5,9 @@ import (
 	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
 )
 
+// Compile-time проверка интерфейса
+var _ roleV1.RoleServiceServer = (*API)(nil)
+
 // API реализует RoleService gRPC сервер
 type API struct {
 	roleV1.UnimplementedRoleServiceServer

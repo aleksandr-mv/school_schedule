@@ -6,9 +6,13 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 
 	v1 "github.com/aleksandr-mv/school_schedule/iam/internal/api/auth/v1"
 	userAPI "github.com/aleksandr-mv/school_schedule/iam/internal/api/user/v1"
+	grpcClient "github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc"
+	rbacV1 "github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc/rbac"
 	"github.com/aleksandr-mv/school_schedule/iam/internal/repository"
 	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/notification"
 	sessionRepo "github.com/aleksandr-mv/school_schedule/iam/internal/repository/session"
@@ -21,10 +25,12 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	grpcclient "github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/client"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/migrator"
 	authv1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
 	userV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1"
+	generatedRbacV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
 type diContainer struct {
@@ -35,6 +41,8 @@ type diContainer struct {
 
 	authService service.AuthServiceInterface
 	userService service.UserServiceInterface
+
+	rbacClient grpcClient.RBACClient
 
 	userRepository         repository.UserRepository
 	sessionRepository      repository.SessionRepository
@@ -92,7 +100,12 @@ func (d *diContainer) AuthService(ctx context.Context) (service.AuthServiceInter
 			return nil, err
 		}
 
-		d.authService = authService.NewService(userRepo, notificationRepo, sessionRepo, d.cfg.Session().TTL())
+		rbacClient, err := d.RBACClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.authService = authService.NewService(userRepo, notificationRepo, sessionRepo, rbacClient, d.cfg.Session().TTL())
 	}
 
 	return d.authService, nil
@@ -234,4 +247,44 @@ func (d *diContainer) RunMigrations(ctx context.Context) error {
 	d.migrator = mig
 
 	return nil
+}
+
+func (d *diContainer) RBACClient(ctx context.Context) (grpcClient.RBACClient, error) {
+	if d.rbacClient == nil {
+		conn, addr, err := d.dialServiceConn(ctx, "rbac")
+		if err != nil {
+			return nil, fmt.Errorf("failed to dial rbac service: %w", err)
+		}
+
+		generatedRbacClient := generatedRbacV1.NewUserRoleServiceClient(conn)
+		d.rbacClient = rbacV1.NewClient(generatedRbacClient)
+
+		closer.AddNamed("gRPC RBAC conn", func(ctx context.Context) error {
+			logger.Info(ctx, "🔐 [Shutdown] Закрытие gRPC RBAC соединения")
+			return conn.Close()
+		})
+
+		logger.Info(ctx, "✅ [gRPC] Подключение к RBAC установлено", zap.String("address", addr))
+	}
+
+	return d.rbacClient, nil
+}
+
+func (d *diContainer) dialServiceConn(ctx context.Context, serviceName string) (*grpc.ClientConn, string, error) {
+	svc, ok := d.cfg.Services().Get(serviceName)
+	if !ok {
+		logger.Error(ctx, "❌ [Config] Сервис не настроен", zap.String("service", serviceName))
+		return nil, "", fmt.Errorf("%s service not configured", serviceName)
+	}
+
+	addr := svc.Address()
+	limits := d.cfg.Transport().GRPCClientLimits()
+
+	conn, err := grpcclient.NewClient(addr, limits.MaxRecvMsgSize(), limits.MaxSendMsgSize(), limits.Timeout())
+	if err != nil {
+		logger.Error(ctx, "❌ [gRPC] Не удалось подключиться к сервису", zap.String("service", serviceName), zap.String("address", addr), zap.Error(err))
+		return nil, "", fmt.Errorf("connect to %s failed: %w", serviceName, err)
+	}
+
+	return conn, addr, nil
 }

@@ -4,16 +4,16 @@ import (
 	"context"
 
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (api *API) DeleteRole(ctx context.Context, req *roleV1.DeleteRoleRequest) (*emptypb.Empty, error) {
-	if err := api.roleService.DeleteRole(ctx, req.RoleId); err != nil {
+func (api *API) Delete(ctx context.Context, req *roleV1.DeleteRequest) (*emptypb.Empty, error) {
+	if err := api.roleService.Delete(ctx, req.RoleId); err != nil {
 		logger.Error(ctx, "❌ [API] Ошибка удаления роли", zap.Error(err))
-		return nil, mapError(ctx, err)
+		return nil, mapError(err)
 	}
 
 	return &emptypb.Empty{}, nil

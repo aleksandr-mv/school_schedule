@@ -6,8 +6,7 @@ CREATE TABLE user_roles (
     assigned_by UUID,
     assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     PRIMARY KEY (user_id, role_id),
-    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
-    FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 -- +goose StatementEnd
 

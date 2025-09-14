@@ -7,41 +7,41 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *ServiceSuite) TestAssignRoleSuccess() {
+func (s *ServiceSuite) TestAssignSuccess() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	s.userRoleRepository.On("AssignRole", mock.Anything, userID, roleID, &assignedBy).Return(nil)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(nil)
 
-	err := s.service.AssignRole(s.ctx, userID, roleID, &assignedBy)
+	err := s.service.Assign(s.ctx, userID, roleID, assignedBy)
 
 	assert.NoError(s.T(), err)
 
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestAssignRoleSuccessWithoutAssignedBy() {
+func (s *ServiceSuite) TestAssignSuccessWithoutAssignedBy() {
 	userID := "user123"
 	roleID := "role456"
 
-	s.userRoleRepository.On("AssignRole", mock.Anything, userID, roleID, (*string)(nil)).Return(nil)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, "").Return(nil)
 
-	err := s.service.AssignRole(s.ctx, userID, roleID, nil)
+	err := s.service.Assign(s.ctx, userID, roleID, "")
 
 	assert.NoError(s.T(), err)
 
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestAssignRoleAlreadyAssigned() {
+func (s *ServiceSuite) TestAssignAlreadyAssigned() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	s.userRoleRepository.On("AssignRole", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrRoleAlreadyAssigned)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleAlreadyAssigned)
 
-	err := s.service.AssignRole(s.ctx, userID, roleID, &assignedBy)
+	err := s.service.Assign(s.ctx, userID, roleID, assignedBy)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrRoleAlreadyAssigned, err)
@@ -49,14 +49,14 @@ func (s *ServiceSuite) TestAssignRoleAlreadyAssigned() {
 	s.userRoleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestAssignRoleRepositoryError() {
+func (s *ServiceSuite) TestAssignRepositoryError() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	s.userRoleRepository.On("AssignRole", mock.Anything, userID, roleID, &assignedBy).Return(model.ErrInternal)
+	s.userRoleRepository.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrInternal)
 
-	err := s.service.AssignRole(s.ctx, userID, roleID, &assignedBy)
+	err := s.service.Assign(s.ctx, userID, roleID, assignedBy)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrInternal, err)

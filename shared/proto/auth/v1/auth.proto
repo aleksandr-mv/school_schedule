@@ -6,7 +6,6 @@ import "validate/validate.proto";
 import "common/v1/user.proto";
 import "common/v1/session.proto";
 import "common/v1/role.proto";
-import "common/v1/permission.proto";
 
 option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1;auth_v1";
 
@@ -48,8 +47,7 @@ message WhoamiRequest {
 message WhoamiResponse {
   common.v1.Session session = 1 [(validate.rules).message.required = true];
   common.v1.User user = 2 [(validate.rules).message.required = true];
-  repeated common.v1.Role roles = 3;
-  repeated common.v1.Permission permissions = 4; 
+  repeated common.v1.RoleWithPermissions roles_with_permissions = 3;
 }
 
 // Запрос на выход из системы

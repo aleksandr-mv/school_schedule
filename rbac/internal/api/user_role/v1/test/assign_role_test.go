@@ -1,6 +1,7 @@
 package user_role_test
 
 import (
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -10,20 +11,20 @@ import (
 	userRoleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
-func (s *APISuite) TestAssignRoleSuccess() {
+func (s *APISuite) TestAssignSuccess() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	req := &userRoleV1.AssignRoleRequest{
+	req := &userRoleV1.AssignRequest{
 		UserId:     userID,
 		RoleId:     roleID,
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("AssignRole", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(nil).Once()
 
-	resp, err := s.api.AssignRole(s.ctx, req)
+	resp, err := s.api.Assign(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
@@ -31,19 +32,19 @@ func (s *APISuite) TestAssignRoleSuccess() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestAssignRoleSuccessWithoutAssignedBy() {
+func (s *APISuite) TestAssignSuccessWithoutAssignedBy() {
 	userID := "user123"
 	roleID := "role456"
 
-	req := &userRoleV1.AssignRoleRequest{
+	req := &userRoleV1.AssignRequest{
 		UserId:     userID,
 		RoleId:     roleID,
 		AssignedBy: nil,
 	}
 
-	s.userRoleService.On("AssignRole", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, "").Return(nil).Once()
 
-	resp, err := s.api.AssignRole(s.ctx, req)
+	resp, err := s.api.Assign(s.ctx, req)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
@@ -51,20 +52,20 @@ func (s *APISuite) TestAssignRoleSuccessWithoutAssignedBy() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestAssignRoleRoleAlreadyAssigned() {
+func (s *APISuite) TestAssignRoleAlreadyAssigned() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	req := &userRoleV1.AssignRoleRequest{
+	req := &userRoleV1.AssignRequest{
 		UserId:     userID,
 		RoleId:     roleID,
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("AssignRole", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(model.ErrRoleAlreadyAssigned).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleAlreadyAssigned).Once()
 
-	resp, err := s.api.AssignRole(s.ctx, req)
+	resp, err := s.api.Assign(s.ctx, req)
 
 	assert.Error(s.T(), err)
 	assert.Nil(s.T(), resp)
@@ -76,20 +77,20 @@ func (s *APISuite) TestAssignRoleRoleAlreadyAssigned() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestAssignRoleUserNotFound() {
+func (s *APISuite) TestAssignUserNotFound() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	req := &userRoleV1.AssignRoleRequest{
+	req := &userRoleV1.AssignRequest{
 		UserId:     userID,
 		RoleId:     roleID,
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("AssignRole", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(model.ErrRoleNotFound).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleNotFound).Once()
 
-	resp, err := s.api.AssignRole(s.ctx, req)
+	resp, err := s.api.Assign(s.ctx, req)
 
 	assert.Error(s.T(), err)
 	assert.Nil(s.T(), resp)
@@ -101,20 +102,20 @@ func (s *APISuite) TestAssignRoleUserNotFound() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestAssignRoleRoleNotFound() {
+func (s *APISuite) TestAssignRoleNotFound() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	req := &userRoleV1.AssignRoleRequest{
+	req := &userRoleV1.AssignRequest{
 		UserId:     userID,
 		RoleId:     roleID,
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("AssignRole", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(model.ErrRoleNotFound).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrRoleNotFound).Once()
 
-	resp, err := s.api.AssignRole(s.ctx, req)
+	resp, err := s.api.Assign(s.ctx, req)
 
 	assert.Error(s.T(), err)
 	assert.Nil(s.T(), resp)
@@ -126,20 +127,20 @@ func (s *APISuite) TestAssignRoleRoleNotFound() {
 	s.userRoleService.AssertExpectations(s.T())
 }
 
-func (s *APISuite) TestAssignRoleInternalError() {
+func (s *APISuite) TestAssignInternalError() {
 	userID := "user123"
 	roleID := "role456"
 	assignedBy := "admin123"
 
-	req := &userRoleV1.AssignRoleRequest{
+	req := &userRoleV1.AssignRequest{
 		UserId:     userID,
 		RoleId:     roleID,
 		AssignedBy: &assignedBy,
 	}
 
-	s.userRoleService.On("AssignRole", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(model.ErrInternal).Once()
+	s.userRoleService.On("Assign", mock.Anything, userID, roleID, assignedBy).Return(model.ErrInternal).Once()
 
-	resp, err := s.api.AssignRole(s.ctx, req)
+	resp, err := s.api.Assign(s.ctx, req)
 
 	assert.Error(s.T(), err)
 	assert.Nil(s.T(), resp)
@@ -149,4 +150,69 @@ func (s *APISuite) TestAssignRoleInternalError() {
 	assert.Equal(s.T(), codes.Internal, grpcErr.Code())
 
 	s.userRoleService.AssertExpectations(s.T())
+}
+
+func (s *APISuite) TestAssignValidation_InvalidUserID() {
+	req := &userRoleV1.AssignRequest{
+		UserId: "invalid-uuid",
+		RoleId: uuid.New().String(),
+	}
+
+	err := req.Validate()
+	assert.Error(s.T(), err)
+	assert.Contains(s.T(), err.Error(), "value must be a valid UUID")
+}
+
+func (s *APISuite) TestAssignValidation_InvalidRoleID() {
+	req := &userRoleV1.AssignRequest{
+		UserId: uuid.New().String(),
+		RoleId: "invalid-uuid",
+	}
+
+	err := req.Validate()
+	assert.Error(s.T(), err)
+	assert.Contains(s.T(), err.Error(), "value must be a valid UUID")
+}
+
+func (s *APISuite) TestAssignValidation_InvalidAssignedBy() {
+	assignedBy := "invalid-uuid"
+
+	req := &userRoleV1.AssignRequest{
+		UserId:     uuid.New().String(),
+		RoleId:     uuid.New().String(),
+		AssignedBy: &assignedBy,
+	}
+
+	err := req.Validate()
+	assert.Error(s.T(), err)
+	assert.Contains(s.T(), err.Error(), "value must be a valid UUID")
+}
+
+func (s *APISuite) TestAssignValidation_ValidRequest() {
+	userID := uuid.New().String()
+	roleID := uuid.New().String()
+	assignedBy := uuid.New().String()
+
+	req := &userRoleV1.AssignRequest{
+		UserId:     userID,
+		RoleId:     roleID,
+		AssignedBy: &assignedBy,
+	}
+
+	err := req.Validate()
+	assert.NoError(s.T(), err)
+}
+
+func (s *APISuite) TestAssignValidation_ValidRequestWithoutAssignedBy() {
+	userID := uuid.New().String()
+	roleID := uuid.New().String()
+
+	req := &userRoleV1.AssignRequest{
+		UserId:     userID,
+		RoleId:     roleID,
+		AssignedBy: nil,
+	}
+
+	err := req.Validate()
+	assert.NoError(s.T(), err)
 }

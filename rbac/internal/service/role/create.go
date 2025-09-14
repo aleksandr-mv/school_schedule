@@ -9,21 +9,13 @@ import (
 
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *RoleService) CreateRole(ctx context.Context, createRole *model.CreateRole) (uuid.UUID, error) {
+func (s *RoleService) Create(ctx context.Context, name, description string) (uuid.UUID, error) {
 	ctx, span := tracing.StartSpan(ctx, "rbac.service.create_role")
 	defer span.End()
 
-	if err := createRole.Validate(); err != nil {
-		logger.Error(ctx, "❌ [Service] Ошибка валидации роли", zap.Error(err))
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		return uuid.Nil, model.ErrInvalidCredentials
-	}
-
-	role, err := s.roleRepo.Create(ctx, createRole)
+	role, err := s.roleRepo.Create(ctx, name, description)
 	if err != nil {
 		logger.Error(ctx, "❌ [Service] Ошибка создания роли в репозитории", zap.Error(err))
 		span.RecordError(err)
@@ -31,5 +23,5 @@ func (s *RoleService) CreateRole(ctx context.Context, createRole *model.CreateRo
 		return uuid.Nil, err
 	}
 
-	return role.ID, nil
+	return role, nil
 }

@@ -14,10 +14,10 @@ func (api *API) GetUserRoles(ctx context.Context, req *userRoleV1.GetUserRolesRe
 	roles, err := api.userRoleService.GetUserRoles(ctx, req.UserId)
 	if err != nil {
 		logger.Error(ctx, "❌ [API] Ошибка получения ролей пользователя", zap.Error(err))
-		return nil, mapError(ctx, err)
+		return nil, mapError(err)
 	}
 
 	return &userRoleV1.GetUserRolesResponse{
-		Data: converter.RolesToProto(roles),
+		Data: converter.EnrichedRolesToProto(roles),
 	}, nil
 }

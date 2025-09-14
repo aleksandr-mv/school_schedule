@@ -27,5 +27,18 @@ func (s *AuthService) Whoami(ctx context.Context, sessionID uuid.UUID) (*model.W
 		return nil, model.ErrSessionExpired
 	}
 
+	roles, err := s.rbacClient.GetUserRoles(ctx, iam.User.ID)
+	if err != nil {
+		logger.Error(ctx,
+			"❌ [Service] Ошибка получения ролей пользователя",
+			zap.Error(err),
+			zap.String("operation", "auth.Service.Whoami"),
+			zap.String("userID", iam.User.ID.String()),
+		)
+		roles = []*model.RoleWithPermissions{}
+	}
+
+	iam.RolesWithPermissions = roles
+
 	return iam, nil
 }

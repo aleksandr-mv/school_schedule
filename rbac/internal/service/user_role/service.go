@@ -9,10 +9,12 @@ var _ service.UserRoleServiceInterface = (*UserRoleService)(nil)
 
 type UserRoleService struct {
 	userRoleRepo repository.UserRoleRepository
+	roleService  service.RoleServiceInterface
 }
 
-func NewService(userRoleRepo repository.UserRoleRepository) *UserRoleService {
+func NewService(userRoleRepo repository.UserRoleRepository, roleService service.RoleServiceInterface) *UserRoleService {
 	return &UserRoleService{
 		userRoleRepo: userRoleRepo,
+		roleService:  roleService,
 	}
 }

@@ -2,6 +2,7 @@ package metric
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -170,10 +171,17 @@ func (m *Metrics) Shutdown(ctx context.Context, timeout time.Duration) error {
 	}
 
 	// 2. Затем закрываем экспортер - после того как MeterProvider завершил отправку данных
+	// MeterProvider может автоматически закрыть exporter через reader, поэтому проверяем
 	if m.exporter != nil {
 		err = m.exporter.Shutdown(shutdownCtx)
 		if err != nil {
-			return errors.Wrap(err, "failed to shutdown exporter")
+			// Игнорируем ошибки о том, что exporter уже закрыт
+			if strings.Contains(err.Error(), "gRPC exporter is shutdown") ||
+				strings.Contains(err.Error(), "exporter is already shutdown") {
+				m.logger.Info(ctx, "Exporter уже закрыт, игнорируем ошибку")
+			} else {
+				return errors.Wrap(err, "failed to shutdown exporter")
+			}
 		}
 		m.exporter = nil
 	}

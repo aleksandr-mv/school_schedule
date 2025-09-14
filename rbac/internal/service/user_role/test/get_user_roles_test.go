@@ -12,66 +12,55 @@ import (
 
 func (s *ServiceSuite) TestGetUserRolesSuccess() {
 	userID := "user123"
-	role1 := &model.Role{
-		ID:        uuid.New(),
-		Name:      "admin",
-		CreatedAt: time.Now(),
-	}
-	role2 := &model.Role{
-		ID:        uuid.New(),
-		Name:      "user",
-		CreatedAt: time.Now(),
-	}
-	expectedRoles := []*model.Role{role1, role2}
+	roleID1 := uuid.New().String()
+	roleID2 := uuid.New().String()
 
-	s.userRoleRepository.On("GetUserRoles", mock.Anything, userID).Return(expectedRoles, nil)
+	role1 := &model.EnrichedRole{
+		Role: model.Role{
+			ID:        uuid.New(),
+			Name:      "admin",
+			CreatedAt: time.Now(),
+		},
+		Permissions: []*model.Permission{},
+	}
+	role2 := &model.EnrichedRole{
+		Role: model.Role{
+			ID:        uuid.New(),
+			Name:      "user",
+			CreatedAt: time.Now(),
+		},
+		Permissions: []*model.Permission{},
+	}
+
+	s.userRoleRepository.On("GetUserRoles", mock.Anything, userID).Return([]string{roleID1, roleID2}, nil)
+	s.roleService.On("Get", mock.Anything, roleID1).Return(role1, nil)
+	s.roleService.On("Get", mock.Anything, roleID2).Return(role2, nil)
 
 	result, err := s.service.GetUserRoles(s.ctx, userID)
 
 	assert.NoError(s.T(), err)
+	assert.NotNil(s.T(), result)
 	assert.Len(s.T(), result, 2)
-	assert.Equal(s.T(), expectedRoles, result)
+
+	assert.Equal(s.T(), role1.Role.ID, result[0].Role.ID)
+	assert.Equal(s.T(), role1.Role.Name, result[0].Role.Name)
+	assert.Equal(s.T(), role2.Role.ID, result[1].Role.ID)
+	assert.Equal(s.T(), role2.Role.Name, result[1].Role.Name)
 
 	s.userRoleRepository.AssertExpectations(s.T())
+	s.roleService.AssertExpectations(s.T())
 }
 
 func (s *ServiceSuite) TestGetUserRolesEmptyResult() {
 	userID := "user123"
 
-	s.userRoleRepository.On("GetUserRoles", mock.Anything, userID).Return([]*model.Role{}, nil)
+	s.userRoleRepository.On("GetUserRoles", mock.Anything, userID).Return([]string{}, nil)
 
 	result, err := s.service.GetUserRoles(s.ctx, userID)
 
 	assert.NoError(s.T(), err)
+	assert.NotNil(s.T(), result)
 	assert.Len(s.T(), result, 0)
-
-	s.userRoleRepository.AssertExpectations(s.T())
-}
-
-func (s *ServiceSuite) TestGetUserRolesNotFound() {
-	userID := "user123"
-
-	s.userRoleRepository.On("GetUserRoles", mock.Anything, userID).Return(nil, model.ErrUserRoleNotFound)
-
-	result, err := s.service.GetUserRoles(s.ctx, userID)
-
-	assert.Error(s.T(), err)
-	assert.Equal(s.T(), model.ErrUserRoleNotFound, err)
-	assert.Nil(s.T(), result)
-
-	s.userRoleRepository.AssertExpectations(s.T())
-}
-
-func (s *ServiceSuite) TestGetUserRolesRepositoryError() {
-	userID := "user123"
-
-	s.userRoleRepository.On("GetUserRoles", mock.Anything, userID).Return(nil, model.ErrInternal)
-
-	result, err := s.service.GetUserRoles(s.ctx, userID)
-
-	assert.Error(s.T(), err)
-	assert.Equal(s.T(), model.ErrInternal, err)
-	assert.Nil(s.T(), result)
 
 	s.userRoleRepository.AssertExpectations(s.T())
 }

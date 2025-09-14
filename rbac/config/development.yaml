@@ -51,7 +51,7 @@ database:
   postgres:
     connection:
       host: "localhost"
-      port: 5435
+      port: 5433
       user: "postgres"
       password: "password"
       database: "rbac"
@@ -78,7 +78,7 @@ redis:
   enabled: true
   connection:
     host: "localhost"
-    port: 6381
+    port: 6380
     password: ""
     database: 0
   pool:
@@ -92,14 +92,5 @@ redis:
     idle_timeout: "30m"
     idle_check_freq: "1m"
 
-# RBAC специфичные настройки
-rbac:
-  cache:
-    enabled: true
-    ttl: "5m"  # TTL для кеширования ролей и прав
-    role_ttl: "10m"  # TTL для кеширования ролей пользователей
-    permission_ttl: "15m"  # TTL для кеширования прав ролей
-  rate_limit:
-    enabled: true
-    requests_per_minute: 1000
-    burst: 100
+session:
+  ttl: "24h" 

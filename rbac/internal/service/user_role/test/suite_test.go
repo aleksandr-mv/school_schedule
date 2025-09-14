@@ -7,7 +7,8 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository/mocks"
+	repositoryMocks "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/mocks"
+	serviceMocks "github.com/aleksandr-mv/school_schedule/rbac/internal/service/mocks"
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/service/user_role"
 )
 
@@ -15,7 +16,9 @@ type ServiceSuite struct {
 	suite.Suite
 	ctx context.Context // nolint:containedctx
 
-	userRoleRepository *mocks.UserRoleRepository
+	userRoleRepository *repositoryMocks.UserRoleRepository
+	roleRepository     *repositoryMocks.RoleRepository
+	roleService        *serviceMocks.RoleServiceInterface
 
 	service *user_role.UserRoleService
 }
@@ -27,13 +30,18 @@ func (s *ServiceSuite) SetupSuite() {
 		panic(err)
 	}
 
-	s.userRoleRepository = mocks.NewUserRoleRepository(s.T())
+	s.userRoleRepository = repositoryMocks.NewUserRoleRepository(s.T())
+	s.roleRepository = repositoryMocks.NewRoleRepository(s.T())
 
-	s.service = user_role.NewService(s.userRoleRepository)
+	// Создаем мок для RoleServiceInterface
+	s.roleService = serviceMocks.NewRoleServiceInterface(s.T())
+	s.service = user_role.NewService(s.userRoleRepository, s.roleService)
 }
 
 func (s *ServiceSuite) SetupTest() {
 	s.userRoleRepository.ExpectedCalls = nil
+	s.roleRepository.ExpectedCalls = nil
+	s.roleService.ExpectedCalls = nil
 }
 
 func (s *ServiceSuite) TearDownTest() {

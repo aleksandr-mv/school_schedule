@@ -10,7 +10,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *ServiceSuite) TestListRolesSuccess() {
+func (s *ServiceSuite) TestListSuccess() {
 	role1 := &model.Role{
 		ID:          uuid.New(),
 		Name:        "admin",
@@ -23,64 +23,50 @@ func (s *ServiceSuite) TestListRolesSuccess() {
 		Description: "User role",
 		CreatedAt:   time.Now(),
 	}
+
 	expectedRoles := []*model.Role{role1, role2}
 
-	s.roleRepository.On("List", mock.Anything, "admin").Return(expectedRoles, nil)
+	s.roleRepository.On("List", mock.Anything).Return(expectedRoles, nil).Once()
 
-	result, err := s.service.ListRoles(s.ctx, "admin")
+	roles, err := s.service.List(s.ctx)
 
 	assert.NoError(s.T(), err)
-	assert.Len(s.T(), result, 2)
-	assert.Equal(s.T(), expectedRoles, result)
+	assert.NotNil(s.T(), roles)
+	assert.Len(s.T(), roles, 2)
+
+	assert.Equal(s.T(), role1.ID, roles[0].ID)
+	assert.Equal(s.T(), role1.Name, roles[0].Name)
+	assert.Equal(s.T(), role1.Description, roles[0].Description)
+
+	assert.Equal(s.T(), role2.ID, roles[1].ID)
+	assert.Equal(s.T(), role2.Name, roles[1].Name)
+	assert.Equal(s.T(), role2.Description, roles[1].Description)
 
 	s.roleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestListRolesEmptyFilter() {
-	role1 := &model.Role{
-		ID:          uuid.New(),
-		Name:        "admin",
-		Description: "Administrator role",
-		CreatedAt:   time.Now(),
-	}
-	role2 := &model.Role{
-		ID:          uuid.New(),
-		Name:        "user",
-		Description: "User role",
-		CreatedAt:   time.Now(),
-	}
-	expectedRoles := []*model.Role{role1, role2}
+func (s *ServiceSuite) TestListEmptyResult() {
+	expectedRoles := []*model.Role{}
 
-	s.roleRepository.On("List", mock.Anything, "").Return(expectedRoles, nil)
+	s.roleRepository.On("List", mock.Anything).Return(expectedRoles, nil).Once()
 
-	result, err := s.service.ListRoles(s.ctx, "")
+	roles, err := s.service.List(s.ctx)
 
 	assert.NoError(s.T(), err)
-	assert.Len(s.T(), result, 2)
-	assert.Equal(s.T(), expectedRoles, result)
+	assert.NotNil(s.T(), roles)
+	assert.Len(s.T(), roles, 0)
 
 	s.roleRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestListRolesEmptyResult() {
-	s.roleRepository.On("List", mock.Anything, "nonexistent").Return([]*model.Role{}, nil)
+func (s *ServiceSuite) TestListInternalError() {
+	s.roleRepository.On("List", mock.Anything).Return(nil, model.ErrInternal).Once()
 
-	result, err := s.service.ListRoles(s.ctx, "nonexistent")
-
-	assert.NoError(s.T(), err)
-	assert.Len(s.T(), result, 0)
-
-	s.roleRepository.AssertExpectations(s.T())
-}
-
-func (s *ServiceSuite) TestListRolesRepositoryError() {
-	s.roleRepository.On("List", mock.Anything, "admin").Return(nil, model.ErrInternal)
-
-	result, err := s.service.ListRoles(s.ctx, "admin")
+	roles, err := s.service.List(s.ctx)
 
 	assert.Error(s.T(), err)
+	assert.Nil(s.T(), roles)
 	assert.Equal(s.T(), model.ErrInternal, err)
-	assert.Nil(s.T(), result)
 
 	s.roleRepository.AssertExpectations(s.T())
 }
