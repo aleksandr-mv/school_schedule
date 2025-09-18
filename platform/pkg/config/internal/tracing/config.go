@@ -1,16 +1,16 @@
 package tracing
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/caarlos0/env/v11"
-
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
 )
 
-// rawTracingConfig содержит настройки трейсинга.
-type rawTracingConfig struct {
+// Компиляционная проверка
+var _ contracts.TracingConfig = (*Config)(nil)
+
+// rawConfig для загрузки данных из YAML/ENV
+type rawConfig struct {
 	Enable   bool          `mapstructure:"enable" yaml:"enable" env:"TRACING_ENABLE"`
 	Endpoint string        `mapstructure:"endpoint" yaml:"endpoint" env:"TRACING_ENDPOINT"`
 	Timeout  time.Duration `mapstructure:"timeout" yaml:"timeout" env:"TRACING_TIMEOUT"`
@@ -27,9 +27,14 @@ type rawTracingConfig struct {
 	ShutdownTimeout    time.Duration `mapstructure:"shutdown_timeout" yaml:"shutdown_timeout" env:"TRACING_SHUTDOWN_TIMEOUT"`
 }
 
-// defaultTracingConfig возвращает конфигурацию с дефолтными значениями
-func defaultTracingConfig() *rawTracingConfig {
-	return &rawTracingConfig{
+// Config публичная структура Tracing конфигурации
+type Config struct {
+	raw rawConfig
+}
+
+// defaultConfig возвращает rawConfig с дефолтными значениями
+func defaultConfig() rawConfig {
+	return rawConfig{
 		Enable:               true,
 		Endpoint:             "localhost:4317",
 		Timeout:              5 * time.Second,
@@ -44,30 +49,15 @@ func defaultTracingConfig() *rawTracingConfig {
 	}
 }
 
-// DefaultTracingConfig читает конфигурацию трассировки из ENV.
-func DefaultTracingConfig() (*rawTracingConfig, error) {
-	// Начинаем с дефолтной конфигурации
-	raw := defaultTracingConfig()
-
-	// Применяем переменные окружения поверх дефолтов
-	if err := env.Parse(raw); err != nil {
-		return nil, fmt.Errorf("failed to parse tracing env: %w", err)
-	}
-
-	return raw, nil
-}
-
-// NewTracingConfig создает конфигурацию трассировки, пытаясь сначала загрузить из YAML, затем из ENV.
-func NewTracingConfig() (*rawTracingConfig, error) {
-	if section := helpers.GetSection("tracing"); section != nil {
-		// Начинаем с дефолтной конфигурации
-		raw := defaultTracingConfig()
-
-		// Применяем YAML конфигурацию поверх дефолтов
-		if err := section.Unmarshal(raw); err == nil {
-			return raw, nil
-		}
-	}
-
-	return DefaultTracingConfig()
-}
+// Методы для TracingConfig интерфейса
+func (c *Config) Enable() bool                        { return c.raw.Enable }
+func (c *Config) Endpoint() string                    { return c.raw.Endpoint }
+func (c *Config) Timeout() time.Duration              { return c.raw.Timeout }
+func (c *Config) SampleRatio() int                    { return c.raw.SampleRatio }
+func (c *Config) RetryEnabled() bool                  { return c.raw.RetryEnabled }
+func (c *Config) RetryInitialInterval() time.Duration { return c.raw.RetryInitialInterval }
+func (c *Config) RetryMaxInterval() time.Duration     { return c.raw.RetryMaxInterval }
+func (c *Config) RetryMaxElapsedTime() time.Duration  { return c.raw.RetryMaxElapsedTime }
+func (c *Config) EnableTraceContext() bool            { return c.raw.EnableTraceContext }
+func (c *Config) EnableBaggage() bool                 { return c.raw.EnableBaggage }
+func (c *Config) ShutdownTimeout() time.Duration      { return c.raw.ShutdownTimeout }

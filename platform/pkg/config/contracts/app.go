@@ -2,7 +2,7 @@ package contracts
 
 // AppModule содержит основную конфигурацию приложения и сервиса.
 // Включает базовые настройки сервиса, которые используются во всех компонентах.
-type AppModule interface {
+type AppConfig interface {
 	// Основные настройки сервиса
 	Name() string
 	Environment() string

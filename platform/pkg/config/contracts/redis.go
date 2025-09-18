@@ -3,73 +3,66 @@ package contracts
 import "time"
 
 // ============================================================================
-// REDIS КОНФИГУРАЦИЯ
+// REDIS КЛАСТЕР КОНФИГУРАЦИЯ
 // ============================================================================
 
-// RedisConfig описывает конфигурацию для работы с Redis.
-// Включает настройки подключения, пула соединений и опциональные параметры.
-// Конфигурация является опциональной - если Redis не настроен,
-// IsEnabled() возвращает false.
+// RedisConfig описывает конфигурацию для работы с Redis Cluster.
+// Только кластерный режим, без обратной совместимости.
 type RedisConfig interface {
-	// IsEnabled возвращает true, если Redis настроен
-	IsEnabled() bool
-
-	// Connection возвращает параметры подключения к Redis
-	Connection() RedisConnection
+	// Cluster возвращает конфигурацию кластера
+	Cluster() RedisClusterConfig
 
 	// Pool возвращает настройки пула соединений Redis
 	Pool() RedisPoolConfig
 }
 
-// RedisConnection представляет параметры подключения к Redis.
-type RedisConnection interface {
-	// Host возвращает хост Redis сервера
-	Host() string
+// RedisClusterConfig представляет конфигурацию Redis кластера.
+type RedisClusterConfig interface {
+	// IsEnabled возвращает true, если кластер настроен (есть узлы)
+	IsEnabled() bool
 
-	// Port возвращает порт Redis сервера
-	Port() int
+	// Nodes возвращает список узлов кластера
+	Nodes() []string
 
-	// Password возвращает пароль для подключения (может быть пустым)
+	// Password возвращает пароль для кластера (может быть пустым)
 	Password() string
 
-	// Database возвращает номер базы данных Redis (0-15)
-	Database() int
+	// MaxRedirects максимальное количество редиректов
+	MaxRedirects() int
 
-	// Address возвращает полный адрес в формате "host:port"
-	Address() string
+	// ReadOnlyCommands позволяет читать с реплик
+	ReadOnlyCommands() bool
 
-	// URI возвращает строку подключения к Redis
-	// Пример: "redis://:password@localhost:6379/0"
-	URI() string
+	// RouteByLatency маршрутизация по задержке
+	RouteByLatency() bool
+
+	// RouteRandomly случайная маршрутизация
+	RouteRandomly() bool
+
+	// NodesAddresses возвращает узлы через запятую для подключения
+	NodesAddresses() string
 }
 
 // RedisPoolConfig представляет настройки пула соединений Redis.
-// Redis использует легкие соединения, поэтому настройки отличаются от PostgreSQL.
 type RedisPoolConfig interface {
-	// PoolSize возвращает максимальный размер пула соединений
-	PoolSize() int
+	// MaxActive максимальное количество активных соединений
+	MaxActive() int
 
-	// MinIdle возвращает минимальное количество простаивающих соединений
-	MinIdle() int
+	// MaxIdle максимальное количество простаивающих соединений
+	MaxIdle() int
 
-	// MaxRetries возвращает максимальное количество попыток переподключения
-	MaxRetries() int
-
-	// DialTimeout возвращает таймаут установки соединения
-	DialTimeout() time.Duration
-
-	// ReadTimeout возвращает таймаут чтения из Redis
-	ReadTimeout() time.Duration
-
-	// WriteTimeout возвращает таймаут записи в Redis
-	WriteTimeout() time.Duration
-
-	// PoolTimeout возвращает таймаут ожидания соединения из пула
-	PoolTimeout() time.Duration
-
-	// IdleTimeout возвращает время, через которое неиспользуемое соединение считается устаревшим
+	// IdleTimeout время жизни простаивающего соединения
 	IdleTimeout() time.Duration
 
-	// IdleCheckFreq возвращает частоту проверки простаивающих соединений
-	IdleCheckFreq() time.Duration
+	// ConnTimeout таймаут установки соединения
+	ConnTimeout() time.Duration
+
+	// ReadTimeout таймаут чтения
+	ReadTimeout() time.Duration
+
+	// WriteTimeout таймаут записи
+	WriteTimeout() time.Duration
+
+	// PoolTimeout таймаут получения соединения из пула
+	PoolTimeout() time.Duration
 }

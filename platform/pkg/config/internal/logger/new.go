@@ -1,25 +1,32 @@
 package logger
 
-import "github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+import (
+	"fmt"
 
-type module struct {
-	loggerConfig *loggerConfig
-}
+	"github.com/caarlos0/env/v11"
 
-func New() (contracts.LoggerModule, error) {
-	loggerCfg, err := NewLoggerConfig()
-	if err != nil {
-		return nil, err
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
+)
+
+// New создает Logger конфигурацию по стратегии: Defaults → YAML → ENV
+func New() (contracts.LoggerConfig, error) {
+	// 1. Создаем конфигурацию с дефолтными значениями
+	cfg := &Config{
+		raw: defaultConfig(),
 	}
 
-	return &module{
-		loggerConfig: loggerCfg,
-	}, nil
+	// 2. Перезаписываем YAML'ом (если есть)
+	if section := helpers.GetSection("logger"); section != nil {
+		if err := section.Unmarshal(&cfg.raw); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal logger YAML: %w", err)
+		}
+	}
+
+	// 3. Перезаписываем ENV переменными (финальный приоритет)
+	if err := env.Parse(&cfg.raw); err != nil {
+		return nil, fmt.Errorf("failed to parse logger ENV: %w", err)
+	}
+
+	return cfg, nil
 }
-
-// Методы логирования
-func (m *module) Level() string { return m.loggerConfig.Level() }
-func (m *module) AsJSON() bool  { return m.loggerConfig.AsJSON() }
-
-// OTLP возвращает модуль OTLP конфигурации
-func (m *module) OTLP() contracts.OTLPModule { return m.loggerConfig.OTLP() }

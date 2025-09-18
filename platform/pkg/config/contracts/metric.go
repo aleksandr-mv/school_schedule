@@ -3,7 +3,7 @@ package contracts
 import "time"
 
 // MetricModule содержит конфигурацию метрик OpenTelemetry.
-type MetricModule interface {
+type MetricConfig interface {
 	// Основные настройки
 	Enable() bool
 	Endpoint() string

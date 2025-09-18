@@ -11,64 +11,48 @@ type rawConsumerConfig struct {
 	Enabled bool   `mapstructure:"enabled"  yaml:"enabled"`
 }
 
-// kafkaConsumerConfig реализует KafkaConsumerConfig
-type kafkaConsumerConfig struct {
-	name    string
-	topic   string
-	groupID string
-	enabled bool
+// ConsumerConfig реализует KafkaConsumerConfig
+type ConsumerConfig struct {
+	name string
+	raw  rawConsumerConfig
 }
+
+// Компиляционная проверка
+var _ contracts.KafkaConsumerConfig = (*ConsumerConfig)(nil)
 
 // Методы интерфейса KafkaConsumerConfig
-func (c *kafkaConsumerConfig) Name() string    { return c.name }
-func (c *kafkaConsumerConfig) Topic() string   { return c.topic }
-func (c *kafkaConsumerConfig) GroupID() string { return c.groupID }
-func (c *kafkaConsumerConfig) IsEnabled() bool { return c.enabled }
+func (c *ConsumerConfig) Name() string    { return c.name }
+func (c *ConsumerConfig) Topic() string   { return c.raw.Topic }
+func (c *ConsumerConfig) GroupID() string { return c.raw.GroupID }
+func (c *ConsumerConfig) IsEnabled() bool { return c.raw.Enabled }
 
-// consumersConfig реализует ConsumersConfig
-type consumersConfig struct {
-	kafkaConfig *kafkaConfig
+// ConsumersConfig реализует ConsumersConfig интерфейс
+type ConsumersConfig struct {
+	consumers map[string]*ConsumerConfig
 }
 
-// Методы для работы с консюмерами в kafkaConfig
-func (k *kafkaConfig) Consumers() contracts.ConsumersConfig {
-	return &consumersConfig{kafkaConfig: k}
+// Компиляционная проверка
+var _ contracts.ConsumersConfig = (*ConsumersConfig)(nil)
+
+func (cc *ConsumersConfig) GetConsumer(name string) (contracts.KafkaConsumerConfig, bool) {
+	consumer, exists := cc.consumers[name]
+	return consumer, exists
 }
 
-func (c *consumersConfig) GetConsumer(name string) (contracts.KafkaConsumerConfig, bool) {
-	raw, exists := c.kafkaConfig.Raw.Consumers[name]
-	if !exists {
-		return nil, false
+func (cc *ConsumersConfig) GetAllConsumers() map[string]contracts.KafkaConsumerConfig {
+	result := make(map[string]contracts.KafkaConsumerConfig, len(cc.consumers))
+	for name, consumer := range cc.consumers {
+		result[name] = consumer
 	}
-
-	consumer := &kafkaConsumerConfig{
-		name:    name,
-		topic:   raw.Topic,
-		groupID: raw.GroupID,
-		enabled: raw.Enabled,
-	}
-
-	return consumer, true
-}
-
-func (c *consumersConfig) GetAllConsumers() map[string]contracts.KafkaConsumerConfig {
-	result := make(map[string]contracts.KafkaConsumerConfig)
-	for name := range c.kafkaConfig.Raw.Consumers {
-		if consumer, exists := c.GetConsumer(name); exists {
-			result[name] = consumer
-		}
-	}
-
 	return result
 }
 
-func (c *consumersConfig) GetEnabledConsumers() map[string]contracts.KafkaConsumerConfig {
+func (cc *ConsumersConfig) GetEnabledConsumers() map[string]contracts.KafkaConsumerConfig {
 	result := make(map[string]contracts.KafkaConsumerConfig)
-	for name, consumer := range c.GetAllConsumers() {
+	for name, consumer := range cc.consumers {
 		if consumer.IsEnabled() {
 			result[name] = consumer
 		}
 	}
-
 	return result
 }

@@ -1,28 +1,32 @@
 package app
 
-import "github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+import (
+	"fmt"
 
-type module struct {
-	appConfig *appConfig
-}
+	"github.com/caarlos0/env/v11"
 
-func New() (contracts.AppModule, error) {
-	appCfg, err := NewAppConfig()
-	if err != nil {
-		return nil, err
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
+)
+
+// New создает App конфигурацию по стратегии: Defaults → YAML → ENV
+func New() (contracts.AppConfig, error) {
+	// 1. Создаем конфигурацию с дефолтными значениями
+	cfg := &Config{
+		raw: defaultConfig(),
 	}
 
-	return &module{
-		appConfig: appCfg,
-	}, nil
+	// 2. Перезаписываем YAML'ом (если есть)
+	if section := helpers.GetSection("app"); section != nil {
+		if err := section.Unmarshal(&cfg.raw); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal app YAML: %w", err)
+		}
+	}
+
+	// 3. Перезаписываем ENV переменными (финальный приоритет)
+	if err := env.Parse(&cfg.raw); err != nil {
+		return nil, fmt.Errorf("failed to parse app ENV: %w", err)
+	}
+
+	return cfg, nil
 }
-
-// Методы сервиса
-func (m *module) Name() string        { return m.appConfig.Name() }
-func (m *module) Environment() string { return m.appConfig.Environment() }
-func (m *module) Version() string     { return m.appConfig.Version() }
-
-// Методы приложения
-func (m *module) MigrationsDir() string { return m.appConfig.MigrationsDir() }
-func (m *module) SwaggerPath() string   { return m.appConfig.SwaggerPath() }
-func (m *module) SwaggerUIPath() string { return m.appConfig.SwaggerUIPath() }

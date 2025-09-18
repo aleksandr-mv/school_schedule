@@ -2,8 +2,8 @@ package contracts
 
 import "time"
 
-// TracingModule содержит конфигурацию трейсинга OpenTelemetry.
-type TracingModule interface {
+// TracingConfig содержит конфигурацию трейсинга OpenTelemetry.
+type TracingConfig interface {
 	// Основные настройки
 	Enable() bool
 	Endpoint() string

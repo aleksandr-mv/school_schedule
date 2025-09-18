@@ -10,61 +10,47 @@ type rawProducerConfig struct {
 	Enabled bool   `mapstructure:"enabled" yaml:"enabled"`
 }
 
-// kafkaProducerConfig реализует KafkaProducerConfig
-type kafkaProducerConfig struct {
-	name    string
-	topic   string
-	enabled bool
+// ProducerConfig реализует KafkaProducerConfig
+type ProducerConfig struct {
+	name string
+	raw  rawProducerConfig
 }
+
+// Компиляционная проверка
+var _ contracts.KafkaProducerConfig = (*ProducerConfig)(nil)
 
 // Методы интерфейса KafkaProducerConfig
-func (p *kafkaProducerConfig) Name() string    { return p.name }
-func (p *kafkaProducerConfig) Topic() string   { return p.topic }
-func (p *kafkaProducerConfig) IsEnabled() bool { return p.enabled }
+func (p *ProducerConfig) Name() string    { return p.name }
+func (p *ProducerConfig) Topic() string   { return p.raw.Topic }
+func (p *ProducerConfig) IsEnabled() bool { return p.raw.Enabled }
 
-// producersConfig реализует ProducersConfig
-type producersConfig struct {
-	kafkaConfig *kafkaConfig
+// ProducersConfig реализует ProducersConfig интерфейс
+type ProducersConfig struct {
+	producers map[string]*ProducerConfig
 }
 
-// Методы для работы с продюсерами в kafkaConfig
-func (k *kafkaConfig) Producers() contracts.ProducersConfig {
-	return &producersConfig{kafkaConfig: k}
+// Компиляционная проверка
+var _ contracts.ProducersConfig = (*ProducersConfig)(nil)
+
+func (pc *ProducersConfig) GetProducer(name string) (contracts.KafkaProducerConfig, bool) {
+	producer, exists := pc.producers[name]
+	return producer, exists
 }
 
-func (p *producersConfig) GetProducer(name string) (contracts.KafkaProducerConfig, bool) {
-	raw, exists := p.kafkaConfig.Raw.Producers[name]
-	if !exists {
-		return nil, false
+func (pc *ProducersConfig) GetAllProducers() map[string]contracts.KafkaProducerConfig {
+	result := make(map[string]contracts.KafkaProducerConfig, len(pc.producers))
+	for name, producer := range pc.producers {
+		result[name] = producer
 	}
-
-	producer := &kafkaProducerConfig{
-		name:    name,
-		topic:   raw.Topic,
-		enabled: raw.Enabled,
-	}
-
-	return producer, true
-}
-
-func (p *producersConfig) GetAllProducers() map[string]contracts.KafkaProducerConfig {
-	result := make(map[string]contracts.KafkaProducerConfig)
-	for name := range p.kafkaConfig.Raw.Producers {
-		if producer, exists := p.GetProducer(name); exists {
-			result[name] = producer
-		}
-	}
-
 	return result
 }
 
-func (p *producersConfig) GetEnabledProducers() map[string]contracts.KafkaProducerConfig {
+func (pc *ProducersConfig) GetEnabledProducers() map[string]contracts.KafkaProducerConfig {
 	result := make(map[string]contracts.KafkaProducerConfig)
-	for name, producer := range p.GetAllProducers() {
+	for name, producer := range pc.producers {
 		if producer.IsEnabled() {
 			result[name] = producer
 		}
 	}
-
 	return result
 }

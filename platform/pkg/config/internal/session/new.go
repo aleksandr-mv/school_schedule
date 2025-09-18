@@ -1,4 +1,4 @@
-package telegram
+package session
 
 import (
 	"fmt"
@@ -9,23 +9,23 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
 )
 
-// New создает Telegram конфигурацию по стратегии: Defaults → YAML → ENV
-func New() (contracts.TelegramConfig, error) {
+// New создает Session конфигурацию по стратегии: Defaults → YAML → ENV
+func New() (contracts.SessionConfig, error) {
 	// 1. Создаем конфигурацию с дефолтными значениями
 	cfg := &Config{
 		raw: defaultConfig(),
 	}
 
 	// 2. Перезаписываем YAML'ом (если есть)
-	if section := helpers.GetSection("telegram"); section != nil {
+	if section := helpers.GetSection("session"); section != nil {
 		if err := section.Unmarshal(&cfg.raw); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal telegram YAML: %w", err)
+			return nil, fmt.Errorf("failed to unmarshal session YAML: %w", err)
 		}
 	}
 
 	// 3. Перезаписываем ENV переменными (финальный приоритет)
 	if err := env.Parse(&cfg.raw); err != nil {
-		return nil, fmt.Errorf("failed to parse telegram ENV: %w", err)
+		return nil, fmt.Errorf("failed to parse session ENV: %w", err)
 	}
 
 	return cfg, nil

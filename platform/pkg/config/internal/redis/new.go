@@ -1,29 +1,32 @@
 package redis
 
-import "github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+import (
+	"fmt"
 
-type module struct {
-	redis contracts.RedisConfig
-}
+	"github.com/caarlos0/env/v11"
 
-// New создает модуль конфигурации Redis.
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
+)
+
+// New создает Redis конфигурацию по стратегии: Defaults → YAML → ENV
 func New() (contracts.RedisConfig, error) {
-	redisCfg, err := NewRedisConfig()
-	if err != nil {
-		return nil, err
+	// 1. Создаем конфигурацию с дефолтными значениями
+	cfg := &Config{
+		raw: defaultConfig(),
 	}
 
-	return &module{redis: redisCfg}, nil
-}
+	// 2. Перезаписываем YAML'ом (если есть)
+	if section := helpers.GetSection("redis"); section != nil {
+		if err := section.Unmarshal(&cfg.raw); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal redis YAML: %w", err)
+		}
+	}
 
-func (m *module) IsEnabled() bool {
-	return m.redis.IsEnabled()
-}
+	// 3. Перезаписываем ENV переменными (финальный приоритет)
+	if err := env.Parse(&cfg.raw); err != nil {
+		return nil, fmt.Errorf("failed to parse redis ENV: %w", err)
+	}
 
-func (m *module) Connection() contracts.RedisConnection {
-	return m.redis.Connection()
-}
-
-func (m *module) Pool() contracts.RedisPoolConfig {
-	return m.redis.Pool()
+	return cfg, nil
 }

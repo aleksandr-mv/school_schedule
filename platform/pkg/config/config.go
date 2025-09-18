@@ -8,19 +8,41 @@
 // - Переиспользование: существующий код loader'ов сохранен
 //
 // Архитектура модулей:
-// - Network:   CORS + TLS конфигурации
-// - Transport: HTTP + gRPC серверы и клиенты
-// - App:       Логирование + приложение
-// - Database:  PostgreSQL + MongoDB
-// - Services:  Внешние сервисы
-// - Kafka:     Apache Kafka брокеры и топики
+// - App:       Базовые настройки сервиса (имя, версия, окружение)
+// - Logger:    Логирование с OpenTelemetry интеграцией
+// - GRPC:      gRPC сервер и клиентские настройки
+// - Postgres:  PostgreSQL Primary-Replica архитектура
+// - Mongo:     MongoDB Primary-Replica архитектура
+// - Redis:     Redis Cluster (3 шарда + 3 реплики)
+// - Services:  Внешние микросервисы
+// - Kafka:     Apache Kafka брокеры, consumers, producers
+// - Telegram:  Telegram Bot интеграция
+// - Session:   Конфигурация сессий
+// - Tracing:   OpenTelemetry трейсинг
+// - Metric:    OpenTelemetry метрики
 //
-// Использование (API остался без изменений):
+// Использование:
 //
 //	cfg, err := config.Load(ctx)
 //	if err != nil { panic(err) }
-//	httpServer := cfg.HTTP()     // Работает как раньше
-//	dbConfig := cfg.DatabaseConfig()
+//
+//	// Базовые модули
+//	appName := cfg.App().Name()
+//	logLevel := cfg.Logger().Level()
+//	grpcAddr := cfg.GRPC().Address()
+//
+//	// Базы данных (Primary-Replica)
+//	pgWrite := cfg.Postgres().PrimaryURI()
+//	pgRead := cfg.Postgres().ReplicaURI()
+//	mongoWrite := cfg.Mongo().PrimaryURI()
+//
+//	// Опциональные модули
+//	if cfg.Redis().Cluster().IsEnabled() {
+//		redisNodes := cfg.Redis().Cluster().Nodes()
+//	}
+//	if cfg.Kafka().IsEnabled() {
+//		kafkaBrokers := cfg.Kafka().Brokers()
+//	}
 package config
 
 import (
@@ -32,17 +54,17 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/app"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/database"
+	grpcmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/grpc"
 	kafkamodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/kafka"
 	loggermodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/logger"
 	metricmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/metric"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/network"
+	mongomodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/mongo"
+	postgresmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/postgres"
 	redismodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/redis"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/services"
 	sessionmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/session"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/telegram"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/tracing"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/transport"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 )
 
@@ -54,18 +76,18 @@ import (
 // Каждое поле представляет отдельный модуль с собственной областью ответственности.
 // Использует интерфейсы для обеспечения инкапсуляции и возможности замены реализаций.
 type config struct {
-	networkConfig   contracts.NetworkConfig   // Сетевые настройки (CORS, TLS)
-	transportConfig contracts.TransportModule // Транспортные протоколы (HTTP, gRPC)
-	appModule       contracts.AppModule       // Приложение
-	loggerModule    contracts.LoggerModule    // Логирование
-	dbConfig        contracts.DatabaseConfig  // Базы данных (PostgreSQL, MongoDB)
-	servicesConfig  contracts.ServicesConfig  // Внешние сервисы
-	kafkaConfig     contracts.KafkaConfig     // Apache Kafka
-	telegramConfig  contracts.TelegramConfig  // Telegram Bot
-	redisConfig     contracts.RedisConfig     // Redis кэш и сессии
-	sessionConfig   contracts.SessionConfig   // Конфигурация сессий
-	tracingModule   contracts.TracingModule   // Трейсинг OpenTelemetry
-	metricModule    contracts.MetricModule    // Метрики OpenTelemetry
+	grpcConfig     contracts.GRPCConfig     // gRPC конфигурация
+	appConfig      contracts.AppConfig      // Приложение
+	loggerConfig   contracts.LoggerConfig   // Логирование
+	postgresConfig contracts.PostgresConfig // PostgreSQL база данных
+	mongoConfig    contracts.MongoConfig    // MongoDB база данных
+	servicesConfig contracts.ServicesConfig // Внешние сервисы
+	kafkaConfig    contracts.KafkaConfig    // Apache Kafka
+	telegramConfig contracts.TelegramConfig // Telegram Bot
+	redisConfig    contracts.RedisConfig    // Redis кэш и сессии
+	sessionConfig  contracts.SessionConfig  // Конфигурация сессий
+	tracingConfig  contracts.TracingConfig  // Трейсинг OpenTelemetry
+	metricConfig   contracts.MetricConfig   // Метрики OpenTelemetry
 }
 
 // =============================================================================
@@ -107,16 +129,10 @@ func Load(ctx context.Context) (contracts.Provider, error) {
 // Каждый модуль загружается независимо и возвращает интерфейс.
 // Это обеспечивает лучшую изоляцию и тестируемость компонентов.
 func buildModularConfig() (*config, error) {
-	// Network модуль (CORS + будущий TLS)
-	networkCfg, err := network.New()
+	// gRPC модуль
+	grpcCfg, err := grpcmodule.New()
 	if err != nil {
-		return nil, fmt.Errorf("initializing network module: %w", err)
-	}
-
-	// Transport модуль (HTTP + gRPC серверы и клиенты)
-	transportCfg, err := transport.New()
-	if err != nil {
-		return nil, fmt.Errorf("initializing transport module: %w", err)
+		return nil, fmt.Errorf("initializing grpc module: %w", err)
 	}
 
 	// App модуль (приложение)
@@ -131,10 +147,16 @@ func buildModularConfig() (*config, error) {
 		return nil, fmt.Errorf("initializing logger module: %w", err)
 	}
 
-	// Database модуль (PostgreSQL + MongoDB агрегация)
-	dbCfg, err := database.New()
+	// PostgreSQL модуль
+	postgresCfg, err := postgresmodule.New()
 	if err != nil {
-		return nil, fmt.Errorf("initializing database module: %w", err)
+		return nil, fmt.Errorf("initializing postgres module: %w", err)
+	}
+
+	// MongoDB модуль
+	mongoCfg, err := mongomodule.New()
+	if err != nil {
+		return nil, fmt.Errorf("initializing mongo module: %w", err)
 	}
 
 	// Services модуль (внешние сервисы)
@@ -144,7 +166,7 @@ func buildModularConfig() (*config, error) {
 	}
 
 	// Kafka модуль (Apache Kafka)
-	kafkaCfg, err := kafkamodule.NewKafkaConfig()
+	kafkaCfg, err := kafkamodule.New()
 	if err != nil {
 		return nil, fmt.Errorf("initializing kafka module: %w", err)
 	}
@@ -162,7 +184,7 @@ func buildModularConfig() (*config, error) {
 	}
 
 	// Session модуль (конфигурация сессий)
-	sessionCfg, err := sessionmodule.NewSessionConfig()
+	sessionCfg, err := sessionmodule.New()
 	if err != nil {
 		return nil, fmt.Errorf("initializing session module: %w", err)
 	}
@@ -180,18 +202,18 @@ func buildModularConfig() (*config, error) {
 	}
 
 	return &config{
-		networkConfig:   networkCfg,
-		transportConfig: transportCfg,
-		appModule:       appCfg,
-		loggerModule:    loggerCfg,
-		dbConfig:        dbCfg,
-		servicesConfig:  servicesCfg,
-		kafkaConfig:     kafkaCfg,
-		telegramConfig:  telegramCfg,
-		redisConfig:     redisCfg,
-		sessionConfig:   sessionCfg,
-		tracingModule:   tracingCfg,
-		metricModule:    metricCfg,
+		grpcConfig:     grpcCfg,
+		appConfig:      appCfg,
+		loggerConfig:   loggerCfg,
+		postgresConfig: postgresCfg,
+		mongoConfig:    mongoCfg,
+		servicesConfig: servicesCfg,
+		kafkaConfig:    kafkaCfg,
+		telegramConfig: telegramCfg,
+		redisConfig:    redisCfg,
+		sessionConfig:  sessionCfg,
+		tracingConfig:  tracingCfg,
+		metricConfig:   metricCfg,
 	}, nil
 }
 
@@ -204,43 +226,43 @@ func buildModularConfig() (*config, error) {
 //
 // Использование:
 //   cfg := config.Load(ctx)
-//   httpConfig := cfg.Transport().HTTP()
-//   corsConfig := cfg.Network().CORS()
-//   loggerLevel := cfg.Logger().LoggerLevel()
-//   dbConfig := cfg.Database()
 //
-//   // Kafka опциональна - проверяем перед использованием
-//   if cfg.Kafka().IsEnabled() {
-//       kafkaBrokers := cfg.Kafka().Brokers()
+//   // Используем модули
+//   appName := cfg.App().Name()
+//   grpcAddr := cfg.GRPC().Address()
+//   pgURI := cfg.Postgres().PrimaryURI()
+//
+//   // Опциональные модули
+//   if cfg.Redis().Cluster().IsEnabled() {
+//       redisNodes := cfg.Redis().Cluster().Nodes()
 //   }
 
 // =============================================================================
 // МОДУЛЬНАЯ РЕАЛИЗАЦИЯ PROVIDER ИНТЕРФЕЙСА
 // =============================================================================
 
-// Network возвращает модуль сетевых настроек (CORS, TLS)
-func (c *config) Network() contracts.NetworkConfig {
-	return c.networkConfig
-}
-
-// Transport возвращает модуль транспортных протоколов (HTTP, gRPC)
-func (c *config) Transport() contracts.TransportModule {
-	return c.transportConfig
-}
-
 // App возвращает модуль приложения
-func (c *config) App() contracts.AppModule {
-	return c.appModule
+func (c *config) App() contracts.AppConfig {
+	return c.appConfig
+}
+
+// GRPC возвращает gRPC конфигурацию
+func (c *config) GRPC() contracts.GRPCConfig {
+	return c.grpcConfig
 }
 
 // Logger возвращает модуль логирования
-func (c *config) Logger() contracts.LoggerModule {
-	return c.loggerModule
+func (c *config) Logger() contracts.LoggerConfig {
+	return c.loggerConfig
 }
 
 // Database возвращает агрегированную конфигурацию баз данных
-func (c *config) Database() contracts.DatabaseConfig {
-	return c.dbConfig
+func (c *config) Postgres() contracts.PostgresConfig {
+	return c.postgresConfig
+}
+
+func (c *config) Mongo() contracts.MongoConfig {
+	return c.mongoConfig
 }
 
 // Services возвращает конфигурацию внешних сервисов
@@ -269,11 +291,11 @@ func (c *config) Session() contracts.SessionConfig {
 }
 
 // Tracing возвращает конфигурацию трейсинга OpenTelemetry
-func (c *config) Tracing() contracts.TracingModule {
-	return c.tracingModule
+func (c *config) Tracing() contracts.TracingConfig {
+	return c.tracingConfig
 }
 
 // Metric возвращает конфигурацию метрик OpenTelemetry
-func (c *config) Metric() contracts.MetricModule {
-	return c.metricModule
+func (c *config) Metric() contracts.MetricConfig {
+	return c.metricConfig
 }

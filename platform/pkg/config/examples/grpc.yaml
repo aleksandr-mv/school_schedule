@@ -1,0 +1,15 @@
+# Пример конфигурации gRPC
+# Соответствует структуре rawConfig в platform/pkg/config/internal/grpc/
+
+grpc:
+  # Настройки сервера
+  host: "0.0.0.0"
+  port: 50051
+  timeout: "15s"
+  idle_timeout: "60s"
+  shutdown_timeout: "10s"
+  
+  # Настройки клиента
+  max_recv_msg_size: 4194304  # 4MB
+  max_send_msg_size: 4194304  # 4MB
+  client_timeout: "5s"

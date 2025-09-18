@@ -46,20 +46,20 @@ package contracts
 //		kafkaBrokers := cfg.Kafka().Brokers()
 //	}
 type Provider interface {
-	// Network возвращает модуль сетевых настроек
-	Network() NetworkConfig
-
-	// Transport возвращает модуль транспортных протоколов
-	Transport() TransportModule
-
 	// App возвращает модуль приложения
-	App() AppModule
+	App() AppConfig
+
+	// GRPC возвращает gRPC конфигурацию
+	GRPC() GRPCConfig
 
 	// Logger возвращает модуль логирования
-	Logger() LoggerModule
+	Logger() LoggerConfig
 
-	// Database возвращает агрегированную конфигурацию баз данных
-	Database() DatabaseConfig
+	// Postgres возвращает конфигурацию PostgreSQL
+	Postgres() PostgresConfig
+
+	// Mongo возвращает конфигурацию MongoDB
+	Mongo() MongoConfig
 
 	// Services возвращает конфигурацию внешних сервисов
 	Services() ServicesConfig
@@ -77,8 +77,8 @@ type Provider interface {
 	Session() SessionConfig
 
 	// Tracing возвращает конфигурацию трейсинга OpenTelemetry
-	Tracing() TracingModule
+	Tracing() TracingConfig
 
 	// Metric возвращает конфигурацию метрик OpenTelemetry
-	Metric() MetricModule
+	Metric() MetricConfig
 }

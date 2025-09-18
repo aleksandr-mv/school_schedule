@@ -8,42 +8,40 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
 )
 
-// rawService соответствует одной записи services в YAML и env.
-type rawService struct {
-	Host    string        `mapstructure:"address" yaml:"address"`
-	Port    int           `mapstructure:"port"    yaml:"port"`
-	Timeout time.Duration `mapstructure:"timeout" yaml:"timeout"`
+// Компиляционная проверка
+var _ contracts.ServiceConfig = (*ServiceConfig)(nil)
+
+// rawServiceConfig для загрузки данных из YAML/ENV
+type rawServiceConfig struct {
+	Host    string        `mapstructure:"host"    yaml:"host"    env:"SERVICE_HOST"`
+	Port    int           `mapstructure:"port"    yaml:"port"    env:"SERVICE_PORT"`
+	Timeout time.Duration `mapstructure:"timeout" yaml:"timeout" env:"SERVICE_TIMEOUT"`
 }
 
-// serviceConfig хранит данные одной службы.
-type serviceConfig struct {
-	Raw rawService
+// ServiceConfig публичная структура для использования
+type ServiceConfig struct {
+	raw rawServiceConfig
 }
 
-func New() (contracts.ServicesConfig, error) {
-	return newServicesConfig()
-}
-
-// defaultServiceConfig возвращает конфигурацию сервиса с дефолтными значениями
-func defaultServiceConfig() rawService {
-	return rawService{
+// defaultService возвращает rawServiceConfig с дефолтными значениями
+func defaultService() rawServiceConfig {
+	return rawServiceConfig{
 		Host:    "",
 		Port:    0,
-		Timeout: 30 * time.Second, // только таймаут имеет смысл по умолчанию
+		Timeout: 30 * time.Second,
 	}
 }
 
-// newServiceConfig создаёт *serviceConfig из rawService.
-func newServiceConfig(raw rawService) (*serviceConfig, error) {
-	return &serviceConfig{Raw: raw}, nil
+// newServiceConfig создает ServiceConfig из rawServiceConfig
+func newServiceConfig(raw rawServiceConfig) *ServiceConfig {
+	return &ServiceConfig{raw: raw}
 }
 
-func (s *serviceConfig) Host() string { return s.Raw.Host }
+// Методы для ServiceConfig интерфейса
+func (s *ServiceConfig) Host() string           { return s.raw.Host }
+func (s *ServiceConfig) Port() int              { return s.raw.Port }
+func (s *ServiceConfig) Timeout() time.Duration { return s.raw.Timeout }
 
-func (s *serviceConfig) Port() int { return s.Raw.Port }
-
-func (s *serviceConfig) Timeout() time.Duration { return s.Raw.Timeout }
-
-func (s *serviceConfig) Address() string {
-	return net.JoinHostPort(s.Raw.Host, strconv.Itoa(s.Raw.Port))
+func (s *ServiceConfig) Address() string {
+	return net.JoinHostPort(s.raw.Host, strconv.Itoa(s.raw.Port))
 }

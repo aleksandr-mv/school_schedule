@@ -1,4 +1,4 @@
-package telegram
+package kafka
 
 import (
 	"fmt"
@@ -9,23 +9,23 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
 )
 
-// New создает Telegram конфигурацию по стратегии: Defaults → YAML → ENV
-func New() (contracts.TelegramConfig, error) {
+// New создает Kafka конфигурацию по стратегии: Defaults → YAML → ENV
+func New() (contracts.KafkaConfig, error) {
 	// 1. Создаем конфигурацию с дефолтными значениями
 	cfg := &Config{
 		raw: defaultConfig(),
 	}
 
 	// 2. Перезаписываем YAML'ом (если есть)
-	if section := helpers.GetSection("telegram"); section != nil {
+	if section := helpers.GetSection("kafka"); section != nil {
 		if err := section.Unmarshal(&cfg.raw); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal telegram YAML: %w", err)
+			return nil, fmt.Errorf("failed to unmarshal kafka YAML: %w", err)
 		}
 	}
 
 	// 3. Перезаписываем ENV переменными (финальный приоритет)
 	if err := env.Parse(&cfg.raw); err != nil {
-		return nil, fmt.Errorf("failed to parse telegram ENV: %w", err)
+		return nil, fmt.Errorf("failed to parse kafka ENV: %w", err)
 	}
 
 	return cfg, nil
