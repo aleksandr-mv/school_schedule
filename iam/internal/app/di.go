@@ -166,7 +166,7 @@ func (d *diContainer) NotificationRepository(ctx context.Context) (repository.No
 
 func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
 	if d.postgresPool == nil {
-		dsn := d.cfg.Database().PostgresDSN()
+		dsn := d.cfg.Postgres().PrimaryURI()
 		if dsn == "" {
 			return nil, fmt.Errorf("postgres dsn is empty")
 		}
