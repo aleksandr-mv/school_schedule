@@ -9,9 +9,13 @@ import (
 var _ def.RolePermissionRepository = (*rolePermissionRepository)(nil)
 
 type rolePermissionRepository struct {
-	pool *pgxpool.Pool
+	writePool *pgxpool.Pool // Primary - для записи (INSERT, UPDATE, DELETE)
+	readPool  *pgxpool.Pool // Replica - для чтения (SELECT)
 }
 
-func NewRepository(pool *pgxpool.Pool) *rolePermissionRepository {
-	return &rolePermissionRepository{pool: pool}
+func NewRepository(writePool, readPool *pgxpool.Pool) *rolePermissionRepository {
+	return &rolePermissionRepository{
+		writePool: writePool,
+		readPool:  readPool,
+	}
 }

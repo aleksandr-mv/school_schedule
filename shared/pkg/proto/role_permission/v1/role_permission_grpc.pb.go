@@ -8,6 +8,7 @@ package role_permission_v1
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -83,6 +84,7 @@ type UnimplementedRolePermissionServiceServer struct{}
 func (UnimplementedRolePermissionServiceServer) Assign(context.Context, *AssignRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Assign not implemented")
 }
+
 func (UnimplementedRolePermissionServiceServer) Revoke(context.Context, *RevokeRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Revoke not implemented")
 }

@@ -36,7 +36,7 @@ func (r *userRepository) Update(ctx context.Context, user model.User) (*model.Us
 		return nil, fmt.Errorf("%w: %w", model.ErrInternal, err)
 	}
 
-	row := r.pool.QueryRow(ctx, query, args...)
+	row := r.writePool.QueryRow(ctx, query, args...)
 
 	var u repoModel.User
 	if err = row.Scan(&u.ID, &u.Login, &u.Email, &u.PasswordHash, &u.CreatedAt, &u.UpdatedAt); err != nil {

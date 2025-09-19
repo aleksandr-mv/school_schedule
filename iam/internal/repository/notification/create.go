@@ -26,7 +26,7 @@ func (r *notificationRepository) Create(ctx context.Context, notificationMethod 
 		return nil, fmt.Errorf("%w: failed to build insert query: %w", model.ErrInternal, err)
 	}
 
-	rows, err := r.pool.Query(ctx, query, args...)
+	rows, err := r.writePool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, r.mapDatabaseError(err, "create")
 	}

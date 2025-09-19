@@ -14,7 +14,7 @@ func (r *roleRepository) Create(ctx context.Context, name, description string) (
 	const query = `INSERT INTO roles (name, description) VALUES ($1, $2) RETURNING id`
 
 	var id uuid.UUID
-	if err := r.pool.QueryRow(ctx, query, name, description).Scan(&id); err != nil {
+	if err := r.writePool.QueryRow(ctx, query, name, description).Scan(&id); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			switch pgErr.Code {

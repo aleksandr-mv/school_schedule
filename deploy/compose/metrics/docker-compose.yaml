@@ -1,9 +1,9 @@
 services:
   prometheus:
-    env_file:
-      - .env
     image: prom/prometheus:v3.3.1 
     container_name: prometheus
+    env_file:
+      - .env
     ports:
       - "${PROMETHEUS_PORT}:9090"
     volumes:
@@ -18,22 +18,20 @@ services:
     networks:
       - school_net
     healthcheck:
-      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:9090/-/healthy" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
+      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:${PROMETHEUS_PORT}/-/healthy" ]
+      interval: ${PROMETHEUS_HEALTHCHECK_INTERVAL}
+      timeout: ${PROMETHEUS_HEALTHCHECK_TIMEOUT}
+      retries: ${PROMETHEUS_HEALTHCHECK_RETRIES}
+      start_period: ${PROMETHEUS_HEALTHCHECK_START_PERIOD}
 
 
   grafana:
     image: grafana/grafana:12.0.0
     container_name: grafana
+    env_file:
+      - .env
     ports:
       - "${GRAFANA_PORT}:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin} # Имя пользователя администратора
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin} # Пароль администратора
-      - GF_USERS_ALLOW_SIGN_UP=false # Запрещаем регистрацию новых пользователей
     volumes:
       - grafana_data:/var/lib/grafana # Подключаем volume для хранения данных Grafana
       - ./grafana/provisioning:/etc/grafana/provisioning # Монтируем директорию с настройками для автоматического провижининга
@@ -42,11 +40,11 @@ services:
     networks:
       - school_net
     healthcheck:
-      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:3000/api/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
+      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:${GRAFANA_PORT}/api/health" ]
+      interval: ${GRAFANA_HEALTHCHECK_INTERVAL}
+      timeout: ${GRAFANA_HEALTHCHECK_TIMEOUT}
+      retries: ${GRAFANA_HEALTHCHECK_RETRIES}
+      start_period: ${GRAFANA_HEALTHCHECK_START_PERIOD}
     depends_on:
       prometheus:
         condition: service_healthy

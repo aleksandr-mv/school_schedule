@@ -11,7 +11,7 @@ import (
 func (r *notificationRepository) Delete(ctx context.Context, userID uuid.UUID, providerName string) error {
 	query := `DELETE FROM notification_methods WHERE user_id = $1 AND provider_name = $2`
 
-	res, err := r.pool.Exec(ctx, query, userID, providerName)
+	res, err := r.writePool.Exec(ctx, query, userID, providerName)
 	if err != nil {
 		return r.mapDatabaseError(err, "delete")
 	}

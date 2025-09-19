@@ -47,15 +47,28 @@ func (conn *Connection) Database() string        { return conn.raw.DB }
 func (conn *Connection) ApplicationName() string { return conn.raw.AppName }
 
 func (conn *Connection) DSN() string {
+	// Правильная обработка аутентификации
+	var auth string
+	if conn.raw.Password != "" {
+		auth = fmt.Sprintf("%s:%s", conn.raw.User, conn.raw.Password)
+	} else {
+		auth = conn.raw.User
+	}
+
+	// Параметры подключения
 	params := []string{"sslmode=disable"}
 	if conn.raw.AppName != "" {
 		params = append(params, "application_name="+conn.raw.AppName)
 	}
+
 	query := ""
 	if len(params) > 0 {
 		query = "?" + strings.Join(params, "&")
 	}
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s%s", conn.raw.User, conn.raw.Password, conn.raw.Host, conn.raw.Port, conn.raw.DB, query)
+
+	// Правильный формат: postgresql:// (не postgres://)
+	return fmt.Sprintf("postgresql://%s@%s:%d/%s%s",
+		auth, conn.raw.Host, conn.raw.Port, conn.raw.DB, query)
 }
 
 func (conn *Connection) URI() string { return conn.DSN() } // alias

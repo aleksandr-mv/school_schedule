@@ -7,13 +7,15 @@
 package user_v1
 
 import (
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+
+	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
@@ -241,15 +243,17 @@ func file_user_v1_user_proto_rawDescGZIP() []byte {
 	return file_user_v1_user_proto_rawDescData
 }
 
-var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_user_v1_user_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: user.v1.RegisterRequest
-	(*RegisterResponse)(nil), // 1: user.v1.RegisterResponse
-	(*GetUserRequest)(nil),   // 2: user.v1.GetUserRequest
-	(*GetUserResponse)(nil),  // 3: user.v1.GetUserResponse
-	(*v1.UserInfo)(nil),      // 4: common.v1.UserInfo
-	(*v1.User)(nil),          // 5: common.v1.User
-}
+var (
+	file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+	file_user_v1_user_proto_goTypes  = []any{
+		(*RegisterRequest)(nil),  // 0: user.v1.RegisterRequest
+		(*RegisterResponse)(nil), // 1: user.v1.RegisterResponse
+		(*GetUserRequest)(nil),   // 2: user.v1.GetUserRequest
+		(*GetUserResponse)(nil),  // 3: user.v1.GetUserResponse
+		(*v1.UserInfo)(nil),      // 4: common.v1.UserInfo
+		(*v1.User)(nil),          // 5: common.v1.User
+	}
+)
 var file_user_v1_user_proto_depIdxs = []int32{
 	4, // 0: user.v1.RegisterRequest.info:type_name -> common.v1.UserInfo
 	5, // 1: user.v1.GetUserResponse.user:type_name -> common.v1.User

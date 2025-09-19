@@ -1,9 +1,10 @@
 package converter
 
 import (
+	"github.com/google/uuid"
+
 	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
 	commonV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
-	"github.com/google/uuid"
 )
 
 // RoleToDomain конвертирует protobuf Role в доменную модель

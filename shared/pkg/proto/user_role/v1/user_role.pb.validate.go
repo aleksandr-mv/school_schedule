@@ -85,7 +85,6 @@ func (m *AssignRequest) validate(all bool) error {
 	}
 
 	if m.AssignedBy != nil {
-
 		if err := m._validateUuid(m.GetAssignedBy()); err != nil {
 			err = AssignRequestValidationError{
 				field:  "AssignedBy",
@@ -97,7 +96,6 @@ func (m *AssignRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-
 	}
 
 	if len(errors) > 0 {
@@ -611,7 +609,6 @@ func (m *GetRoleUsersRequest) validate(all bool) error {
 	}
 
 	if m.Limit != nil {
-
 		if val := m.GetLimit(); val < 1 || val > 100 {
 			err := GetRoleUsersRequestValidationError{
 				field:  "Limit",
@@ -622,7 +619,6 @@ func (m *GetRoleUsersRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
-
 	}
 
 	if m.Cursor != nil {

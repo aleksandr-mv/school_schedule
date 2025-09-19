@@ -22,7 +22,7 @@ func (r *rolePermissionRepository) Assign(ctx context.Context, roleID, permissio
 		return fmt.Errorf("%w: failed to build insert query: %w", model.ErrInternal, err)
 	}
 
-	_, err = r.pool.Exec(ctx, query, args...)
+	_, err = r.writePool.Exec(ctx, query, args...)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {

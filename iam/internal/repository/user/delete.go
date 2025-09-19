@@ -10,7 +10,7 @@ import (
 
 func (r *userRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	query := `DELETE FROM users WHERE id = $1`
-	res, err := r.pool.Exec(ctx, query, id)
+	res, err := r.writePool.Exec(ctx, query, id)
 	if err != nil {
 		return r.mapDatabaseError(err, "delete")
 	}

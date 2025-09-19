@@ -7,13 +7,15 @@
 package auth_v1
 
 import (
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+
+	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
@@ -357,18 +359,20 @@ func file_auth_v1_auth_proto_rawDescGZIP() []byte {
 	return file_auth_v1_auth_proto_rawDescData
 }
 
-var file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_auth_v1_auth_proto_goTypes = []any{
-	(*LoginRequest)(nil),           // 0: auth.v1.LoginRequest
-	(*LoginResponse)(nil),          // 1: auth.v1.LoginResponse
-	(*WhoamiRequest)(nil),          // 2: auth.v1.WhoamiRequest
-	(*WhoamiResponse)(nil),         // 3: auth.v1.WhoamiResponse
-	(*LogoutRequest)(nil),          // 4: auth.v1.LogoutRequest
-	(*LogoutResponse)(nil),         // 5: auth.v1.LogoutResponse
-	(*v1.Session)(nil),             // 6: common.v1.Session
-	(*v1.User)(nil),                // 7: common.v1.User
-	(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
-}
+var (
+	file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+	file_auth_v1_auth_proto_goTypes  = []any{
+		(*LoginRequest)(nil),           // 0: auth.v1.LoginRequest
+		(*LoginResponse)(nil),          // 1: auth.v1.LoginResponse
+		(*WhoamiRequest)(nil),          // 2: auth.v1.WhoamiRequest
+		(*WhoamiResponse)(nil),         // 3: auth.v1.WhoamiResponse
+		(*LogoutRequest)(nil),          // 4: auth.v1.LogoutRequest
+		(*LogoutResponse)(nil),         // 5: auth.v1.LogoutResponse
+		(*v1.Session)(nil),             // 6: common.v1.Session
+		(*v1.User)(nil),                // 7: common.v1.User
+		(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
+	}
+)
 var file_auth_v1_auth_proto_depIdxs = []int32{
 	6, // 0: auth.v1.WhoamiResponse.session:type_name -> common.v1.Session
 	7, // 1: auth.v1.WhoamiResponse.user:type_name -> common.v1.User

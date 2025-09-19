@@ -15,7 +15,7 @@ func (r *userRepository) Get(ctx context.Context, value string) (*model.User, er
 		SELECT id, login, email, password_hash, created_at, updated_at
 		FROM users
 		WHERE id::text = $1 OR login = $1 OR email = $1`
-	rows, err := r.pool.Query(ctx, query, value)
+	rows, err := r.readPool.Query(ctx, query, value)
 	if err != nil {
 		return nil, r.mapDatabaseError(err, "get")
 	}

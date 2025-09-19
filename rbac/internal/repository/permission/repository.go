@@ -9,9 +9,9 @@ import (
 var _ def.PermissionRepository = (*permissionRepository)(nil)
 
 type permissionRepository struct {
-	pool *pgxpool.Pool
+	readPool *pgxpool.Pool // Replica - только для чтения (SELECT)
 }
 
-func NewRepository(pool *pgxpool.Pool) *permissionRepository {
-	return &permissionRepository{pool: pool}
+func NewRepository(readPool *pgxpool.Pool) *permissionRepository {
+	return &permissionRepository{readPool: readPool}
 }

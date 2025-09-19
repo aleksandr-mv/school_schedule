@@ -18,7 +18,7 @@ func (r *roleRepository) List(ctx context.Context) ([]*model.Role, error) {
 		WHERE deleted_at IS NULL
 		ORDER BY name ASC`
 
-	rows, err := r.pool.Query(ctx, query)
+	rows, err := r.readPool.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list roles: %w", err)
 	}

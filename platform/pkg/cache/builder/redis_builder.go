@@ -1,8 +1,12 @@
 package builder
 
 import (
+	"github.com/redis/go-redis/v9"
+
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
+	redisclient "github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
-	"github.com/go-redis/redis/v8"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 )
 
 type RedisBuilder struct {
@@ -15,8 +19,8 @@ func NewRedisBuilder(config contracts.RedisConfig) *RedisBuilder {
 	}
 }
 
-// BuildClient создает Redis кластер клиент (go-redis)
-func (b *RedisBuilder) BuildClient() (redis.UniversalClient, error) {
+// BuildClient создает Redis кластер клиент через go-redis
+func (b *RedisBuilder) BuildClient() (cache.RedisClient, error) {
 	cluster := b.config.Cluster()
 	if !cluster.IsEnabled() {
 		return nil, nil
@@ -25,7 +29,7 @@ func (b *RedisBuilder) BuildClient() (redis.UniversalClient, error) {
 	pool := b.config.Pool()
 
 	// Создаем кластерный клиент
-	client := redis.NewClusterClient(&redis.ClusterOptions{
+	rdb := redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:          cluster.Nodes(),
 		Password:       cluster.Password(),
 		MaxRedirects:   cluster.MaxRedirects(),
@@ -34,13 +38,15 @@ func (b *RedisBuilder) BuildClient() (redis.UniversalClient, error) {
 		RouteRandomly:  cluster.RouteRandomly(),
 
 		// Настройки пула
-		PoolSize:     pool.MaxActive(),
-		MinIdleConns: pool.MaxIdle(),
-		IdleTimeout:  pool.IdleTimeout(),
-		DialTimeout:  pool.ConnTimeout(),
-		ReadTimeout:  pool.ReadTimeout(),
-		WriteTimeout: pool.WriteTimeout(),
+		PoolSize:        pool.MaxActive(),
+		MinIdleConns:    pool.MaxIdle(),
+		PoolTimeout:     pool.PoolTimeout(),
+		ConnMaxIdleTime: pool.IdleTimeout(),
+		DialTimeout:     pool.ConnTimeout(),
+		ReadTimeout:     pool.ReadTimeout(),
+		WriteTimeout:    pool.WriteTimeout(),
 	})
 
-	return client, nil
+	// Создаем адаптер с нашим интерфейсом
+	return redisclient.NewClient(rdb, logger.Logger(), pool.ConnTimeout()), nil
 }

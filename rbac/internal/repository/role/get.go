@@ -12,7 +12,7 @@ import (
 func (r *roleRepository) Get(ctx context.Context, id string) (*model.Role, error) {
 	query := `SELECT id, name, description, created_at, updated_at, deleted_at FROM roles WHERE id = $1 AND deleted_at IS NULL`
 
-	row := r.pool.QueryRow(ctx, query, id)
+	row := r.readPool.QueryRow(ctx, query, id)
 
 	var role repoModel.Role
 	err := row.Scan(&role.ID, &role.Name, &role.Description, &role.CreatedAt, &role.UpdatedAt, &role.DeletedAt)

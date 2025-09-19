@@ -114,7 +114,6 @@ func (m *Role) validate(all bool) error {
 	}
 
 	if m.UpdatedAt != nil {
-
 		if all {
 			switch v := interface{}(m.GetUpdatedAt()).(type) {
 			case interface{ ValidateAll() error }:
@@ -143,7 +142,6 @@ func (m *Role) validate(all bool) error {
 				}
 			}
 		}
-
 	}
 
 	if len(errors) > 0 {

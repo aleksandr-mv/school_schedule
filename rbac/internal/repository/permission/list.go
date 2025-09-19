@@ -14,7 +14,7 @@ import (
 func (r *permissionRepository) List(ctx context.Context) ([]*model.Permission, error) {
 	query := `SELECT id, resource, action FROM permissions ORDER BY resource, action`
 
-	rows, err := r.pool.Query(ctx, query)
+	rows, err := r.readPool.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list permissions: %w", err)
 	}

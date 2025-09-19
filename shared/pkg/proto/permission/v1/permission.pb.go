@@ -7,12 +7,14 @@
 package permission_v1
 
 import (
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+
+	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
@@ -127,12 +129,14 @@ func file_permission_v1_permission_proto_rawDescGZIP() []byte {
 	return file_permission_v1_permission_proto_rawDescData
 }
 
-var file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_permission_v1_permission_proto_goTypes = []any{
-	(*ListRequest)(nil),   // 0: permission.v1.ListRequest
-	(*ListResponse)(nil),  // 1: permission.v1.ListResponse
-	(*v1.Permission)(nil), // 2: common.v1.Permission
-}
+var (
+	file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+	file_permission_v1_permission_proto_goTypes  = []any{
+		(*ListRequest)(nil),   // 0: permission.v1.ListRequest
+		(*ListResponse)(nil),  // 1: permission.v1.ListResponse
+		(*v1.Permission)(nil), // 2: common.v1.Permission
+	}
+)
 var file_permission_v1_permission_proto_depIdxs = []int32{
 	2, // 0: permission.v1.ListResponse.data:type_name -> common.v1.Permission
 	0, // 1: permission.v1.PermissionService.List:input_type -> permission.v1.ListRequest

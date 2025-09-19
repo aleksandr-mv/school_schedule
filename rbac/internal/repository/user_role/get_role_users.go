@@ -14,7 +14,7 @@ func (r *userRoleRepository) GetRoleUsers(ctx context.Context, roleID string, li
 		ORDER BY user_id LIMIT $3`
 	args := []interface{}{roleID, cursor, limit + 1}
 
-	rows, err := r.pool.Query(ctx, query, args...)
+	rows, err := r.readPool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, nil, fmt.Errorf("get role users failed: %w", err)
 	}

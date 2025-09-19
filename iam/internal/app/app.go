@@ -74,9 +74,9 @@ func (app *App) initLogger(ctx context.Context) error {
 		logger.WithJSON(app.cfg.Logger().AsJSON()),
 		logger.WithName(app.cfg.App().Name()),
 		logger.WithEnvironment(app.cfg.App().Environment()),
-		logger.WithOTLPEnable(app.cfg.Logger().OTLP().Enable()),
-		logger.WithOTLPEndpoint(app.cfg.Logger().OTLP().Endpoint()),
-		logger.WithOTLPTimeout(time.Duration(app.cfg.Logger().OTLP().ShutdownTimeout())*time.Second),
+		logger.WithOTLPEnable(app.cfg.Logger().Enable()),
+		logger.WithOTLPEndpoint(app.cfg.Logger().Endpoint()),
+		logger.WithOTLPTimeout(time.Duration(app.cfg.Logger().ShutdownTimeout())*time.Second),
 	)
 }
 
@@ -163,7 +163,7 @@ func (app *App) initMigrations(ctx context.Context) error {
 }
 
 func (app *App) initListener(_ context.Context) error {
-	addr := app.cfg.Transport().GRPC().Address()
+	addr := app.cfg.GRPC().Address()
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		return fmt.Errorf("failed to listen on %s: %w", addr, err)
@@ -184,9 +184,9 @@ func (app *App) initListener(_ context.Context) error {
 
 func (app *App) initGRPCServer(ctx context.Context) error {
 	app.grpcServer = platformgrpc.New(ctx,
-		app.cfg.Transport().GRPC().Timeout(),
-		app.cfg.Transport().GRPCClientLimits().MaxRecvMsgSize(),
-		app.cfg.Transport().GRPCClientLimits().MaxSendMsgSize(),
+		app.cfg.GRPC().Timeout(),
+		app.cfg.GRPC().MaxRecvMsgSize(),
+		app.cfg.GRPC().MaxSendMsgSize(),
 		tracing.UnaryServerInterceptor(app.cfg.App().Name()),
 		metric.UnaryServerInterceptor(ctx, app.cfg.Metric().BucketBoundaries()))
 
@@ -221,7 +221,7 @@ func (app *App) initGRPCServer(ctx context.Context) error {
 func (app *App) runGRPCServer(ctx context.Context) error {
 	logger.Info(ctx,
 		"🚀 [gRPC] IAM сервис слушает адрес",
-		zap.String("address", app.cfg.Transport().GRPC().Address()),
+		zap.String("address", app.cfg.GRPC().Address()),
 	)
 
 	err := app.grpcServer.Serve(app.listener)

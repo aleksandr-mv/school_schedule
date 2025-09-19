@@ -20,7 +20,7 @@ func (r *rolePermissionRepository) GetRolePermissions(ctx context.Context, roleI
 		ORDER BY p.resource, p.action
 	`
 
-	rows, err := r.pool.Query(ctx, query, roleID)
+	rows, err := r.readPool.Query(ctx, query, roleID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get role permissions: %w", err)
 	}

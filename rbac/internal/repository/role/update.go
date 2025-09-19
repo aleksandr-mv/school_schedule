@@ -33,7 +33,7 @@ func (r *roleRepository) Update(ctx context.Context, updateRole *model.UpdateRol
 		return fmt.Errorf("%w: failed to build update query: %w", model.ErrInternal, err)
 	}
 
-	result, err := r.pool.Exec(ctx, query, args...)
+	result, err := r.writePool.Exec(ctx, query, args...)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {

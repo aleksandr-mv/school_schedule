@@ -3,10 +3,11 @@ package rbac
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	converter "github.com/aleksandr-mv/school_schedule/iam/internal/client/converter/rbac"
 	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
 	rbacV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
-	"github.com/google/uuid"
 )
 
 func (c *client) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]*model.RoleWithPermissions, error) {

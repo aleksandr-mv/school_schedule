@@ -7,12 +7,13 @@
 package common_v1
 
 import (
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -106,10 +107,12 @@ func file_common_v1_permission_proto_rawDescGZIP() []byte {
 	return file_common_v1_permission_proto_rawDescData
 }
 
-var file_common_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_common_v1_permission_proto_goTypes = []any{
-	(*Permission)(nil), // 0: common.v1.Permission
-}
+var (
+	file_common_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+	file_common_v1_permission_proto_goTypes  = []any{
+		(*Permission)(nil), // 0: common.v1.Permission
+	}
+)
 var file_common_v1_permission_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type

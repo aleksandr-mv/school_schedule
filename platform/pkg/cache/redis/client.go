@@ -4,14 +4,16 @@ import (
 	"context"
 	"time"
 
-	redigo "github.com/gomodule/redigo/redis"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
+
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
 )
 
 type client struct {
-	pool              *redigo.Pool
-	logger            Logger
-	connectionTimeout time.Duration
+	rdb     redis.Cmdable
+	logger  Logger
+	timeout time.Duration
 }
 
 type Logger interface {
@@ -19,122 +21,78 @@ type Logger interface {
 	Error(ctx context.Context, msg string, fields ...zap.Field)
 }
 
-type redisFn func(ctx context.Context, conn redigo.Conn) error
-
-func NewClient(pool *redigo.Pool, logger Logger, connectionTimeout time.Duration) *client {
+// NewClient создаёт обёртку над go-redis клиентом (ClusterClient или Client)
+func NewClient(rdb redis.Cmdable, logger Logger, timeout time.Duration) cache.RedisClient {
 	return &client{
-		pool:              pool,
-		logger:            logger,
-		connectionTimeout: connectionTimeout,
+		rdb:     rdb,
+		logger:  logger,
+		timeout: timeout,
 	}
-}
-
-func (c *client) withConn(ctx context.Context, fn redisFn) error {
-	conn, err := c.getConn(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if cerr := conn.Close(); cerr != nil {
-			c.logger.Error(ctx, "failed to close redis connection", zap.Error(cerr))
-		}
-	}()
-
-	return fn(ctx, conn)
-}
-
-func (c *client) getConn(ctx context.Context) (redigo.Conn, error) {
-	ctx, cancel := context.WithTimeout(ctx, c.connectionTimeout)
-	defer cancel()
-	conn, err := c.pool.GetContext(ctx)
-	if err != nil {
-		c.logger.Error(ctx, "failed to get redis connection", zap.Error(err))
-		return nil, err
-	}
-
-	return conn, nil
 }
 
 func (c *client) Set(ctx context.Context, key string, value any) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("SET", key, value)
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.Set(ctx, key, value, 0).Err()
 }
 
 func (c *client) SetWithTTL(ctx context.Context, key string, value any, ttl time.Duration) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("SET", key, value, "EX", int(ttl.Seconds()))
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.Set(ctx, key, value, ttl).Err()
 }
 
 func (c *client) Get(ctx context.Context, key string) ([]byte, error) {
-	var result []byte
-	err := c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		val, err := redigo.Bytes(conn.Do("GET", key))
-		if err != nil {
-			return err
-		}
-		result = val
-		return nil
-	})
-
-	return result, err
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	data, err := c.rdb.Get(ctx, key).Bytes()
+	if err == redis.Nil {
+		return nil, nil
+	}
+	return data, err
 }
 
 func (c *client) HashSet(ctx context.Context, key string, values any) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("HSET", redigo.Args{key}.AddFlat(values)...)
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.HSet(ctx, key, values).Err()
 }
 
 func (c *client) HGetAll(ctx context.Context, key string) ([]any, error) {
-	var values []any
-	err := c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		result, err := redigo.Values(conn.Do("HGETALL", key))
-		if err != nil {
-			return err
-		}
-		values = result
-		return nil
-	})
-
-	return values, err
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	m, err := c.rdb.HGetAll(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	res := make([]any, 0, len(m)*2)
+	for k, v := range m {
+		res = append(res, k, v)
+	}
+	return res, nil
 }
 
 func (c *client) Del(ctx context.Context, key string) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("DEL", key)
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.Del(ctx, key).Err()
 }
 
 func (c *client) Exists(ctx context.Context, key string) (bool, error) {
-	var exists bool
-	err := c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		val, err := redigo.Bool(conn.Do("EXISTS", key))
-		if err != nil {
-			return err
-		}
-		exists = val
-		return nil
-	})
-
-	return exists, err
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	n, err := c.rdb.Exists(ctx, key).Result()
+	return n > 0, err
 }
 
 func (c *client) Expire(ctx context.Context, key string, expiration time.Duration) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("EXPIRE", key, int(expiration.Seconds()))
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.Expire(ctx, key, expiration).Err()
 }
 
 func (c *client) Ping(ctx context.Context) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("PING")
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.Ping(ctx).Err()
 }

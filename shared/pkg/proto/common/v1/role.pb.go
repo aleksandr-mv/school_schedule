@@ -7,13 +7,14 @@
 package common_v1
 
 import (
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -183,13 +184,15 @@ func file_common_v1_role_proto_rawDescGZIP() []byte {
 	return file_common_v1_role_proto_rawDescData
 }
 
-var file_common_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_common_v1_role_proto_goTypes = []any{
-	(*Role)(nil),                  // 0: common.v1.Role
-	(*RoleWithPermissions)(nil),   // 1: common.v1.RoleWithPermissions
-	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
-	(*Permission)(nil),            // 3: common.v1.Permission
-}
+var (
+	file_common_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+	file_common_v1_role_proto_goTypes  = []any{
+		(*Role)(nil),                  // 0: common.v1.Role
+		(*RoleWithPermissions)(nil),   // 1: common.v1.RoleWithPermissions
+		(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+		(*Permission)(nil),            // 3: common.v1.Permission
+	}
+)
 var file_common_v1_role_proto_depIdxs = []int32{
 	2, // 0: common.v1.Role.created_at:type_name -> google.protobuf.Timestamp
 	2, // 1: common.v1.Role.updated_at:type_name -> google.protobuf.Timestamp

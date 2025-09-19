@@ -7,14 +7,16 @@
 package role_v1
 
 import (
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
+
+	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
@@ -448,20 +450,22 @@ func file_role_v1_role_proto_rawDescGZIP() []byte {
 	return file_role_v1_role_proto_rawDescData
 }
 
-var file_role_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_role_v1_role_proto_goTypes = []any{
-	(*CreateRequest)(nil),          // 0: role.v1.CreateRequest
-	(*CreateResponse)(nil),         // 1: role.v1.CreateResponse
-	(*UpdateRequest)(nil),          // 2: role.v1.UpdateRequest
-	(*DeleteRequest)(nil),          // 3: role.v1.DeleteRequest
-	(*GetRequest)(nil),             // 4: role.v1.GetRequest
-	(*GetResponse)(nil),            // 5: role.v1.GetResponse
-	(*ListRequest)(nil),            // 6: role.v1.ListRequest
-	(*ListResponse)(nil),           // 7: role.v1.ListResponse
-	(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
-	(*v1.Role)(nil),                // 9: common.v1.Role
-	(*emptypb.Empty)(nil),          // 10: google.protobuf.Empty
-}
+var (
+	file_role_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+	file_role_v1_role_proto_goTypes  = []any{
+		(*CreateRequest)(nil),          // 0: role.v1.CreateRequest
+		(*CreateResponse)(nil),         // 1: role.v1.CreateResponse
+		(*UpdateRequest)(nil),          // 2: role.v1.UpdateRequest
+		(*DeleteRequest)(nil),          // 3: role.v1.DeleteRequest
+		(*GetRequest)(nil),             // 4: role.v1.GetRequest
+		(*GetResponse)(nil),            // 5: role.v1.GetResponse
+		(*ListRequest)(nil),            // 6: role.v1.ListRequest
+		(*ListResponse)(nil),           // 7: role.v1.ListResponse
+		(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
+		(*v1.Role)(nil),                // 9: common.v1.Role
+		(*emptypb.Empty)(nil),          // 10: google.protobuf.Empty
+	}
+)
 var file_role_v1_role_proto_depIdxs = []int32{
 	8,  // 0: role.v1.GetResponse.data:type_name -> common.v1.RoleWithPermissions
 	9,  // 1: role.v1.ListResponse.data:type_name -> common.v1.Role

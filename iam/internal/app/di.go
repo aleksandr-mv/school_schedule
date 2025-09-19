@@ -23,7 +23,6 @@ import (
 	userProducerService "github.com/aleksandr-mv/school_schedule/iam/internal/service/user_producer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/builder"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
 	grpcclient "github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/client"
@@ -52,9 +51,10 @@ type diContainer struct {
 
 	userProducerService service.UserProducerService
 
-	postgresPool *pgxpool.Pool
-	redisClient  cache.RedisClient
-	migrator     *migrator.Migrator
+	postgresWritePool *pgxpool.Pool
+	postgresReadPool  *pgxpool.Pool
+	redisClient       cache.RedisClient
+	migrator          *migrator.Migrator
 }
 
 func NewDiContainer(cfg contracts.Provider) *diContainer {
@@ -140,12 +140,17 @@ func (d *diContainer) UserService(ctx context.Context) (service.UserService, err
 
 func (d *diContainer) UserRepository(ctx context.Context) (repository.UserRepository, error) {
 	if d.userRepository == nil {
-		pool, err := d.PostgresPool(ctx)
+		writePool, err := d.PostgresWritePool(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		d.userRepository = userRepo.NewRepository(pool)
+		readPool, err := d.PostgresReadPool(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.userRepository = userRepo.NewRepository(writePool, readPool)
 	}
 
 	return d.userRepository, nil
@@ -153,45 +158,90 @@ func (d *diContainer) UserRepository(ctx context.Context) (repository.UserReposi
 
 func (d *diContainer) NotificationRepository(ctx context.Context) (repository.NotificationRepository, error) {
 	if d.notificationRepository == nil {
-		pool, err := d.PostgresPool(ctx)
+		writePool, err := d.PostgresWritePool(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		d.notificationRepository = notification.NewRepository(pool)
+		readPool, err := d.PostgresReadPool(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.notificationRepository = notification.NewRepository(writePool, readPool)
 	}
 
 	return d.notificationRepository, nil
 }
 
-func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
-	if d.postgresPool == nil {
+func (d *diContainer) PostgresWritePool(ctx context.Context) (*pgxpool.Pool, error) {
+	if d.postgresWritePool == nil {
 		dsn := d.cfg.Postgres().PrimaryURI()
 		if dsn == "" {
-			return nil, fmt.Errorf("postgres dsn is empty")
+			return nil, fmt.Errorf("postgres primary dsn is empty")
 		}
 
 		pgCfg, err := pgxpool.ParseConfig(dsn)
 		if err != nil {
-			return nil, fmt.Errorf("invalid postgres dsn: %w", err)
+			return nil, fmt.Errorf("invalid postgres primary dsn: %w", err)
 		}
 
 		pool, err := pgxpool.NewWithConfig(ctx, pgCfg)
 		if err != nil {
-			return nil, fmt.Errorf("create postgres pool failed: %w", err)
+			return nil, fmt.Errorf("create postgres write pool failed: %w", err)
 		}
 
-		closer.AddNamed("PostgreSQL pool", func(ctx context.Context) error {
-			logger.Info(ctx, "🐘 [Shutdown] Закрытие PostgreSQL pool")
+		closer.AddNamed("PostgreSQL write pool", func(ctx context.Context) error {
+			logger.Info(ctx, "🐘 [Shutdown] Закрытие PostgreSQL write pool")
 			pool.Close()
 			return nil
 		})
 
-		logger.Info(ctx, "✅ [Database] Пул PostgreSQL создан")
-		d.postgresPool = pool
+		logger.Info(ctx, "✅ [Database] PostgreSQL write pool создан")
+		d.postgresWritePool = pool
 	}
 
-	return d.postgresPool, nil
+	return d.postgresWritePool, nil
+}
+
+func (d *diContainer) PostgresReadPool(ctx context.Context) (*pgxpool.Pool, error) {
+	if d.postgresReadPool == nil {
+		dsn := d.cfg.Postgres().ReplicaURI()
+		if dsn == "" {
+			// Fallback на primary если реплика не настроена
+			dsn = d.cfg.Postgres().PrimaryURI()
+		}
+
+		if dsn == "" {
+			return nil, fmt.Errorf("postgres replica dsn is empty")
+		}
+
+		pgCfg, err := pgxpool.ParseConfig(dsn)
+		if err != nil {
+			return nil, fmt.Errorf("invalid postgres replica dsn: %w", err)
+		}
+
+		pool, err := pgxpool.NewWithConfig(ctx, pgCfg)
+		if err != nil {
+			return nil, fmt.Errorf("create postgres read pool failed: %w", err)
+		}
+
+		closer.AddNamed("PostgreSQL read pool", func(ctx context.Context) error {
+			logger.Info(ctx, "🐘 [Shutdown] Закрытие PostgreSQL read pool")
+			pool.Close()
+			return nil
+		})
+
+		logger.Info(ctx, "✅ [Database] PostgreSQL read pool создан")
+		d.postgresReadPool = pool
+	}
+
+	return d.postgresReadPool, nil
+}
+
+// PostgresPool возвращает write pool для обратной совместимости
+func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
+	return d.PostgresWritePool(ctx)
 }
 
 func (d *diContainer) SessionRepository(ctx context.Context) (repository.SessionRepository, error) {
@@ -210,13 +260,14 @@ func (d *diContainer) SessionRepository(ctx context.Context) (repository.Session
 func (d *diContainer) RedisClient(ctx context.Context) (cache.RedisClient, error) {
 	if d.redisClient == nil {
 		redisBuilder := builder.NewRedisBuilder(d.cfg.Redis())
-		redigoPool, err := redisBuilder.BuildPool()
+		client, err := redisBuilder.BuildClient()
 		if err != nil {
 			return nil, err
 		}
 
-		pool := d.cfg.Redis().Pool()
-		client := redis.NewClient(redigoPool, nil, pool.PoolTimeout())
+		if client == nil {
+			return nil, fmt.Errorf("redis cluster not enabled")
+		}
 
 		if err = client.Ping(ctx); err != nil {
 			return nil, fmt.Errorf("redis ping failed: %w", err)
@@ -224,10 +275,10 @@ func (d *diContainer) RedisClient(ctx context.Context) (cache.RedisClient, error
 
 		closer.AddNamed("Redis client", func(ctx context.Context) error {
 			logger.Info(ctx, "🔴 [Shutdown] Закрытие Redis клиента")
-			return redigoPool.Close()
+			return nil // go-redis клиент закрывается автоматически
 		})
 
-		logger.Info(ctx, "✅ [Cache] Redis клиент создан")
+		logger.Info(ctx, "✅ [Cache] Redis кластер клиент создан")
 		d.redisClient = client
 	}
 
@@ -239,15 +290,16 @@ func (d *diContainer) RunMigrations(ctx context.Context) error {
 		return nil
 	}
 
-	pool, err := d.PostgresPool(ctx)
+	// Миграции выполняются на write pool (Primary)
+	writePool, err := d.PostgresWritePool(ctx)
 	if err != nil {
-		return fmt.Errorf("postgres pool failed: %w", err)
+		return fmt.Errorf("postgres write pool failed: %w", err)
 	}
-	if pool == nil {
-		return fmt.Errorf("cannot run migrations: DB pool is nil")
+	if writePool == nil {
+		return fmt.Errorf("cannot run migrations: write pool is nil")
 	}
 
-	mig := migrator.NewMigrator(stdlib.OpenDB(*pool.Config().ConnConfig), d.cfg.App().MigrationsDir())
+	mig := migrator.NewMigrator(stdlib.OpenDB(*writePool.Config().ConnConfig), d.cfg.App().MigrationsDir())
 
 	if err = mig.Up(ctx); err != nil {
 		return fmt.Errorf("migrations failed: %w", err)
@@ -287,7 +339,7 @@ func (d *diContainer) dialServiceConn(ctx context.Context, serviceName string) (
 	}
 
 	addr := svc.Address()
-	limits := d.cfg.Transport().GRPCClientLimits()
+	limits := d.cfg.GRPC()
 
 	conn, err := grpcclient.NewClient(addr, limits.MaxRecvMsgSize(), limits.MaxSendMsgSize(), limits.Timeout())
 	if err != nil {

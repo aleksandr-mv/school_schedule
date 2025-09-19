@@ -18,7 +18,7 @@ func (r *notificationRepository) GetByUser(ctx context.Context, userID uuid.UUID
 			  WHERE user_id = $1 
 			  ORDER BY created_at ASC`
 
-	rows, err := r.pool.Query(ctx, query, userID)
+	rows, err := r.readPool.Query(ctx, query, userID)
 	if err != nil {
 		return nil, r.mapDatabaseError(err, "list")
 	}

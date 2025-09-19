@@ -7,14 +7,16 @@
 package role_permission_v1
 
 import (
-	_ "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
+
+	_ "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
@@ -157,12 +159,14 @@ func file_role_permission_v1_role_permission_proto_rawDescGZIP() []byte {
 	return file_role_permission_v1_role_permission_proto_rawDescData
 }
 
-var file_role_permission_v1_role_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_role_permission_v1_role_permission_proto_goTypes = []any{
-	(*AssignRequest)(nil), // 0: role_permission.v1.AssignRequest
-	(*RevokeRequest)(nil), // 1: role_permission.v1.RevokeRequest
-	(*emptypb.Empty)(nil), // 2: google.protobuf.Empty
-}
+var (
+	file_role_permission_v1_role_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+	file_role_permission_v1_role_permission_proto_goTypes  = []any{
+		(*AssignRequest)(nil), // 0: role_permission.v1.AssignRequest
+		(*RevokeRequest)(nil), // 1: role_permission.v1.RevokeRequest
+		(*emptypb.Empty)(nil), // 2: google.protobuf.Empty
+	}
+)
 var file_role_permission_v1_role_permission_proto_depIdxs = []int32{
 	0, // 0: role_permission.v1.RolePermissionService.Assign:input_type -> role_permission.v1.AssignRequest
 	1, // 1: role_permission.v1.RolePermissionService.Revoke:input_type -> role_permission.v1.RevokeRequest

@@ -19,7 +19,6 @@ vars:
   YQ_VERSION: 'v4.45.4'
   GRPCURL_VERSION: 'v1.9.3'
   MOCKERY_VERSION: 'v2.53.3'
-  ENVSUBST_VERSION: 'v1.4.3'
 
   # Пути к инструментам
   BIN_DIR: '{{.ROOT_DIR}}/bin'
@@ -35,12 +34,10 @@ vars:
   PROTOC_GEN_OPENAPIV2: '{{.BIN_DIR}}/protoc-gen-openapiv2'
   GRPCURL: '{{.BIN_DIR}}/grpcurl'
   MOCKERY: "{{.BIN_DIR}}/mockery"
-  ENVSUBST: '{{.BIN_DIR}}/envsubst'
 
   # Пути к файлам проекта
   COVERAGE_DIR: '{{.ROOT_DIR}}/coverage'
   COVERAGE_FILE: total.out
-  ENVDIR: '{{.ROOT_DIR}}/deploy/env'
 
   # Модули и сервисы
   MODULES: platform shared iam rbac
@@ -391,44 +388,22 @@ tasks:
       - find . -name "*.pb.gw.go" -delete
       - echo "✅ Очистка завершена"
 
+
 # =============================================================================
-# ГЕНЕРАЦИЯ ENV ФАЙЛОВ
+# DOCKER COMPOSE - УПРАВЛЕНИЕ СЕТЬЮ
 # =============================================================================
 
-  env:install-envsubst:
-    desc: "Устанавливает envsubst в bin/"
+  up-network:
+    desc: "Создать сеть school_net"
     cmds:
-      - |
-        [ -f {{.ENVSUBST}} ] || {
-          echo "📦 Устанавливаем envsubst версии {{.ENVSUBST_VERSION}}..."
-          GOBIN={{.BIN_DIR}} go install github.com/a8m/envsubst/cmd/envsubst@{{.ENVSUBST_VERSION}}
-        }
-        echo "✅ envsubst установлен: {{.ENVSUBST}}"
+      - echo "[task] 🌐 Создаем сеть school_net"
+      - docker network create school_net || echo "Сеть уже существует"
 
-  env:generate:
-    desc: "Генерирует .env файлы для всех сервисов из шаблонов и единого файла конфигурации"
-    deps: [ env:install-envsubst ]
+  down-network:
+    desc: "Удалить сеть school_net"
     cmds:
-      - |
-        ENV_FILE="{{.ENVDIR}}/.env"
-        TEMPLATE_FILE="{{.ENVDIR}}/.env.template"
-        SCRIPT="{{.ENVDIR}}/generate-env.sh"
-        
-        if [ ! -f "$ENV_FILE" ]; then
-          if [ -f "$TEMPLATE_FILE" ]; then
-            echo "🔄 Файл $ENV_FILE не найден, создаем из шаблона $TEMPLATE_FILE"
-            cp "$TEMPLATE_FILE" "$ENV_FILE"
-            echo "✅ Создан файл $ENV_FILE. Проверьте и отредактируйте значения переменных при необходимости."
-          else
-            echo "❌ Шаблон $TEMPLATE_FILE не найден!"
-            exit 1
-          fi
-        fi
-        
-        chmod +x "$SCRIPT"
-        # Передаем список сервисов в виде строки с разделителями-запятыми
-        export SERVICES="{{.SERVICES}}"
-        ENV_SUBST={{.ENVSUBST}} "$SCRIPT"
+      - echo "[task] 🗑️ Удаляем сеть school_net"
+      - docker network rm school_net || echo "Сеть не существует или используется"
 
 # =============================================================================
 # DOCKER COMPOSE - УПРАВЛЕНИЕ СЕРВИСАМИ
@@ -440,7 +415,6 @@ tasks:
     dir: deploy/compose/core
     cmds:
       - echo "[task] 🚀 Поднимаем core контейнеры"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-core:
@@ -456,7 +430,6 @@ tasks:
     dir: deploy/compose/eventbus
     cmds:
       - echo "[task] 🔄 Поднимаем eventbus контейнеры"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-eventbus:
@@ -472,7 +445,6 @@ tasks:
     dir: deploy/compose/otel
     cmds:
       - echo "[task] 📊 Поднимаем OTEL Collector"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-otel:
@@ -488,7 +460,6 @@ tasks:
     dir: deploy/compose/tracing
     cmds:
       - echo "[task] 🔍 Поднимаем tracing контейнеры"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-tracing:
@@ -504,7 +475,6 @@ tasks:
     dir: deploy/compose/logs
     cmds:
       - echo "[task] 📝 Поднимаем logs контейнеры"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-logs:
@@ -519,8 +489,8 @@ tasks:
     desc: "Поднять iam сервис и все его зависимости"
     dir: deploy/compose/iam
     cmds: 
+      - task: up-network
       - echo "[task] 🔐 Поднимаем iam сервис с зависимостями"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-iam:
@@ -535,8 +505,8 @@ tasks:
     desc: "Поднять rbac сервис и все его зависимости"
     dir: deploy/compose/rbac
     cmds: 
+      - task: up-network
       - echo "[task] 🔒 Поднимаем rbac сервис с зависимостями"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-rbac:
@@ -552,7 +522,6 @@ tasks:
     dir: deploy/compose/metrics
     cmds:
       - echo "[task] 📊 Поднимаем metrics контейнеры"
-      - task: env:generate
       - docker compose -p school_schedule up --build --detach
 
   down-metrics:
@@ -566,7 +535,7 @@ tasks:
     desc: "Поднять cache сервис (Redis) с зависимостями"
     dir: deploy/compose/cache
     cmds:
-      - task: env:generate
+      - task: up-network
       - echo "[task] 🚀 Поднимаем cache сервис"
       - docker compose -p school_schedule up --build --detach
 
@@ -584,6 +553,7 @@ tasks:
   up-all:
     desc: "Поднять все сервисы по очереди вместе с зависимостями"
     cmds:
+      - task: up-network
       - task: up-core
       - task: up-cache
       - task: up-eventbus
@@ -607,6 +577,7 @@ tasks:
       - task: down-tracing
       - task: down-eventbus
       - task: down-core
+      - task: down-network
       - echo "✅ Все сервисы остановлены!"
 
   restart-all:

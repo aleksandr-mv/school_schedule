@@ -16,7 +16,7 @@ func (r *notificationRepository) GetByUserAndProvider(ctx context.Context, userI
 			  FROM notification_methods 
 			  WHERE user_id = $1 AND provider_name = $2`
 
-	rows, err := r.pool.Query(ctx, query, userID, providerName)
+	rows, err := r.readPool.Query(ctx, query, userID, providerName)
 	if err != nil {
 		return nil, r.mapDatabaseError(err, "get")
 	}

@@ -1,99 +1,107 @@
 logger:
-  level: "${LOG_LEVEL}"
-  as_json: ${LOG_JSON}
+  level: "info"
+  as_json: true
   otlp:
-    enable: ${ENABLE}
-    endpoint: "${ENDPOINT}"
-    shutdown_timeout: ${SHUTDOWN_TIMEOUT}
+    enable: true
+    endpoint: "otel-collector:4317"
+    shutdown_timeout: 5
 
 tracing:
-  enable: ${TRACING_ENABLE}
-  endpoint: "${TRACING_ENDPOINT}"
-  timeout: "${TRACING_TIMEOUT}"
-  sample_ratio: ${TRACING_SAMPLE_RATIO}
-  retry_enabled: ${TRACING_RETRY_ENABLED}
-  retry_initial_interval: "${TRACING_RETRY_INITIAL_INTERVAL}"
-  retry_max_interval: "${TRACING_RETRY_MAX_INTERVAL}"
-  retry_max_elapsed_time: "${TRACING_RETRY_MAX_ELAPSED_TIME}"
-  enable_trace_context: ${TRACING_ENABLE_TRACE_CONTEXT}
-  enable_baggage: ${TRACING_ENABLE_BAGGAGE}
-  shutdown_timeout: "${TRACING_SHUTDOWN_TIMEOUT}"
+  enable: true
+  endpoint: "otel-collector:4317"
+  timeout: "5s"
+  sample_ratio: 10
+  retry_enabled: true
+  retry_initial_interval: "500ms"
+  retry_max_interval: "5s"
+  retry_max_elapsed_time: "30s"
+  enable_trace_context: true
+  enable_baggage: true
+  shutdown_timeout: "30s"
 
 metric:
-  enable: ${METRIC_ENABLE}
-  endpoint: "${METRIC_ENDPOINT}"
-  timeout: "${METRIC_TIMEOUT}"
-  namespace: "${METRIC_NAMESPACE}"
-  app_name: "${METRIC_APP_NAME}"
-  export_interval: "${METRIC_EXPORT_INTERVAL}"
-  shutdown_timeout: "${METRIC_SHUTDOWN_TIMEOUT}"
-  bucket_boundaries: ${METRIC_BUCKET_BOUNDARIES}
+  enable: true
+  endpoint: "otel-collector:4317"
+  timeout: "30s"
+  namespace: "microservices"
+  app_name: "platform"
+  export_interval: "5s"
+  shutdown_timeout: "30s"
+  bucket_boundaries: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0]
 
 app:
-  name: "${NAME}"
-  environment: "${ENVIRONMENT}"
-  version: "${VERSION}"
-  migrations_dir: "${MIGRATIONS_DIR}"
+  name: "iam-service"
+  environment: "production"
+  version: "1.0.0"
+  migrations_dir: "db/migrations"
 
 grpc_server:
-  host: "${GRPC_HOST}"
-  port: ${GRPC_PORT}
-  timeout: "${GRPC_TIMEOUT}"
-  idle_timeout: "${GRPC_IDLE_TIMEOUT}"
-  shutdown_timeout: "${GRPC_SHUTDOWN_TIMEOUT}"
+  host: "0.0.0.0"
+  port: 50051
+  timeout: "15s"
+  idle_timeout: "60s"
+  shutdown_timeout: "10s"
 
 grpc_client_limits:
-  max_recv_msg_size: ${GRPC_MAX_RECV_MSG_SIZE}
-  max_send_msg_size: ${GRPC_MAX_SEND_MSG_SIZE}
-  timeout: "${GRPC_CLIENT_TIMEOUT}"
+  max_recv_msg_size: 4194304  # 4MB
+  max_send_msg_size: 4194304  # 4MB
+  timeout: "5s"
 
-database:
-  postgres:
-    connection:
-      host: "${DB_HOST}"
-      port: ${DB_PORT}
-      user: "${POSTGRES_USER}"
-      password: "${POSTGRES_PASSWORD}"
-      database: "${POSTGRES_DB}"
-      application_name: "${DB_APPLICATION_NAME}"
-    pool:
-      max_cons: ${POOL_MAX_CONS}
-      min_cons: ${POOL_MIN_CONS}
-      max_conn_lifetime: "${POOL_MAX_CONN_LIFETIME}"
-      max_conn_idle_time: "${POOL_MAX_CONN_IDLE_TIME}"
-      health_check_period: "${HEALTH_CHECK_PERIOD}"
-      connect_timeout: "${CONNECT_TIMEOUT}"
-      shutdown_timeout: "${SHUTDOWN_TIMEOUT}"
-    tls:
-      enabled: ${TLS_ENABLED}
-      ssl_mode: "${SSL_MODE}"
-      ssl_cert: "${SSL_CERT}"
-      ssl_key: "${SSL_KEY}"
-      ssl_root_cert: "${SSL_ROOT_CERT}"
-      ssl_password: "${SSL_PASSWORD}"
-      ssl_crl: "${SSL_CRL}"
-      ssl_compression: ${SSL_COMPRESSION}
+postgres:
+  primary:
+    host: "postgres-iam-primary"
+    database: "iam"
+    application_name: "iam-service"
+  replicas:
+    - host: "postgres-iam-replica1"
+      database: "iam"
+      application_name: "iam-service"
+    - host: "postgres-iam-replica2"
+      database: "iam"
+      application_name: "iam-service"
+  pool:
+    max_cons: 25
+    min_cons: 5
+    max_conn_lifetime: "1h"
+    max_conn_idle_time: "30m"
+    health_check_period: "1m"
+    connect_timeout: "5s"
+    shutdown_timeout: "30s"
 
 redis:
-  enabled: ${REDIS_ENABLED}
-  connection:
-    host: "${REDIS_HOST}"
-    port: ${REDIS_PORT}
-    password: "${REDIS_PASSWORD}"
-    database: ${REDIS_DATABASE}
+  cluster:
+    nodes:
+      - "redis-cluster-1:6379"
+      - "redis-cluster-2:6379"
+      - "redis-cluster-3:6379"
+      - "redis-cluster-4:6379"
+      - "redis-cluster-5:6379"
+      - "redis-cluster-6:6379"
+    max_redirects: 3
+    readonly_commands: true
+    route_by_latency: false
+    route_randomly: false
   pool:
-    pool_size: ${REDIS_POOL_SIZE}
-    min_idle: ${REDIS_MIN_IDLE}
-    max_retries: ${REDIS_MAX_RETRIES}
-    dial_timeout: "${REDIS_DIAL_TIMEOUT}"
-    read_timeout: "${REDIS_READ_TIMEOUT}"
-    write_timeout: "${REDIS_WRITE_TIMEOUT}"
-    pool_timeout: "${REDIS_POOL_TIMEOUT}"
-    idle_timeout: "${REDIS_IDLE_TIMEOUT}"
-    idle_check_freq: "${REDIS_IDLE_CHECK_FREQ}"
+    max_active: 10
+    max_idle: 5
+    idle_timeout: "30m"
+    conn_timeout: "5s"
+    read_timeout: "3s"
+    write_timeout: "3s"
+    pool_timeout: "4s"
+
+session:
+  ttl: "24h"
+
+kafka:
+  brokers: "kafka:9092"
+  producers:
+    user_created:
+      topic: "iam.user.created"
+      enabled: true
 
 services:
   rbac:
-    address: "${RBAC_ADDRESS}"
-    port: ${RBAC_PORT}
-    timeout: "${RBAC_TIMEOUT}"
+    address: "rbac-service"
+    port: 50052
+    timeout: "5s"

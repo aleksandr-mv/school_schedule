@@ -14,7 +14,7 @@ func (r *userRoleRepository) GetUserRoles(ctx context.Context, userID string) ([
 		WHERE ur.user_id = $1
 		ORDER BY r.name`
 
-	rows, err := r.pool.Query(ctx, query, userID)
+	rows, err := r.readPool.Query(ctx, query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user roles: %w", err)
 	}

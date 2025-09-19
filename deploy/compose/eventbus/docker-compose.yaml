@@ -5,25 +5,8 @@ services:
     env_file:
       - .env
     ports:
-      - "${EVENTBUS_EXTERNAL_PORT}:${EVENTBUS_EXTERNAL_PORT}" 
-    environment: 
-      # === Основные параметры KRaft (Kafka без Zookeeper) ===
-      KAFKA_KRAFT_MODE: "true" # Включаем работу в режиме KRaft (Kafka Raft Metadata Mode), без ZooKeeper.
-      KAFKA_PROCESS_ROLES: controller,broker # Роль текущего процесса: одновременно controller (управляет metadata) и broker (обрабатывает сообщения).
-      KAFKA_NODE_ID: 1 # Уникальный идентификатор ноды в кластере Kafka. В кластере должно быть уникальным для каждой ноды.
-      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:${EVENTBUS_CONTROLLER_PORT}"
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:${EVENTBUS_INTERNAL_PORT},PLAINTEXT_EXTERNAL://0.0.0.0:${EVENTBUS_EXTERNAL_PORT},CONTROLLER://kafka:${EVENTBUS_CONTROLLER_PORT}
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:${EVENTBUS_INTERNAL_PORT},PLAINTEXT_EXTERNAL://localhost:${EVENTBUS_EXTERNAL_PORT},CONTROLLER://kafka:${EVENTBUS_CONTROLLER_PORT}
-     
-      # === Поведение кластера ===
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG_RETENTION_HOURS: 168
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      CLUSTER_ID: "Mk3OEYBSD34fcwNTJENDM2Qk"
+      - "9092:9092"
+      - "${KAFKA_JMX_PORT}:${KAFKA_JMX_PORT}"
 
     volumes:
       - kafka_data:/var/lib/kafka/data
@@ -36,7 +19,7 @@ services:
           "CMD",
           "bash",
           "-c",
-          "echo > /dev/tcp/localhost/${EVENTBUS_INTERNAL_PORT}",
+          "echo > /dev/tcp/localhost/9094",
         ]
       interval: 10s
       timeout: 5s
@@ -47,13 +30,10 @@ services:
   kafka-ui: 
     image: provectuslabs/kafka-ui:v0.7.2
     container_name: kafka-ui
-    ports:
-      - "${EVENTBUS_UI_PORT}:8080"
     env_file:
       - .env
-    environment:
-      KAFKA_CLUSTERS_0_NAME: "local-cluster"
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:${EVENTBUS_INTERNAL_PORT}"
+    ports:
+      - "8080:8080"
     depends_on:
       kafka:
         condition: service_healthy
@@ -73,5 +53,4 @@ volumes:
 
 networks:
   school_net:
-    name: school_net
     external: true

@@ -7,14 +7,16 @@
 package user_role_v1
 
 import (
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
+
+	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
@@ -409,17 +411,19 @@ func file_user_role_v1_user_role_proto_rawDescGZIP() []byte {
 	return file_user_role_v1_user_role_proto_rawDescData
 }
 
-var file_user_role_v1_user_role_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_user_role_v1_user_role_proto_goTypes = []any{
-	(*AssignRequest)(nil),          // 0: user_role.v1.AssignRequest
-	(*RevokeRequest)(nil),          // 1: user_role.v1.RevokeRequest
-	(*GetUserRolesRequest)(nil),    // 2: user_role.v1.GetUserRolesRequest
-	(*GetUserRolesResponse)(nil),   // 3: user_role.v1.GetUserRolesResponse
-	(*GetRoleUsersRequest)(nil),    // 4: user_role.v1.GetRoleUsersRequest
-	(*GetRoleUsersResponse)(nil),   // 5: user_role.v1.GetRoleUsersResponse
-	(*v1.RoleWithPermissions)(nil), // 6: common.v1.RoleWithPermissions
-	(*emptypb.Empty)(nil),          // 7: google.protobuf.Empty
-}
+var (
+	file_user_role_v1_user_role_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+	file_user_role_v1_user_role_proto_goTypes  = []any{
+		(*AssignRequest)(nil),          // 0: user_role.v1.AssignRequest
+		(*RevokeRequest)(nil),          // 1: user_role.v1.RevokeRequest
+		(*GetUserRolesRequest)(nil),    // 2: user_role.v1.GetUserRolesRequest
+		(*GetUserRolesResponse)(nil),   // 3: user_role.v1.GetUserRolesResponse
+		(*GetRoleUsersRequest)(nil),    // 4: user_role.v1.GetRoleUsersRequest
+		(*GetRoleUsersResponse)(nil),   // 5: user_role.v1.GetRoleUsersResponse
+		(*v1.RoleWithPermissions)(nil), // 6: common.v1.RoleWithPermissions
+		(*emptypb.Empty)(nil),          // 7: google.protobuf.Empty
+	}
+)
 var file_user_role_v1_user_role_proto_depIdxs = []int32{
 	6, // 0: user_role.v1.GetUserRolesResponse.data:type_name -> common.v1.RoleWithPermissions
 	0, // 1: user_role.v1.UserRoleService.Assign:input_type -> user_role.v1.AssignRequest

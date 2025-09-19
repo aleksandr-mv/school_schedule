@@ -47,50 +47,58 @@ grpc_client_limits:
   max_send_msg_size: 4194304  # 4MB
   timeout: "5s"
 
-database:
-  postgres:
-    connection:
-      host: "localhost"
-      port: 5433
+postgres:
+  primary:
+    host: "localhost"
+    port: 5433
+    user: "postgres"
+    password: "password"
+    database: "rbac"
+    application_name: "rbac-service"
+  replicas:
+    - host: "localhost"
+      port: 5435
       user: "postgres"
       password: "password"
       database: "rbac"
       application_name: "rbac-service"
-    pool:
-      max_cons: 25
-      min_cons: 5
-      max_conn_lifetime: "1h"
-      max_conn_idle_time: "30m"
-      health_check_period: "1m"
-      connect_timeout: "5s"
-      shutdown_timeout: "30s"
-    tls:
-      enabled: false
-      ssl_mode: "disable"
-      ssl_cert: ""
-      ssl_key: ""
-      ssl_root_cert: ""
-      ssl_password: ""
-      ssl_crl: ""
-      ssl_compression: false
+    - host: "localhost"
+      port: 5436
+      user: "postgres"
+      password: "password"
+      database: "rbac"
+      application_name: "rbac-service"
+  pool:
+    max_cons: 25
+    min_cons: 5
+    max_conn_lifetime: "1h"
+    max_conn_idle_time: "30m"
+    health_check_period: "1m"
+    connect_timeout: "5s"
+    shutdown_timeout: "30s"
 
 redis:
-  enabled: true
-  connection:
-    host: "localhost"
-    port: 6380
+  cluster:
+    nodes:
+      - "localhost:7000"
+      - "localhost:7001"
+      - "localhost:7002"
+      - "localhost:7003"
+      - "localhost:7004"
+      - "localhost:7005"
     password: ""
-    database: 0
+    max_redirects: 3
+    readonly_commands: true
+    route_by_latency: false
+    route_randomly: false
   pool:
-    pool_size: 10
-    min_idle: 5
-    max_retries: 3
-    dial_timeout: "5s"
+    max_active: 10
+    max_idle: 5
+    idle_timeout: "30m"
+    conn_timeout: "5s"
     read_timeout: "3s"
     write_timeout: "3s"
     pool_timeout: "4s"
-    idle_timeout: "30m"
-    idle_check_freq: "1m"
 
 session:
   ttl: "24h" 

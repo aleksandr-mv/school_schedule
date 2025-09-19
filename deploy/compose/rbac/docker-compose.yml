@@ -1,26 +1,93 @@
 services:
+  rbac:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rbac-service
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "grpc-health-probe", "-addr=rbac:50052"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    depends_on:
+      postgres-rbac-primary:
+        condition: service_healthy
+    networks:
+      - school_net
 
-  postgres-rbac:
-    image: ${POSTGRES_IMAGE_NAME}
-    container_name: ${POSTGRES_CONTAINER_NAME}
+  postgres-rbac-primary:
+    image: postgres:17.5-alpine
+    container_name: rbac-postgres-primary
     env_file:
       - .env
     volumes:
-      - postgres_rbac_data:/var/lib/postgresql/data
+      - postgres_rbac_primary_data:/var/lib/postgresql/data
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro
     ports:
-      - "${EXTERNAL_POSTGRES_PORT}:5432"
+      - "5433:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d rbac" ]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: ${HEALTHCHECK_START_PERIOD}s
+      start_period: 30s
     restart: unless-stopped
     networks:
       - school_net
 
+  postgres-rbac-replica-1:
+    image: postgres:17.5-alpine
+    container_name: rbac-postgres-replica-1
+    env_file:
+      - .env
+    volumes:
+      - postgres_rbac_replica_1_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    depends_on:
+      postgres-rbac-primary:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d rbac" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - school_net
+
+  postgres-rbac-replica-2:
+    image: postgres:17.5-alpine
+    container_name: rbac-postgres-replica-2
+    env_file:
+      - .env
+    volumes:
+      - postgres_rbac_replica_2_data:/var/lib/postgresql/data
+    ports:
+      - "5436:5432"
+    depends_on:
+      postgres-rbac-primary:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d rbac" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - school_net
+
+
 volumes:
-  postgres_rbac_data:
+  postgres_rbac_primary_data:
+  postgres_rbac_replica_1_data:
+  postgres_rbac_replica_2_data:
 
 networks:
   school_net:

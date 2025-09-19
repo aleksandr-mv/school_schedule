@@ -2,56 +2,31 @@ package redis
 
 import (
 	"context"
-
-	redigo "github.com/gomodule/redigo/redis"
 )
 
+// SetOperator методы для работы с Redis Sets
+// Выделены в отдельный файл для лучшей организации кода
+
 func (c *client) SAdd(ctx context.Context, key, value string) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("SADD", key, value)
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.SAdd(ctx, key, value).Err()
 }
 
 func (c *client) SRem(ctx context.Context, key, value string) error {
-	return c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		_, err := conn.Do("SREM", key, value)
-		return err
-	})
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.SRem(ctx, key, value).Err()
 }
 
 func (c *client) SIsMember(ctx context.Context, key, value string) (bool, error) {
-	var isMember bool
-	err := c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		result, err := redigo.Int(conn.Do("SISMEMBER", redigo.Args{key}.Add(value)...))
-		if err != nil {
-			return err
-		}
-
-		isMember = result > 0
-		return nil
-	})
-	if err != nil {
-		return false, err
-	}
-
-	return isMember, nil
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.SIsMember(ctx, key, value).Result()
 }
 
 func (c *client) SMembers(ctx context.Context, key string) ([]string, error) {
-	var members []string
-	err := c.withConn(ctx, func(ctx context.Context, conn redigo.Conn) error {
-		result, err := redigo.Strings(conn.Do("SMEMBERS", redigo.Args{key}...))
-		if err != nil {
-			return err
-		}
-
-		members = result
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return members, nil
+	ctx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+	return c.rdb.SMembers(ctx, key).Result()
 }

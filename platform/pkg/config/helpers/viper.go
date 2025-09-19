@@ -2,15 +2,16 @@
 //
 // Этот пакет реализует принцип KISS (Keep It Simple, Stupid) и предоставляет
 // минимальный API для работы с Viper конфигурацией. Все загрузчики используют
-// единый экземпляр Viper через функции этого пакета.
+// единый инкапсулированный экземпляр Viper через функции этого пакета.
 //
 // Особенности загрузки:
-//   - Один глобальный Viper экземпляр для всех загрузчиков
+//   - Инкапсулированный Viper экземпляр с thread-safe доступом
 //   - Простые функции без сложных абстракций
 //   - Поддержка fallback на ENV-переменные (через теги env в структурах)
 //   - Централизованная инициализация из YAML файла
 //   - Перед парсингом YAML выполняется os.ExpandEnv для подстановки ${VAR} из окружения
 //   - После загрузки выполняется базовая валидация обязательных полей
+//   - Thread-safe операции с использованием RWMutex
 package helpers
 
 import (
@@ -19,17 +20,26 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/spf13/viper"
 )
 
 // ============================================================================
-// ГЛОБАЛЬНОЕ СОСТОЯНИЕ И ПЕРЕМЕННЫЕ
+// ИНКАПСУЛИРОВАННОЕ СОСТОЯНИЕ КОНФИГУРАЦИИ
 // ============================================================================
 
-// globalViper хранит общий экземпляр Viper для всех загрузчиков конфигурации.
-// Может быть nil, если YAML файл недоступен (ENV-only режим).
-var globalViper *viper.Viper
+// configState инкапсулирует состояние конфигурации для обеспечения thread-safety
+// и лучшей организации кода. Содержит Viper экземпляр и мьютекс для синхронизации.
+type configState struct {
+	viper *viper.Viper // может быть nil в ENV-only режиме
+	mu    sync.RWMutex // защищает доступ к viper
+}
+
+// globalState - единственная глобальная переменная, инкапсулирующая состояние.
+// Инициализируется один раз при старте приложения в основной горутине.
+// ВНИМАНИЕ: InitViper должен вызываться до создания других горутин!
+var globalState = &configState{}
 
 // allowedConfigFiles — белый список допустимых конфигурационных файлов.
 var allowedConfigFiles = map[string]bool{
@@ -43,24 +53,28 @@ var allowedConfigFiles = map[string]bool{
 // ФУНКЦИИ ИНИЦИАЛИЗАЦИИ И УПРАВЛЕНИЯ
 // ============================================================================
 
-// InitViper создаёт и инициализирует глобальный экземпляр Viper из YAML файла.
+// InitViper создаёт и инициализирует инкапсулированный экземпляр Viper из YAML файла.
 //
 // Параметры:
 //   - path: путь к YAML файлу конфигурации
 //
 // Поведение:
-//   - Если path пустой, устанавливает globalViper в nil (ENV-only режим)
+//   - Если path пустой, устанавливает viper в nil (ENV-only режим)
 //   - Читает файл как текст, выполняет os.ExpandEnv для подстановки ${VAR}
 //   - Парсит результат через Viper (ReadConfig)
 //   - Выполняет базовую валидацию обязательных полей (см. validateRequired)
-//   - При ошибке возвращает её и не сохраняет глобальное состояние
+//   - При ошибке возвращает её и не сохраняет состояние
+//   - Thread-safe: использует мьютекс для защиты от race conditions
 //
 // Возвращает:
 //   - nil при успешной инициализации или ENV-only режиме
 //   - error при ошибке чтения YAML файла
 func InitViper(path string) error {
+	globalState.mu.Lock()
+	defer globalState.mu.Unlock()
+
 	if path == "" {
-		globalViper = nil
+		globalState.viper = nil
 		return nil
 	}
 
@@ -78,22 +92,22 @@ func InitViper(path string) error {
 
 	data, err := os.ReadFile(cleanPath)
 	if err != nil {
-		globalViper = nil
+		globalState.viper = nil
 		return fmt.Errorf("failed to read config file %s: %w", cleanPath, err)
 	}
 
 	expanded := os.ExpandEnv(string(data))
 	if err := v.ReadConfig(bytes.NewReader([]byte(expanded))); err != nil {
-		globalViper = nil
+		globalState.viper = nil
 		return fmt.Errorf("failed to parse config file %s: %w", cleanPath, err)
 	}
 
 	if err := validateRequired(v); err != nil {
-		globalViper = nil
+		globalState.viper = nil
 		return err
 	}
 
-	globalViper = v
+	globalState.viper = v
 	return nil
 }
 
@@ -149,7 +163,9 @@ func validateRequired(v *viper.Viper) error {
 //
 // Возвращает:
 //   - *viper.Viper: подсекцию конфигурации для unmarshaling
-//   - nil: если globalViper не инициализирован или секция не найдена
+//   - nil: если viper не инициализирован или секция не найдена
+//
+// Thread-safe: использует read lock для безопасного доступа.
 //
 // Использование:
 //
@@ -158,10 +174,13 @@ func validateRequired(v *viper.Viper) error {
 //	    section.Unmarshal(&config)
 //	}
 func GetSection(sectionName string) *viper.Viper {
-	if globalViper == nil {
+	globalState.mu.RLock()
+	defer globalState.mu.RUnlock()
+
+	if globalState.viper == nil {
 		return nil
 	}
-	return globalViper.Sub(sectionName)
+	return globalState.viper.Sub(sectionName)
 }
 
 // GetViper возвращает полный экземпляр Viper для unmarshaling всей конфигурации.
@@ -173,11 +192,34 @@ func GetSection(sectionName string) *viper.Viper {
 //   - *viper.Viper: полный экземпляр конфигурации
 //   - nil: если YAML файл не был загружен (ENV-only режим)
 //
+// Thread-safe: использует read lock для безопасного доступа.
+//
 // Использование:
 //
 //	if v := GetViper(); v != nil {
 //	    v.Unmarshal(&fullConfig)
 //	}
 func GetViper() *viper.Viper {
-	return globalViper
+	globalState.mu.RLock()
+	defer globalState.mu.RUnlock()
+
+	return globalState.viper
+}
+
+// ============================================================================
+// ФУНКЦИИ ДЛЯ ТЕСТИРОВАНИЯ
+// ============================================================================
+
+// Reset сбрасывает состояние конфигурации в nil.
+// Используется исключительно в тестах для очистки состояния между тестами.
+//
+// ВНИМАНИЕ: Эта функция НЕ должна использоваться в production коде!
+// Она предназначена только для unit тестов.
+//
+// Thread-safe: использует write lock для безопасного сброса.
+func Reset() {
+	globalState.mu.Lock()
+	defer globalState.mu.Unlock()
+
+	globalState.viper = nil
 }

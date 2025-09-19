@@ -3,8 +3,9 @@ package grpc
 import (
 	"context"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
 	"github.com/google/uuid"
+
+	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
 )
 
 type RBACClient interface {

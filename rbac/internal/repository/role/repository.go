@@ -9,9 +9,13 @@ import (
 var _ def.RoleRepository = (*roleRepository)(nil)
 
 type roleRepository struct {
-	pool *pgxpool.Pool
+	writePool *pgxpool.Pool // Primary - для записи (INSERT, UPDATE, DELETE)
+	readPool  *pgxpool.Pool // Replica - для чтения (SELECT)
 }
 
-func NewRepository(pool *pgxpool.Pool) *roleRepository {
-	return &roleRepository{pool: pool}
+func NewRepository(writePool, readPool *pgxpool.Pool) *roleRepository {
+	return &roleRepository{
+		writePool: writePool,
+		readPool:  readPool,
+	}
 }

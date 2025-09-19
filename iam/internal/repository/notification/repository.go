@@ -9,11 +9,13 @@ import (
 var _ def.NotificationRepository = (*notificationRepository)(nil)
 
 type notificationRepository struct {
-	pool *pgxpool.Pool
+	writePool *pgxpool.Pool
+	readPool  *pgxpool.Pool
 }
 
-func NewRepository(pool *pgxpool.Pool) *notificationRepository {
+func NewRepository(writePool, readPool *pgxpool.Pool) *notificationRepository {
 	return &notificationRepository{
-		pool: pool,
+		writePool: writePool,
+		readPool:  readPool,
 	}
 }

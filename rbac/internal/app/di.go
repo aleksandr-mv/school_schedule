@@ -9,7 +9,6 @@ import (
 
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
 	cacheBuilder "github.com/aleksandr-mv/school_schedule/platform/pkg/cache/builder"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/builder"
@@ -59,9 +58,10 @@ type diContainer struct {
 	rolePermissionRepository repository.RolePermissionRepository
 	enrichedRoleRepository   repository.EnrichedRoleRepository
 
-	postgresPool *pgxpool.Pool
-	redisClient  cache.RedisClient
-	migrator     *migrator.Migrator
+	postgresWritePool *pgxpool.Pool
+	postgresReadPool  *pgxpool.Pool
+	redisClient       cache.RedisClient
+	migrator          *migrator.Migrator
 }
 
 func NewDiContainer(cfg contracts.Provider) *diContainer {
@@ -191,12 +191,17 @@ func (d *diContainer) UserRoleService(ctx context.Context) (service.UserRoleServ
 
 func (d *diContainer) RoleRepository(ctx context.Context) (repository.RoleRepository, error) {
 	if d.roleRepository == nil {
-		pool, err := d.PostgresPool(ctx)
+		writePool, err := d.PostgresWritePool(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		d.roleRepository = roleRepo.NewRepository(pool)
+		readPool, err := d.PostgresReadPool(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.roleRepository = roleRepo.NewRepository(writePool, readPool)
 	}
 
 	return d.roleRepository, nil
@@ -204,12 +209,12 @@ func (d *diContainer) RoleRepository(ctx context.Context) (repository.RoleReposi
 
 func (d *diContainer) PermissionRepository(ctx context.Context) (repository.PermissionRepository, error) {
 	if d.permissionRepository == nil {
-		pool, err := d.PostgresPool(ctx)
+		readPool, err := d.PostgresReadPool(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		d.permissionRepository = permissionRepo.NewRepository(pool)
+		d.permissionRepository = permissionRepo.NewRepository(readPool)
 	}
 
 	return d.permissionRepository, nil
@@ -217,12 +222,17 @@ func (d *diContainer) PermissionRepository(ctx context.Context) (repository.Perm
 
 func (d *diContainer) UserRoleRepository(ctx context.Context) (repository.UserRoleRepository, error) {
 	if d.userRoleRepository == nil {
-		pool, err := d.PostgresPool(ctx)
+		writePool, err := d.PostgresWritePool(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		d.userRoleRepository = userRoleRepo.NewRepository(pool)
+		readPool, err := d.PostgresReadPool(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.userRoleRepository = userRoleRepo.NewRepository(writePool, readPool)
 	}
 
 	return d.userRoleRepository, nil
@@ -230,12 +240,17 @@ func (d *diContainer) UserRoleRepository(ctx context.Context) (repository.UserRo
 
 func (d *diContainer) RolePermissionRepository(ctx context.Context) (repository.RolePermissionRepository, error) {
 	if d.rolePermissionRepository == nil {
-		pool, err := d.PostgresPool(ctx)
+		writePool, err := d.PostgresWritePool(ctx)
 		if err != nil {
 			return nil, err
 		}
 
-		d.rolePermissionRepository = rolePermissionRepo.NewRepository(pool)
+		readPool, err := d.PostgresReadPool(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.rolePermissionRepository = rolePermissionRepo.NewRepository(writePool, readPool)
 	}
 
 	return d.rolePermissionRepository, nil
@@ -254,46 +269,82 @@ func (d *diContainer) EnrichedRoleRepository(ctx context.Context) (repository.En
 	return d.enrichedRoleRepository, nil
 }
 
-func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
-	if d.postgresPool == nil {
-		dsn := d.cfg.Database().PostgresDSN()
+func (d *diContainer) PostgresWritePool(ctx context.Context) (*pgxpool.Pool, error) {
+	if d.postgresWritePool == nil {
+		dsn := d.cfg.Postgres().PrimaryURI()
 		if dsn == "" {
-			return nil, fmt.Errorf("postgres dsn is empty")
+			return nil, fmt.Errorf("postgres primary dsn is empty")
 		}
 
 		pgCfg, err := pgxpool.ParseConfig(dsn)
 		if err != nil {
-			return nil, fmt.Errorf("invalid postgres dsn: %w", err)
+			return nil, fmt.Errorf("invalid postgres primary dsn: %w", err)
 		}
 
 		pool, err := pgxpool.NewWithConfig(ctx, pgCfg)
 		if err != nil {
-			return nil, fmt.Errorf("create postgres pool failed: %w", err)
+			return nil, fmt.Errorf("create postgres write pool failed: %w", err)
 		}
 
-		closer.AddNamed("PostgreSQL pool", func(ctx context.Context) error {
-			logger.Info(ctx, "🐘 [Shutdown] Закрытие PostgreSQL pool")
+		closer.AddNamed("PostgreSQL write pool", func(ctx context.Context) error {
+			logger.Info(ctx, "🐘 [Shutdown] Закрытие PostgreSQL write pool")
 			pool.Close()
 			return nil
 		})
 
-		logger.Info(ctx, "✅ [Database] Пул PostgreSQL создан")
-		d.postgresPool = pool
+		logger.Info(ctx, "✅ [Database] PostgreSQL write pool создан")
+		d.postgresWritePool = pool
 	}
 
-	return d.postgresPool, nil
+	return d.postgresWritePool, nil
+}
+
+func (d *diContainer) PostgresReadPool(ctx context.Context) (*pgxpool.Pool, error) {
+	if d.postgresReadPool == nil {
+		dsn := d.cfg.Postgres().ReplicaURI()
+		if dsn == "" {
+			// Fallback на primary если реплика не настроена
+			dsn = d.cfg.Postgres().PrimaryURI()
+		}
+
+		if dsn == "" {
+			return nil, fmt.Errorf("postgres replica dsn is empty")
+		}
+
+		pgCfg, err := pgxpool.ParseConfig(dsn)
+		if err != nil {
+			return nil, fmt.Errorf("invalid postgres replica dsn: %w", err)
+		}
+
+		pool, err := pgxpool.NewWithConfig(ctx, pgCfg)
+		if err != nil {
+			return nil, fmt.Errorf("create postgres read pool failed: %w", err)
+		}
+
+		closer.AddNamed("PostgreSQL read pool", func(ctx context.Context) error {
+			logger.Info(ctx, "🐘 [Shutdown] Закрытие PostgreSQL read pool")
+			pool.Close()
+			return nil
+		})
+
+		logger.Info(ctx, "✅ [Database] PostgreSQL read pool создан")
+		d.postgresReadPool = pool
+	}
+
+	return d.postgresReadPool, nil
+}
+
+func (d *diContainer) PostgresPool(ctx context.Context) (*pgxpool.Pool, error) {
+	return d.PostgresWritePool(ctx)
 }
 
 func (d *diContainer) RedisClient(ctx context.Context) (cache.RedisClient, error) {
 	if d.redisClient == nil {
 		redisBuilder := cacheBuilder.NewRedisBuilder(d.cfg.Redis())
-		redigoPool, err := redisBuilder.BuildPool()
+		client, err := redisBuilder.BuildClient()
 		if err != nil {
 			return nil, err
 		}
-
-		pool := d.cfg.Redis().Pool()
-		client := redis.NewClient(redigoPool, logger.Logger(), pool.PoolTimeout())
 
 		if err = client.Ping(ctx); err != nil {
 			return nil, fmt.Errorf("redis ping failed: %w", err)
@@ -301,7 +352,7 @@ func (d *diContainer) RedisClient(ctx context.Context) (cache.RedisClient, error
 
 		closer.AddNamed("Redis client", func(ctx context.Context) error {
 			logger.Info(ctx, "🔴 [Shutdown] Закрытие Redis клиента")
-			return redigoPool.Close()
+			return nil // Redis client закрывается автоматически
 		})
 
 		logger.Info(ctx, "✅ [Cache] Redis клиент создан")
