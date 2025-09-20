@@ -41,7 +41,7 @@ vars:
 
   # Модули и сервисы
   MODULES: platform shared iam rbac
-  SERVICES: core,cache,eventbus,iam,logs,metrics,otel,rbac,tracing
+  SERVICES: core,cache,eventbus,envoy,iam,logs,metrics,rbac,tracing
   GRPC_SERVER_ADDR: 'localhost:50051'
 
 # =============================================================================
@@ -248,6 +248,66 @@ tasks:
     cmds:
       - '{{.BUF}} generate --template buf.gen.yaml'
 
+  proto:build:common:
+    desc: Сборка proto файлов Common пакета
+    deps: [ install-buf, proto:install-plugins ]
+    dir: ./shared/proto
+    cmds:
+      - 'mkdir -p ../pkg/proto/common/v1'
+      - '{{.BUF}} build --path common --as-file-descriptor-set --output "../pkg/proto/common/v1/common_descriptor.pb"'
+
+  proto:build:auth:
+    desc: Сборка proto файлов Auth сервиса
+    deps: [ install-buf, proto:install-plugins, proto:build:common ]
+    dir: ./shared/proto
+    cmds:
+      - 'mkdir -p ../pkg/proto/auth/v1'
+      - '{{.BUF}} build --path auth --path common --as-file-descriptor-set --output "../pkg/proto/auth/v1/auth_descriptor.pb"'
+
+  proto:build:user:
+    desc: Сборка proto файлов User сервиса
+    deps: [ install-buf, proto:install-plugins, proto:build:common ]
+    dir: ./shared/proto
+    cmds:
+      - 'mkdir -p ../pkg/proto/user/v1'
+      - '{{.BUF}} build --path user --path common --as-file-descriptor-set --output "../pkg/proto/user/v1/user_descriptor.pb"'
+
+  proto:build:role:
+    desc: Сборка proto файлов Role сервиса
+    deps: [ install-buf, proto:install-plugins, proto:build:common ]
+    dir: ./shared/proto
+    cmds:
+      - 'mkdir -p ../pkg/proto/role/v1'
+      - '{{.BUF}} build --path role --path common --as-file-descriptor-set --output "../pkg/proto/role/v1/role_descriptor.pb"'
+
+  proto:build:permission:
+    desc: Сборка proto файлов Permission сервиса
+    deps: [ install-buf, proto:install-plugins, proto:build:common ]
+    dir: ./shared/proto
+    cmds:
+      - 'mkdir -p ../pkg/proto/permission/v1'
+      - '{{.BUF}} build --path permission --path common --as-file-descriptor-set --output "../pkg/proto/permission/v1/permission_descriptor.pb"'
+
+  proto:build:user_role:
+    desc: Сборка proto файлов UserRole сервиса
+    deps: [ install-buf, proto:install-plugins, proto:build:common ]
+    dir: ./shared/proto
+    cmds:
+      - 'mkdir -p ../pkg/proto/user_role/v1'
+      - '{{.BUF}} build --path user_role --path common --as-file-descriptor-set --output "../pkg/proto/user_role/v1/user_role_descriptor.pb"'
+
+  proto:build:microservices:
+    desc: Сборка объединенного дескриптора для всех микросервисов (для Envoy)
+    deps: [ install-buf, proto:install-plugins ]
+    dir: ./shared/proto
+    cmds:
+      - 'mkdir -p ../../deploy/compose/envoy'
+      - '{{.BUF}} build --as-file-descriptor-set --output "../../deploy/compose/envoy/microservices_descriptor.pb"'
+
+  proto:build:all:
+    desc: Сборка всех proto дескрипторов
+    deps: [ proto:build:common, proto:build:auth, proto:build:user, proto:build:role, proto:build:permission, proto:build:user_role, proto:build:microservices ]
+
   gen:
     desc: "Генерация всех proto файлов"
     cmds:
@@ -439,27 +499,20 @@ tasks:
       - echo "[task] 🛑 Останавливаем eventbus контейнеры"
       - docker compose -p school_schedule down
 
-  # Opentelemetry сервисы (Otel-collector)
-  up-otel:
-    desc: "Поднять OTEL Collector"
-    dir: deploy/compose/otel
-    cmds:
-      - echo "[task] 📊 Поднимаем OTEL Collector"
-      - docker compose -p school_schedule up --build --detach
-
-  down-otel:
-    desc: "Остановить и удалить OTEL Collector"
-    dir: deploy/compose/otel
-    cmds:
-      - echo "[task] 🛑 Останавливаем OTEL Collector"
-      - docker compose -p school_schedule down
 
   # Tracing сервисы (Jaeger)
   up-tracing:
-    desc: "Поднять tracing контейнеры"
+    desc: "Поднять tracing контейнеры (без OTEL)"
     dir: deploy/compose/tracing
     cmds:
       - echo "[task] 🔍 Поднимаем tracing контейнеры"
+      - docker compose -p school_schedule up --build --detach
+
+  up-tracing-with-otel:
+    desc: "Поднять tracing контейнеры с domain-specific HA OTEL"
+    dir: deploy/compose/tracing
+    cmds:
+      - echo "[task] 🔍 Поднимаем tracing с HA OTEL коллекторами (все в одном compose)"
       - docker compose -p school_schedule up --build --detach
 
   down-tracing:
@@ -471,11 +524,19 @@ tasks:
 
   # Logs сервисы (ELK)
   up-logs:
-    desc: "Поднять logs контейнеры"
+    desc: "Поднять logs контейнеры (без OTEL)"
     dir: deploy/compose/logs
     cmds:
       - echo "[task] 📝 Поднимаем logs контейнеры"
       - docker compose -p school_schedule up --build --detach
+
+  up-logs-with-otel:
+    desc: "Поднять logs контейнеры с domain-specific HA OTEL"
+    dir: deploy/compose/logs
+    cmds:
+      - echo "[task] 📝 Поднимаем logs с HA OTEL коллекторами"
+      - docker compose -p school_schedule up --build --detach
+      - docker compose -f otel-logs-ha.yml -p school_schedule up --build --detach
 
   down-logs:
     desc: "Остановить и удалить logs контейнеры"
@@ -518,11 +579,19 @@ tasks:
 
   # Metrics сервисы (Prometheus + Grafana)
   up-metrics:
-    desc: "Поднять metrics контейнеры"
+    desc: "Поднять metrics контейнеры (без OTEL)"
     dir: deploy/compose/metrics
     cmds:
       - echo "[task] 📊 Поднимаем metrics контейнеры"
       - docker compose -p school_schedule up --build --detach
+
+  up-metrics-with-otel:
+    desc: "Поднять metrics контейнеры с domain-specific HA OTEL"
+    dir: deploy/compose/metrics
+    cmds:
+      - echo "[task] 📊 Поднимаем metrics с HA OTEL коллекторами"
+      - docker compose -p school_schedule up --build --detach
+      - docker compose -f otel-metrics-ha.yml -p school_schedule up --build --detach
 
   down-metrics:
     desc: "Остановить и удалить metrics контейнеры"
@@ -538,12 +607,27 @@ tasks:
       - task: up-network
       - echo "[task] 🚀 Поднимаем cache сервис"
       - docker compose -p school_schedule up --build --detach
-
   down-cache:
     desc: "Остановить и удалить cache сервис с зависимостями"
     dir: deploy/compose/cache
     cmds:
       - echo "[task] 🛑 Останавливаем cache сервис"
+      - docker compose -p school_schedule down --volumes
+      
+  up-envoy:
+    desc: "Поднять Envoy API Gateway"
+    dir: deploy/compose/envoy
+    cmds:
+      - task: up-network
+      - task: proto:build:microservices
+      - echo "[task] 🌐 Поднимаем Envoy API Gateway"
+      - docker compose -p school_schedule up --build --detach
+
+  down-envoy:
+    desc: "Остановить и удалить Envoy API Gateway"
+    dir: deploy/compose/envoy
+    cmds:
+      - echo "[task] 🛑 Останавливаем Envoy API Gateway"
       - docker compose -p school_schedule down --volumes
 
 # =============================================================================
@@ -551,23 +635,26 @@ tasks:
 # =============================================================================
 
   up-all:
-    desc: "Поднять все сервисы по очереди вместе с зависимостями"
+    desc: "Поднять все сервисы с domain-specific OTEL коллекторами"
     cmds:
       - task: up-network
       - task: up-core
       - task: up-cache
       - task: up-eventbus
-      - task: up-tracing
-      - task: up-logs
-      - task: up-metrics
+      - task: up-tracing-with-otel
+      - task: up-logs-with-otel
+      - task: up-metrics-with-otel
       - task: up-iam
       - task: up-rbac
-      - task: up-otel
-      - echo "✅ Все сервисы подняты!"
+      - task: up-envoy
+      - echo 'Все сервисы подняты с domain-specific OTEL!'
+      - echo 'Traces HAProxy stats - http://localhost:8408/stats'
+      - echo 'API Gateway - http://localhost:8080'
 
   down-all:
     desc: "Остановить и удалить все сервисы по очереди вместе с зависимостями"
     cmds:
+      - task: down-envoy
       - task: down-otel
       - task: down-rbac
       - task: down-iam

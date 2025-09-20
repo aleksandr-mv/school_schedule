@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Master узлы
   redis-node-1:
     image: redis:7.2.5-alpine3.20
     container_name: redis-node-1
@@ -16,10 +15,19 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
     ports:
       - "${REDIS_NODE_1_PORT}:${REDIS_NODE_1_PORT}"
     volumes:
       - redis_cluster_1_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "${REDIS_NODE_1_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: ${REDIS_HEALTHCHECK_INTERVAL}
@@ -43,10 +51,19 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
     ports:
       - "${REDIS_NODE_2_PORT}:${REDIS_NODE_2_PORT}"
     volumes:
       - redis_cluster_2_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "${REDIS_NODE_2_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: ${REDIS_HEALTHCHECK_INTERVAL}
@@ -70,10 +87,19 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
     ports:
       - "${REDIS_NODE_3_PORT}:${REDIS_NODE_3_PORT}"
     volumes:
       - redis_cluster_3_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "${REDIS_NODE_3_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: ${REDIS_HEALTHCHECK_INTERVAL}
@@ -83,7 +109,6 @@ services:
     networks:
       - school_net
 
-  # Replica узлы
   redis-node-4:
     image: redis:7.2.5-alpine3.20
     container_name: redis-node-4
@@ -98,10 +123,19 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
     ports:
       - "${REDIS_NODE_4_PORT}:${REDIS_NODE_4_PORT}"
     volumes:
       - redis_cluster_4_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "${REDIS_NODE_4_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: ${REDIS_HEALTHCHECK_INTERVAL}
@@ -125,10 +159,19 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
     ports:
       - "${REDIS_NODE_5_PORT}:${REDIS_NODE_5_PORT}"
     volumes:
       - redis_cluster_5_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "${REDIS_NODE_5_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: ${REDIS_HEALTHCHECK_INTERVAL}
@@ -152,10 +195,19 @@ services:
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
     ports:
       - "${REDIS_NODE_6_PORT}:${REDIS_NODE_6_PORT}"
     volumes:
       - redis_cluster_6_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "${REDIS_NODE_6_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: ${REDIS_HEALTHCHECK_INTERVAL}
@@ -165,7 +217,6 @@ services:
     networks:
       - school_net
 
-  # Инициализация кластера (выполняется один раз)
   redis-cluster-init:
     image: redis:7.2.5-alpine3.20
     container_name: redis-cluster-init
@@ -191,16 +242,33 @@ services:
         echo 'Ожидаем готовности узлов Redis...'
         sleep 15
         echo 'Создаем Redis Cluster (3 master + 3 replica)...'
-        redis-cli --cluster create redis-node-1:${REDIS_NODE_1_PORT} redis-node-2:${REDIS_NODE_2_PORT} redis-node-3:${REDIS_NODE_3_PORT} redis-node-4:${REDIS_NODE_4_PORT} redis-node-5:${REDIS_NODE_5_PORT} redis-node-6:${REDIS_NODE_6_PORT} --cluster-replicas ${REDIS_CLUSTER_REPLICAS} --cluster-yes -a ${REDIS_PASSWORD}
+        export REDISCLI_AUTH=${REDIS_PASSWORD}
+        redis-cli --cluster create \
+          redis-node-1:${REDIS_NODE_1_PORT} \
+          redis-node-2:${REDIS_NODE_2_PORT} \
+          redis-node-3:${REDIS_NODE_3_PORT} \
+          redis-node-4:${REDIS_NODE_4_PORT} \
+          redis-node-5:${REDIS_NODE_5_PORT} \
+          redis-node-6:${REDIS_NODE_6_PORT} \
+          --cluster-replicas ${REDIS_CLUSTER_REPLICAS} \
+          --cluster-yes
         echo 'Redis Cluster успешно создан!'
         echo '=== Информация об узлах кластера ==='
-        redis-cli -c -h redis-node-1 -p ${REDIS_NODE_1_PORT} -a ${REDIS_PASSWORD} cluster nodes
+        redis-cli -c -h redis-node-1 -p ${REDIS_NODE_1_PORT} cluster nodes
         echo '=== Статистика кластера ==='
-        redis-cli -c -h redis-node-1 -p ${REDIS_NODE_1_PORT} -a ${REDIS_PASSWORD} cluster info
+        redis-cli -c -h redis-node-1 -p ${REDIS_NODE_1_PORT} cluster info
         echo '=== Тестируем кластер ==='
-        redis-cli -c -h redis-node-1 -p ${REDIS_NODE_1_PORT} -a ${REDIS_PASSWORD} set test-key 'Привет от кластера!'
-        redis-cli -c -h redis-node-2 -p ${REDIS_NODE_2_PORT} -a ${REDIS_PASSWORD} get test-key
+        redis-cli -c -h redis-node-1 -p ${REDIS_NODE_1_PORT} set test-key 'Привет от кластера!'
+        redis-cli -c -h redis-node-2 -p ${REDIS_NODE_2_PORT} get test-key
         echo 'Кластер готов к работе!'
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+        reservations:
+          memory: 64M
+          cpus: '0.05'
     networks:
       - school_net
     restart: "no"

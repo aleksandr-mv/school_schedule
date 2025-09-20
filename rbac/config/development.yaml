@@ -1,10 +1,9 @@
 logger:
   level: "debug"
   as_json: true
-  otlp:
-    enable: true
-    endpoint: "localhost:4317"
-    shutdown_timeout: 5
+  enable: true
+  endpoint: "localhost:4320"  # Logs на отдельном порту
+  shutdown_timeout: 5
 
 tracing:
   enable: true
@@ -21,7 +20,7 @@ tracing:
 
 metric:
   enable: true
-  endpoint: "localhost:4317"
+  endpoint: "localhost:4322"  # Metrics на отдельном порту
   timeout: "30s"
   namespace: "microservices"
   app_name: "platform"

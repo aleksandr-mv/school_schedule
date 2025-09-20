@@ -1,48 +1,80 @@
-services: 
+version: "3.8"
+
+services:
   cassandra:
-    image: cassandra:4.1.3
+    image: cassandra:5.0.5
     container_name: cassandra
-    env_file:
-      - .env
-    ports:
-      - "${CASSANDRA_PORT}:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: "jaeger-cluster"
+      CASSANDRA_NUM_TOKENS: 16
+      CASSANDRA_DC: "dc1"
+      CASSANDRA_RACK: "rack1"
     volumes:
       - cassandra_data:/var/lib/cassandra
     healthcheck:
-      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
-      interval: ${CASSANDRA_HEALTHCHECK_INTERVAL}
-      timeout: ${CASSANDRA_HEALTHCHECK_TIMEOUT}
-      retries: ${CASSANDRA_HEALTHCHECK_RETRIES}
-      start_period: ${CASSANDRA_HEALTHCHECK_START_PERIOD}
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE KEYSPACES'"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
     networks:
-      - school_net
+      - microservices-net
 
   jaeger:
     image: jaegertracing/jaeger:2.6.0
     container_name: jaeger
-    env_file:
-      - .env
-    ports:
-      - "${JAEGER_UI_PORT}:16686"
     depends_on:
       cassandra:
         condition: service_healthy
+    ports:
+      - "${JAEGER_UI_PORT:-16686}:16686"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+      STORAGE_TYPE: cassandra
+      CASSANDRA_CONTACT_POINTS: cassandra
+      CASSANDRA_KEYSPACE: jaeger_v1_datastore
+      CASSANDRA_USERNAME: "${CASSANDRA_USERNAME:-}"
+      CASSANDRA_PASSWORD: "${CASSANDRA_PASSWORD:-}"
+      CASSANDRA_SCHEMA_CREATE: "true"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "localhost:${JAEGER_UI_PORT}"]
-      interval: ${JAEGER_HEALTHCHECK_INTERVAL}
-      timeout: ${JAEGER_HEALTHCHECK_TIMEOUT}
-      retries: ${JAEGER_HEALTHCHECK_RETRIES}
-      start_period: ${JAEGER_HEALTHCHECK_START_PERIOD}
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${JAEGER_UI_PORT:-16686}"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
     restart: unless-stopped
     networks:
-      - school_net
+      - microservices-net
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.133.0
+    container_name: otel-collector
+    depends_on:
+      jaeger:
+        condition: service_started
+    ports:
+      - "${OTEL_GRPC_PORT:-4317}:4317"
+      - "${OTEL_COLLECTOR_METRICS_PORT:-8888}:8888"
+      - "${CORE_OTEL_COLLECTOR_HEALTH_PORT:-13133}:13133"
+    volumes:
+      - ./otel-config.yaml:/etc/otel-collector-config.yaml:ro
+    command: ["/otelcol-contrib", "--config", "/etc/otel-collector-config.yaml"]
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${CORE_OTEL_COLLECTOR_HEALTH_PORT:-13133}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - microservices-net
 
 volumes:
   cassandra_data:
-  jaeger_data:
-  jaeger_key:
 
 networks:
-  school_net:
+  microservices-net:
     external: true

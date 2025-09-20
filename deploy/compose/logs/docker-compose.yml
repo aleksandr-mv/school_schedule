@@ -1,61 +1,92 @@
-# ===================================================================
-# DOCKER COMPOSE КОНФИГУРАЦИЯ ДЛЯ СИСТЕМЫ ЦЕНТРАЛИЗОВАННОГО ЛОГИРОВАНИЯ
-# ===================================================================
-# 
-# Эта конфигурация поднимает полную инфраструктуру для сбора, хранения 
-# и визуализации логов от микросервисов через OpenTelemetry.
-#
-# АРХИТЕКТУРА ЛОГИРОВАНИЯ:
-# Go App → OpenTelemetry Collector → Elasticsearch → Kibana
-#
-# Порты:
-# - 9200: Elasticsearch (REST API)
-# - 5601: Kibana (веб-интерфейс)
+version: "3.8"
 
-services: 
+services:
   elasticsearch:
-    image: elasticsearch:9.0.4
+    image: elasticsearch:8.15.0
     container_name: elasticsearch
-    env_file:
-      - .env
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
-      - "${ELASTICSEARCH_PORT}:9200"
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:${ELASTICSEARCH_PORT}/_cluster/health >/dev/null"]
-      interval: ${ELASTICSEARCH_HEALTHCHECK_INTERVAL}
-      timeout: ${ELASTICSEARCH_HEALTHCHECK_TIMEOUT}
-      retries: ${ELASTICSEARCH_HEALTHCHECK_RETRIES}
-      start_period: ${ELASTICSEARCH_HEALTHCHECK_START_PERIOD}
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     restart: unless-stopped
     networks:
-      - school_net
-
+      - microservices-net
 
   kibana:
-    image: kibana:9.0.4
+    image: kibana:8.15.0
     container_name: kibana
-    env_file:
-      - .env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_SECURITY_ENABLED=false
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5601/api/status >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - microservices-net
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.133.0
+    container_name: otel-logs-collector
     depends_on:
       elasticsearch:
         condition: service_healthy
     ports:
-      - "${KIBANA_PORT}:5601"
+      - "${OTEL_GRPC_PORT:-4320}:4317"  # Logs endpoint (избегаем конфликта с traces:4317)
+      - "${OTEL_COLLECTOR_METRICS_PORT:-8889}:8888"
+      - "${CORE_OTEL_COLLECTOR_HEALTH_PORT:-13134}:13133"
+    volumes:
+      - ./otel-config.yaml:/etc/otel-collector-config.yaml:ro
+    command: ["/otelcol-contrib", "--config", "/etc/otel-collector-config.yaml"]
+    env_file:
+      - .env
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:${KIBANA_PORT}/api/status >/dev/null"]
-      interval: ${KIBANA_HEALTHCHECK_INTERVAL}
-      timeout: ${KIBANA_HEALTHCHECK_TIMEOUT}
-      retries: ${KIBANA_HEALTHCHECK_RETRIES}
-      start_period: ${KIBANA_HEALTHCHECK_START_PERIOD}
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     restart: unless-stopped
     networks:
-      - school_net
+      - microservices-net
 
 volumes:
   es_data:
 
 networks:
-  school_net:
+  microservices-net:
     external: true

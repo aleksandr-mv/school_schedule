@@ -1,0 +1,308 @@
+admin:
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 8081
+
+static_resources:
+  listeners:
+  - name: school_schedule_listener
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 8080
+
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+          
+          stat_prefix: school_schedule_api
+          
+          route_config:
+            name: school_schedule_routes
+            
+            virtual_hosts:
+            - name: school_schedule_service
+              domains: ["*"]
+              
+              cors:
+                allow_origin_string_match:
+                - prefix: "*"
+                allow_methods: GET, PUT, DELETE, POST, OPTIONS
+                allow_headers: keep-alive,user-agent,cache-control,content-type,authorization,session-uuid,x-session-id,cookie
+                max_age: "1728000"
+                expose_headers: x-user-uuid,x-user-login,x-user-email,x-session-uuid,x-session-expires,grpc-status,grpc-message
+
+              routes:
+              
+              # Health check
+              - match:
+                  path: "/healthz"
+                route:
+                  cluster: iam_service
+                  timeout: 5s
+                typed_per_filter_config:
+                  envoy.filters.http.ext_authz:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                    disabled: true
+                  
+              # IAM публичные API
+              - match:
+                  prefix: "/api/v1/users/register"
+                route:
+                  cluster: iam_service
+                  timeout: 15s
+                typed_per_filter_config:
+                  envoy.filters.http.ext_authz:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                    disabled: true
+                    
+              - match:
+                  prefix: "/api/v1/auth/login"
+                route:
+                  cluster: iam_service
+                  timeout: 15s
+                typed_per_filter_config:
+                  envoy.filters.http.ext_authz:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                    disabled: true
+
+              - match:
+                  prefix: "/api/v1/external-auth"
+                route:
+                  cluster: iam_service
+                  timeout: 15s
+                typed_per_filter_config:
+                  envoy.filters.http.ext_authz:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                    disabled: true
+              
+              # IAM защищенные API
+              - match:
+                  prefix: "/api/v1/auth"
+                route:
+                  cluster: iam_service
+                  timeout: 15s
+                  
+              - match:
+                  prefix: "/api/v1/users"
+                route:
+                  cluster: iam_service
+                  timeout: 15s
+                  
+              - match:
+                  prefix: "/api/v1/whoami"
+                route:
+                  cluster: iam_service
+                  timeout: 15s
+              
+              # RBAC API
+              - match:
+                  prefix: "/api/v1/roles"
+                route:
+                  cluster: rbac_service
+                  timeout: 15s
+                  
+              - match:
+                  prefix: "/api/v1/permissions"
+                route:
+                  cluster: rbac_service
+                  timeout: 15s
+                  
+              - match:
+                  prefix: "/api/v1/user-roles"
+                route:
+                  cluster: rbac_service
+                  timeout: 15s
+
+              - match:
+                  prefix: "/api/v1/role-permissions"
+                route:
+                  cluster: rbac_service
+                  timeout: 15s
+                  
+              # Маршрут по умолчанию
+              - match:
+                  prefix: "/"
+                direct_response:
+                  status: 404
+                  body:
+                    inline_string: |
+                      {
+                        "error": "Not Found",
+                        "message": "School Schedule API Gateway",
+                        "public_endpoints": [
+                          "POST /api/v1/auth/login - Login",
+                          "POST /api/v1/users/register - User registration", 
+                          "POST /api/v1/external-auth/* - External auth providers",
+                          "GET /healthz - Health check"
+                        ],
+                        "protected_endpoints": [
+                          "GET /api/v1/users - User management",
+                          "GET /api/v1/whoami - Current user info",
+                          "GET /api/v1/roles - Role management",
+                          "GET /api/v1/permissions - Permission management",
+                          "GET /api/v1/user-roles - User role assignments",
+                          "GET /api/v1/role-permissions - Role permission assignments"
+                        ],
+                        "authentication": {
+                          "methods": [
+                            "Header: Session-UUID: <uuid>",
+                            "Header: X-Session-ID: <uuid>", 
+                            "Header: Authorization: Bearer <uuid>",
+                            "Cookie: X-Session-Uuid=<uuid>"
+                          ]
+                        }
+                      }
+
+          http_filters:
+          
+          # 1. CORS фильтр
+          - name: envoy.filters.http.cors
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+          
+          # 2. External Authorization
+          - name: envoy.filters.http.ext_authz
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+              
+              grpc_service:
+                envoy_grpc:
+                  cluster_name: iam_service
+                timeout: 2s
+              
+              failure_mode_allow: false
+              
+              with_request_body:
+                max_request_bytes: 8192
+                allow_partial_message: true
+                pack_as_bytes: false
+              
+              allowed_headers:
+                patterns:
+                  - exact: "authorization"
+                  - exact: "cookie"
+                  - exact: "session-uuid"
+                  - exact: "x-session-id"
+                  - exact: "user-agent"
+                  - exact: "x-forwarded-for"
+                  - exact: "x-real-ip"
+                  - exact: "host"
+          
+          # 3. gRPC JSON Transcoder
+          - name: envoy.filters.http.grpc_json_transcoder
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
+              proto_descriptor: "/etc/envoy/microservices_descriptor.pb"
+              services: ["auth.v1.AuthService", "user.v1.UserService", "role.v1.RoleService", "permission.v1.PermissionService", "user_role.v1.UserRoleService"]
+              match_incoming_request_route: true
+              print_options:
+                add_whitespace: true
+                always_print_primitive_fields: true
+                always_print_enums_as_ints: false
+                preserve_proto_field_names: true
+              ignore_unknown_query_parameters: true
+          
+          # 4. Router фильтр
+          - name: envoy.filters.http.router
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+  clusters:
+  
+  # IAM service (gRPC)
+  - name: iam_service
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: 
+            max_concurrent_streams: 100            
+            initial_stream_window_size: 1048576
+            initial_connection_window_size: 1048576
+          
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 60
+        max_pending_requests: 120
+        max_requests: 1200
+        max_retries: 3
+        track_remaining: true
+    
+    upstream_connection_options:
+      tcp_keepalive:
+        keepalive_probes: 3
+        keepalive_time: 30
+        keepalive_interval: 5
+
+    health_checks:
+    - timeout: 1s
+      interval: 5s
+      unhealthy_threshold: 2
+      healthy_threshold: 2
+      grpc_health_check:
+        service_name: "auth.v1.AuthService"
+        
+    load_assignment:
+      cluster_name: iam_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: iam-service
+                port_value: 50051
+
+  # RBAC service (gRPC)
+  - name: rbac_service
+    type: STRICT_DNS
+    lb_policy: ROUND_ROBIN
+
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: 
+            max_concurrent_streams: 100            
+            initial_stream_window_size: 1048576
+            initial_connection_window_size: 1048576
+          
+    circuit_breakers:
+      thresholds:
+      - priority: DEFAULT
+        max_connections: 60
+        max_pending_requests: 120
+        max_requests: 1200
+        max_retries: 3
+        track_remaining: true
+    
+    upstream_connection_options:
+      tcp_keepalive:
+        keepalive_probes: 3
+        keepalive_time: 30
+        keepalive_interval: 5
+
+    health_checks:
+    - timeout: 1s
+      interval: 5s
+      unhealthy_threshold: 2
+      healthy_threshold: 2
+      grpc_health_check:
+        service_name: "role.v1.RoleService"
+        
+    load_assignment:
+      cluster_name: rbac_service
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: rbac-service
+                port_value: 50052

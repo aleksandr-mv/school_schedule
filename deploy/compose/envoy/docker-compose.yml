@@ -1,0 +1,33 @@
+services:
+  envoy:
+    image: envoyproxy/envoy:v1.34.0
+    container_name: envoy-proxy
+    env_file:
+      - .env
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./microservices_descriptor.pb:/etc/envoy/microservices_descriptor.pb:ro
+    ports:
+      - "${ENVOY_PORT}:8080"
+      - "${ENVOY_ADMIN_PORT}:8081"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/8081'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - school_net
+
+networks:
+  school_net:
+    external: true

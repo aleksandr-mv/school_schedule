@@ -1,59 +1,98 @@
+version: "3.8"
+
 services:
   prometheus:
-    image: prom/prometheus:v3.3.1 
+    image: prom/prometheus:v3.3.1
     container_name: prometheus
-    env_file:
-      - .env
     ports:
-      - "${PROMETHEUS_PORT}:9090"
+      - "${PROMETHEUS_PORT:-9090}:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml # Монтируем конфигурацию Prometheus
-      - prometheus_data:/prometheus # Подключаем volume для хранения данных Prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml' # Указываем путь к файлу конфигурации
-      - '--storage.tsdb.path=/prometheus' # Директория для хранения временных рядов
-      - '--web.enable-lifecycle' # Включает HTTP API для управления Prometheus
-      - '--web.enable-remote-write-receiver' # Включает поддержку remote write API для приема метрик
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+      - '--web.enable-remote-write-receiver'
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
     networks:
-      - school_net
-    healthcheck:
-      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:${PROMETHEUS_PORT}/-/healthy" ]
-      interval: ${PROMETHEUS_HEALTHCHECK_INTERVAL}
-      timeout: ${PROMETHEUS_HEALTHCHECK_TIMEOUT}
-      retries: ${PROMETHEUS_HEALTHCHECK_RETRIES}
-      start_period: ${PROMETHEUS_HEALTHCHECK_START_PERIOD}
-
+      - microservices-net
 
   grafana:
     image: grafana/grafana:12.0.0
     container_name: grafana
-    env_file:
-      - .env
-    ports:
-      - "${GRAFANA_PORT}:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana # Подключаем volume для хранения данных Grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning # Монтируем директорию с настройками для автоматического провижининга
-      - ./grafana/dashboards:/var/lib/grafana/dashboards # Монтируем директорию с дашбордами
-    restart: unless-stopped
-    networks:
-      - school_net
-    healthcheck:
-      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:${GRAFANA_PORT}/api/health" ]
-      interval: ${GRAFANA_HEALTHCHECK_INTERVAL}
-      timeout: ${GRAFANA_HEALTHCHECK_TIMEOUT}
-      retries: ${GRAFANA_HEALTHCHECK_RETRIES}
-      start_period: ${GRAFANA_HEALTHCHECK_START_PERIOD}
     depends_on:
       prometheus:
         condition: service_healthy
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - microservices-net
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.133.0
+    container_name: otel-metrics-collector
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    ports:
+      - "${OTEL_GRPC_PORT:-4322}:4317"  # Metrics endpoint (уникальный порт)
+      - "${OTEL_COLLECTOR_METRICS_PORT:-8890}:8888"
+      - "${CORE_OTEL_COLLECTOR_HEALTH_PORT:-13135}:13133"
+    volumes:
+      - ./otel-config.yaml:/etc/otel-collector-config.yaml:ro
+    command: ["/otelcol-contrib", "--config", "/etc/otel-collector-config.yaml"]
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - microservices-net
 
 volumes:
-  prometheus_data: # Именованный том для хранения данных Prometheus
-  grafana_data: # Именованный том для хранения данных Grafana
+  prometheus_data:
+  grafana_data:
 
 networks:
-  school_net:
+  microservices-net:
     external: true

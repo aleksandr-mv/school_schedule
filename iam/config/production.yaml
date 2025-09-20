@@ -1,14 +1,13 @@
 logger:
   level: "info"
   as_json: true
-  otlp:
-    enable: true
-    endpoint: "otel-collector:4317"
-    shutdown_timeout: 5
+  enable: true
+  endpoint: "otel-logs-collector:4320"  # Прямо в OTEL Logs Collector
+  shutdown_timeout: 5
 
 tracing:
   enable: true
-  endpoint: "otel-collector:4317"
+  endpoint: "jaeger:4321"  # Прямо в Jaeger v2 OTLP
   timeout: "5s"
   sample_ratio: 10
   retry_enabled: true
@@ -21,7 +20,7 @@ tracing:
 
 metric:
   enable: true
-  endpoint: "otel-collector:4317"
+  endpoint: "otel-metrics-collector:4322"  # Прямо в OTEL Metrics Collector
   timeout: "30s"
   namespace: "microservices"
   app_name: "platform"
