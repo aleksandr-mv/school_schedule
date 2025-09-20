@@ -1,44 +1,33 @@
 extensions:
   health_check:
-    endpoint: "0.0.0.0:${CORE_OTEL_COLLECTOR_HEALTH_PORT}"
+    endpoint: "0.0.0.0:13133"
 
 receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: "0.0.0.0:${OTEL_GRPC_PORT}"
+        endpoint: "0.0.0.0:4317"
 
 processors:
   resource:
     attributes:
       - key: deployment.environment
-        value: ${ENVIRONMENT}
+        value: "development"
         action: insert
   batch:
-    send_batch_size: ${OTEL_BATCH_SIZE}
-    timeout: ${OTEL_BATCH_TIMEOUT}
-    send_batch_max_size: ${OTEL_BATCH_SIZE}
+    send_batch_size: 1024
+    timeout: "1s"
+    send_batch_max_size: 1024
   probabilistic_sampler:
-    sampling_percentage: ${TRACING_SAMPLE_RATIO}
+    sampling_percentage: 15
 
 exporters:
   otlp/jaeger:
-    endpoint: "${JAEGER_HOST}:${OTEL_JAEGER_PORT}"
-    tls:
-      insecure: true
-  elasticsearch:
-    endpoints: ["http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
-    logs_index: "logs-%{+yyyy.MM.dd}"
-    tls:
-      insecure: true
-    mapping:
-      mode: ecs
-  prometheusremotewrite:
-    endpoint: "http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/write"
+    endpoint: "jaeger:4317"
     tls:
       insecure: true
   debug:
-    verbosity: ${OTEL_LOG_LEVEL}
+    verbosity: "normal"
 
 service:
   extensions: [health_check]
@@ -50,11 +39,3 @@ service:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
       exporters: [otlp/jaeger, debug]
-    logs:
-      receivers: [otlp]
-      processors: [resource, batch]
-      exporters: [elasticsearch, debug]
-    metrics:
-      receivers: [otlp]
-      processors: [resource, batch]
-      exporters: [prometheusremotewrite, debug]

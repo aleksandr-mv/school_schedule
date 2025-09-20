@@ -1,70 +1,73 @@
-services: 
-  kafka: 
-    image: confluentinc/cp-kafka:7.9.0 
-    container_name: kafka 
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.9.0
+    container_name: kafka
     env_file:
       - .env
     ports:
-      - "9092:9092"
-      - "${KAFKA_JMX_PORT}:${KAFKA_JMX_PORT}"
+      - "9092:${KAFKA_INTERNAL_PORT}"
+      - "9095:${KAFKA_EXTERNAL_PORT}"
+    environment:
+      # KRaft configuration
+      KAFKA_KRAFT_MODE: "true"
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:${KAFKA_CONTROLLER_PORT}"
+      
+      # Listeners
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:${KAFKA_INTERNAL_PORT},PLAINTEXT_EXTERNAL://0.0.0.0:${KAFKA_EXTERNAL_PORT},CONTROLLER://0.0.0.0:${KAFKA_CONTROLLER_PORT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:${KAFKA_INTERNAL_PORT},PLAINTEXT_EXTERNAL://localhost:${KAFKA_EXTERNAL_PORT},CONTROLLER://kafka:${KAFKA_CONTROLLER_PORT}
+      
+      # Single broker settings
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: "${KAFKA_CLUSTER_ID}"
     volumes:
       - kafka_data:/var/lib/kafka/data
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '0.75'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
-    restart: unless-stopped
-    networks:
-      - school_net
     healthcheck:
-      test:
-        [
-          "CMD",
-          "bash",
-          "-c",
-          "echo > /dev/tcp/localhost/9094",
-        ]
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/${KAFKA_INTERNAL_PORT}"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
+    restart: unless-stopped
+    networks:
+      - school_net
 
-
-  kafka-ui: 
+  kafka-ui:
     image: provectuslabs/kafka-ui:v0.7.2
     container_name: kafka-ui
     env_file:
       - .env
     ports:
       - "8082:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "local-cluster"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:${KAFKA_INTERNAL_PORT}"
     depends_on:
       kafka:
         condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.25'
-        reservations:
-          memory: 128M
-          cpus: '0.1'
-    restart: unless-stopped
-    networks:
-      - school_net
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
-
+    restart: unless-stopped
+    networks:
+      - school_net
 
 volumes:
-  kafka_data: 
+  kafka_data:
 
 networks:
   school_net:

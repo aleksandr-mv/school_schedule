@@ -70,9 +70,6 @@ type Provider interface {
 	// Kafka возвращает конфигурацию Apache Kafka
 	Kafka() KafkaConfig
 
-	// Telegram возвращает конфигурацию Telegram Bot
-	Telegram() TelegramConfig
-
 	// Session возвращает конфигурацию сессий
 	Session() SessionConfig
 

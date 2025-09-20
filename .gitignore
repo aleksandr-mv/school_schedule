@@ -22,11 +22,26 @@
 *.env
 !*.env.template
 
+# Configuration files (contain secrets and environment-specific settings)
+*/config/development.yaml
+*/config/production.yaml
+*/config/staging.yaml
+*/config/local.yaml
+
 # IDE files
-/.idea
-/.vscode
-/.cursor
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
 .DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.fleet/
+.vim/
+.netrwhist
 
 # Binaries and build artifacts
 /bin
@@ -48,3 +63,20 @@ logs/
 *.tmp
 *.cache
 .cache/
+
+# Security and certificates
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+private/
+certs/
+
+# OS specific
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
+*.lnk
