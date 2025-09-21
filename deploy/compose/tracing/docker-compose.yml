@@ -45,30 +45,6 @@ services:
     networks:
       - school_net
 
-  otel-collector:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: otel-traces-collector
-    depends_on:
-      jaeger:
-        condition: service_started
-    ports:
-      - "4317:4317"  # Traces endpoint
-      - "8888:8888"
-      - "13133:13133"
-    env_file:
-      - .env
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    restart: unless-stopped
-    networks:
-      - school_net
-
 volumes:
   cassandra_data:
 

@@ -11,7 +11,7 @@ import (
 	cacheBuilder "github.com/aleksandr-mv/school_schedule/platform/pkg/cache/builder"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/builder"
+	consumerBuilder "github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/consumer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/migrator"
 	permissionAPI "github.com/aleksandr-mv/school_schedule/rbac/internal/api/permission/v1"
@@ -49,8 +49,6 @@ type diContainer struct {
 	rolePermissionService service.RolePermissionServiceInterface
 	userRoleService       service.UserRoleServiceInterface
 	userConsumerService   service.UserConsumerService
-
-	kafkaBuilder *builder.KafkaBuilder
 
 	roleRepository           repository.RoleRepository
 	permissionRepository     repository.PermissionRepository
@@ -386,13 +384,6 @@ func (d *diContainer) RunMigrations(ctx context.Context) error {
 	return nil
 }
 
-func (d *diContainer) KafkaBuilder() *builder.KafkaBuilder {
-	if d.kafkaBuilder == nil {
-		d.kafkaBuilder = builder.NewKafkaBuilder(d.cfg.Kafka())
-	}
-	return d.kafkaBuilder
-}
-
 func (d *diContainer) UserConsumerService(ctx context.Context) (service.UserConsumerService, error) {
 	if d.userConsumerService == nil {
 		if !d.cfg.Kafka().IsEnabled() {
@@ -401,7 +392,8 @@ func (d *diContainer) UserConsumerService(ctx context.Context) (service.UserCons
 			return d.userConsumerService, nil
 		}
 
-		userCreatedConsumer, err := d.KafkaBuilder().BuildConsumer("user_created")
+		builder := consumerBuilder.NewBuilder(d.cfg.Kafka())
+		userCreatedConsumer, err := builder.BuildConsumer("user_created")
 		if err != nil {
 			return nil, fmt.Errorf("get user created consumer: %w", err)
 		}

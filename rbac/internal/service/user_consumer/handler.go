@@ -7,13 +7,13 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/consumer"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/model"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
+	rbacModel "github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
 
-func (s *service) UserCreatedHandler(ctx context.Context, msg consumer.Message) error {
-	var event model.UserCreated
+func (s *service) UserCreatedHandler(ctx context.Context, msg model.Message) error {
+	var event rbacModel.UserCreated
 	if err := json.Unmarshal(msg.Value, &event); err != nil {
 		logger.Error(ctx, "❌ Ошибка декодирования UserCreated", zap.Error(err))
 		return fmt.Errorf("decode user created: %w", err)

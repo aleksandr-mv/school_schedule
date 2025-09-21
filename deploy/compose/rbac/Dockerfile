@@ -44,7 +44,7 @@ COPY --from=builder /app/grpc-health-probe /bin/grpc-health-probe
 COPY rbac/config ./config
 COPY rbac/db ./db
 
-ENV CONFIG_PATH=/app/config/production.yaml
+ENV CONFIG_PATH=/app/config/development.yaml
 
 EXPOSE 50052
 

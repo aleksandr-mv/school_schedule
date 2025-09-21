@@ -1,8 +1,8 @@
 services:
   iam:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../../..
+      dockerfile: deploy/compose/iam/Dockerfile
     container_name: iam-service
     env_file:
       - .env

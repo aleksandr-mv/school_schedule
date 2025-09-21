@@ -7,22 +7,9 @@ import (
 // Компиляционная проверка
 var _ contracts.ServicesConfig = (*Config)(nil)
 
-// rawConfig для загрузки данных из YAML/ENV
-type rawConfig struct {
-	Services map[string]rawServiceConfig `mapstructure:"services" yaml:"services"`
-}
-
 // Config публичная структура Services конфигурации
 type Config struct {
-	raw      rawConfig
 	services map[string]*ServiceConfig
-}
-
-// defaultConfig возвращает rawConfig с дефолтными значениями
-func defaultConfig() rawConfig {
-	return rawConfig{
-		Services: make(map[string]rawServiceConfig),
-	}
 }
 
 // Get возвращает сервис по имени

@@ -1,13 +1,13 @@
 services:
-  # Минимальный Redis кластер для dev: 1 master + 2 replica
-  redis-master:
+  # Redis кластер: 3 master + 3 replica
+  redis-master-1:
     image: redis:7.2.5-alpine3.20
-    container_name: redis-master
+    container_name: redis-master-1
     command: >
-      redis-server 
+      redis-server
       --port 6379
-      --cluster-enabled yes 
-      --cluster-config-file nodes.conf 
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
       --cluster-node-timeout 5000
       --appendonly yes
       --bind 0.0.0.0
@@ -15,11 +15,65 @@ services:
       --masterauth ${REDIS_PASSWORD}
     ports:
       - "6379:6379"
-      - "16379:16379"  
+      - "16379:16379"
     volumes:
-      - redis_master_data:/data
+      - redis_master_1_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - school_net
+
+  redis-master-2:
+    image: redis:7.2.5-alpine3.20
+    container_name: redis-master-2
+    command: >
+      redis-server
+      --port 6380
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+      --appendonly yes
+      --bind 0.0.0.0
+      --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
+    ports:
+      - "6380:6380"
+      - "16380:16380"
+    volumes:
+      - redis_master_2_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6380", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - school_net
+
+  redis-master-3:
+    image: redis:7.2.5-alpine3.20
+    container_name: redis-master-3
+    command: >
+      redis-server
+      --port 6381
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+      --appendonly yes
+      --bind 0.0.0.0
+      --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
+    ports:
+      - "6381:6381"
+      - "16381:16381"
+    volumes:
+      - redis_master_3_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6381", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -31,22 +85,22 @@ services:
     image: redis:7.2.5-alpine3.20
     container_name: redis-replica-1
     command: >
-      redis-server 
-      --port 6380
-      --cluster-enabled yes 
-      --cluster-config-file nodes.conf 
+      redis-server
+      --port 6382
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
       --cluster-node-timeout 5000
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
       --masterauth ${REDIS_PASSWORD}
     ports:
-      - "6380:6380"
-      - "16380:16380" 
+      - "6382:6382"
+      - "16382:16382"
     volumes:
       - redis_replica_1_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-p", "6380", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "-p", "6382", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -58,22 +112,49 @@ services:
     image: redis:7.2.5-alpine3.20
     container_name: redis-replica-2
     command: >
-      redis-server 
-      --port 6381
-      --cluster-enabled yes 
-      --cluster-config-file nodes.conf 
+      redis-server
+      --port 6383
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
       --cluster-node-timeout 5000
       --appendonly yes
       --bind 0.0.0.0
       --requirepass ${REDIS_PASSWORD}
       --masterauth ${REDIS_PASSWORD}
     ports:
-      - "6381:6381"
-      - "16381:16381"  
+      - "6383:6383"
+      - "16383:16383"
     volumes:
       - redis_replica_2_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-p", "6381", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "-p", "6383", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - school_net
+
+  redis-replica-3:
+    image: redis:7.2.5-alpine3.20
+    container_name: redis-replica-3
+    command: >
+      redis-server
+      --port 6384
+      --cluster-enabled yes
+      --cluster-config-file nodes.conf
+      --cluster-node-timeout 5000
+      --appendonly yes
+      --bind 0.0.0.0
+      --requirepass ${REDIS_PASSWORD}
+      --masterauth ${REDIS_PASSWORD}
+    ports:
+      - "6384:6384"
+      - "16384:16384"
+    volumes:
+      - redis_replica_3_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6384", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -85,11 +166,17 @@ services:
     image: redis:7.2.5-alpine3.20
     container_name: redis-cluster-init
     depends_on:
-      redis-master:
+      redis-master-1:
+        condition: service_healthy
+      redis-master-2:
+        condition: service_healthy
+      redis-master-3:
         condition: service_healthy
       redis-replica-1:
         condition: service_healthy
       redis-replica-2:
+        condition: service_healthy
+      redis-replica-3:
         condition: service_healthy
     command: 
       - sh
@@ -97,31 +184,38 @@ services:
       - |
         echo 'Ожидаем готовности узлов Redis...'
         sleep 10
-        echo 'Создаем минимальный Redis Cluster (1 master + 2 replica)...'
+        echo 'Создаем Redis Cluster (3 master + 3 replica)...'
         export REDISCLI_AUTH=${REDIS_PASSWORD}
         redis-cli --cluster create \
-          redis-master:6379 \
-          redis-replica-1:6380 \
-          redis-replica-2:6381 \
-          --cluster-replicas 2 \
+          redis-master-1:6379 \
+          redis-master-2:6380 \
+          redis-master-3:6381 \
+          redis-replica-1:6382 \
+          redis-replica-2:6383 \
+          redis-replica-3:6384 \
+          --cluster-replicas 1 \
           --cluster-yes
         echo 'Redis Cluster успешно создан!'
         echo '=== Информация об узлах кластера ==='
-        redis-cli -c -h redis-master -p 6379 cluster nodes
+        redis-cli -c -h redis-master-1 -p 6379 cluster nodes
         echo '=== Статистика кластера ==='
-        redis-cli -c -h redis-master -p 6379 cluster info
+        redis-cli -c -h redis-master-1 -p 6379 cluster info
         echo '=== Тестируем кластер ==='
-        redis-cli -c -h redis-master -p 6379 set test-key 'Hello from minimal cluster!'
-        redis-cli -c -h redis-replica-1 -p 6380 get test-key
-        echo 'Минимальный кластер готов к работе!'
+        redis-cli -c -h redis-master-1 -p 6379 set test-key 'Hello from Redis cluster!'
+        redis-cli -c -h redis-master-1 -p 6379 get test-key
+        echo 'Redis кластер готов к работе!'
     networks:
       - school_net
     restart: "no"
 
+
 volumes:
-  redis_master_data:
+  redis_master_1_data:
+  redis_master_2_data:
+  redis_master_3_data:
   redis_replica_1_data:
   redis_replica_2_data:
+  redis_replica_3_data:
 
 networks:
   school_net:

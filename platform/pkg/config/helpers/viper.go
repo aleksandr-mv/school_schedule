@@ -43,10 +43,14 @@ var globalState = &configState{}
 
 // allowedConfigFiles — белый список допустимых конфигурационных файлов.
 var allowedConfigFiles = map[string]bool{
-	"config/development.yaml": true,
-	"config/production.yaml":  true,
-	"config/staging.yaml":     true,
-	"config/test.yaml":        true,
+	"config/development.yaml":      true,
+	"/app/config/development.yaml": true,
+	"config/production.yaml":       true,
+	"/app/config/production.yaml":  true,
+	"config/staging.yaml":          true,
+	"/app/config/staging.yaml":     true,
+	"config/test.yaml":             true,
+	"/app/config/test.yaml":        true,
 }
 
 // ============================================================================

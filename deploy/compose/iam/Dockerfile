@@ -44,7 +44,7 @@ COPY --from=builder /app/grpc-health-probe /bin/grpc-health-probe
 COPY iam/config ./config
 COPY iam/db ./db
 
-ENV CONFIG_PATH=/app/config/production.yaml
+ENV CONFIG_PATH=/app/config/development.yaml
 
 EXPOSE 50051
 

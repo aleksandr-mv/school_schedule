@@ -26,7 +26,7 @@ import (
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
 	grpcclient "github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/client"
-	kafkaBuilder "github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/builder"
+	producerBuilder "github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/producer"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/migrator"
 	authv1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
@@ -358,8 +358,8 @@ func (d *diContainer) UserProducerService(ctx context.Context) (service.UserProd
 			return d.userProducerService, nil
 		}
 
-		kafkaBuilder := kafkaBuilder.NewKafkaBuilder(d.cfg.Kafka())
-		userCreatedProducer, err := kafkaBuilder.BuildProducer("user_created")
+		builder := producerBuilder.NewBuilder(d.cfg.Kafka())
+		userCreatedProducer, err := builder.BuildProducer("user_created")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build user_created producer: %w", err)
 		}

@@ -1,0 +1,54 @@
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:${CORE_OTEL_COLLECTOR_HEALTH_PORT}"
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:${OTEL_GRPC_PORT}"
+
+processors:
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: ${ENVIRONMENT}
+        action: insert
+  batch:
+    send_batch_size: ${OTEL_BATCH_SIZE}
+    timeout: ${OTEL_BATCH_TIMEOUT}
+    send_batch_max_size: ${OTEL_BATCH_SIZE}
+  probabilistic_sampler:
+    sampling_percentage: ${TRACING_SAMPLE_RATIO}
+
+exporters:
+  otlp/jaeger:
+    endpoint: ${JAEGER_HOST}:${JAEGER_PORT}
+  elasticsearch:
+    endpoints: ["http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
+    logs_index: "logs-%{+yyyy.mm.dd}"
+    mapping:
+      mode: ecs
+  prometheusremotewrite:
+    endpoint: http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/write
+  debug:
+    verbosity: ${OTEL_LOG_LEVEL}
+
+service:
+  extensions: [health_check]
+  telemetry:
+    metrics:
+      level: detailed
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [probabilistic_sampler, batch]
+      exporters: [otlp/jaeger, debug]
+    logs:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [elasticsearch, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [prometheusremotewrite, debug]

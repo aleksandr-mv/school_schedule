@@ -1,26 +1,23 @@
 package consumer
 
 import (
-	"context"
-
 	"github.com/IBM/sarama"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/model"
 	"go.uber.org/zap"
 )
 
-// MessageHandler — обработчик сообщений.
-type MessageHandler func(ctx context.Context, msg Message) error
-
 // Middleware — функция middleware для дополнительной обработки.
-type Middleware func(next MessageHandler) MessageHandler
+type Middleware func(next kafka.MessageHandler) kafka.MessageHandler
 
 // groupHandler — обёртка для sarama.ConsumerGroupHandler
 type groupHandler struct {
-	handler MessageHandler
-	logger  Logger
+	handler kafka.MessageHandler
+	logger  kafka.Logger
 }
 
 // NewGroupHandler создаёт новый groupHandler с middleware цепочкой.
-func NewGroupHandler(handler MessageHandler, logger Logger, middlewares ...Middleware) *groupHandler {
+func NewGroupHandler(handler kafka.MessageHandler, logger kafka.Logger, middlewares ...Middleware) *groupHandler {
 	// Применяем middleware цепочку
 	for i := len(middlewares) - 1; i >= 0; i-- {
 		handler = middlewares[i](handler)
@@ -49,7 +46,7 @@ func (g *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 				return nil
 			}
 
-			msg := Message{
+			msg := model.Message{
 				Key:            message.Key,
 				Value:          message.Value,
 				Topic:          message.Topic,

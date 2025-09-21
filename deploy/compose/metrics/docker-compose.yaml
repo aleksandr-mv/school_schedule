@@ -46,30 +46,6 @@ services:
     networks:
       - school_net
 
-  otel-collector:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: otel-metrics-collector
-    depends_on:
-      prometheus:
-        condition: service_healthy
-    ports:
-      - "4319:4317"  # Metrics endpoint
-      - "8890:8888"
-      - "13135:13133"
-    env_file:
-      - .env
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    restart: unless-stopped
-    networks:
-      - school_net
-
 volumes:
   prometheus_data:
   grafana_data:

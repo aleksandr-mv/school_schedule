@@ -3,25 +3,22 @@ package consumer
 import (
 	"context"
 
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
+
 	"github.com/IBM/sarama"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
-type Logger interface {
-	Info(ctx context.Context, msg string, fields ...zap.Field)
-	Error(ctx context.Context, msg string, fields ...zap.Field)
-}
-
 type consumer struct {
 	group       sarama.ConsumerGroup
 	topics      []string
-	logger      Logger
+	logger      kafka.Logger
 	middlewares []Middleware
 }
 
 // NewConsumer — создаёт новый consumer.
-func NewConsumer(group sarama.ConsumerGroup, topics []string, logger Logger, middlewares ...Middleware) *consumer {
+func NewConsumer(group sarama.ConsumerGroup, topics []string, logger kafka.Logger, middlewares ...Middleware) *consumer {
 	return &consumer{
 		group:       group,
 		topics:      topics,
@@ -31,7 +28,7 @@ func NewConsumer(group sarama.ConsumerGroup, topics []string, logger Logger, mid
 }
 
 // Consume запускает консьюмер для списка топиков.
-func (c *consumer) Consume(ctx context.Context, handler MessageHandler) error {
+func (c *consumer) Consume(ctx context.Context, handler kafka.MessageHandler) error {
 	newGroupHandler := NewGroupHandler(handler, c.logger, c.middlewares...)
 
 	for {
@@ -50,4 +47,8 @@ func (c *consumer) Consume(ctx context.Context, handler MessageHandler) error {
 
 		c.logger.Info(ctx, "Kafka consumer group rebalancing...")
 	}
+}
+
+func (c *consumer) Close() error {
+	return c.group.Close()
 }

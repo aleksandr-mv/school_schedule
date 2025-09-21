@@ -41,7 +41,7 @@ vars:
 
   # Модули и сервисы
   MODULES: platform shared iam rbac
-  SERVICES: core,cache,eventbus,envoy,iam,logs,metrics,rbac,tracing
+  SERVICES: cache,eventbus,envoy,iam,logs,metrics,rbac,tracing
   GRPC_SERVER_ADDR: 'localhost:50051'
 
 # =============================================================================
@@ -469,20 +469,6 @@ tasks:
 # DOCKER COMPOSE - УПРАВЛЕНИЕ СЕРВИСАМИ
 # =============================================================================
 
-  # Core сервисы (сеть)
-  up-core:
-    desc: "Поднять core контейнеры"
-    dir: deploy/compose/core
-    cmds:
-      - echo "[task] 🚀 Поднимаем core контейнеры"
-      - docker compose -p school_schedule up --build --detach
-
-  down-core:
-    desc: "Остановить и удалить core контейнеры"
-    dir: deploy/compose/core
-    cmds:
-      - echo "[task] 🛑 Останавливаем core контейнеры"
-      - docker compose -p school_schedule down --volumes
 
   # Eventbus сервисы (Kafka)
   up-eventbus:
@@ -508,12 +494,6 @@ tasks:
       - echo "[task] 🔍 Поднимаем tracing контейнеры"
       - docker compose -p school_schedule up --build --detach
 
-  up-tracing-with-otel:
-    desc: "Поднять tracing контейнеры с domain-specific HA OTEL"
-    dir: deploy/compose/tracing
-    cmds:
-      - echo "[task] 🔍 Поднимаем tracing с HA OTEL коллекторами (все в одном compose)"
-      - docker compose -p school_schedule up --build --detach
 
   down-tracing:
     desc: "Остановить и удалить tracing контейнеры"
@@ -530,13 +510,6 @@ tasks:
       - echo "[task] 📝 Поднимаем logs контейнеры"
       - docker compose -p school_schedule up --build --detach
 
-  up-logs-with-otel:
-    desc: "Поднять logs контейнеры с domain-specific HA OTEL"
-    dir: deploy/compose/logs
-    cmds:
-      - echo "[task] 📝 Поднимаем logs с HA OTEL коллекторами"
-      - docker compose -p school_schedule up --build --detach
-      - docker compose -f otel-logs-ha.yml -p school_schedule up --build --detach
 
   down-logs:
     desc: "Остановить и удалить logs контейнеры"
@@ -585,13 +558,6 @@ tasks:
       - echo "[task] 📊 Поднимаем metrics контейнеры"
       - docker compose -p school_schedule up --build --detach
 
-  up-metrics-with-otel:
-    desc: "Поднять metrics контейнеры с domain-specific HA OTEL"
-    dir: deploy/compose/metrics
-    cmds:
-      - echo "[task] 📊 Поднимаем metrics с HA OTEL коллекторами"
-      - docker compose -p school_schedule up --build --detach
-      - docker compose -f otel-metrics-ha.yml -p school_schedule up --build --detach
 
   down-metrics:
     desc: "Остановить и удалить metrics контейнеры"
@@ -599,6 +565,21 @@ tasks:
     cmds:
       - echo "[task] 🛑 Останавливаем metrics контейнеры"
       - docker compose -p school_schedule down --volumes
+
+  # OTEL Collector
+  up-otel:
+    desc: "Поднять единый OTEL коллектор"
+    dir: deploy/compose/otel
+    cmds:
+      - echo "[task] 📡 Поднимаем единый OTEL коллектор"
+      - docker compose -p school_schedule up --build --detach
+
+  down-otel:
+    desc: "Остановить и удалить OTEL коллектор"
+    dir: deploy/compose/otel
+    cmds:
+      - echo "[task] 🛑 Останавливаем OTEL коллектор"
+      - docker compose -p school_schedule down
 
   up-cache:
     desc: "Поднять cache сервис (Redis) с зависимостями"
@@ -635,15 +616,15 @@ tasks:
 # =============================================================================
 
   up-all:
-    desc: "Поднять все сервисы с domain-specific OTEL коллекторами"
+    desc: "Поднять все сервисы с единым OTEL коллектором"
     cmds:
       - task: up-network
-      - task: up-core
       - task: up-cache
       - task: up-eventbus
-      - task: up-tracing-with-otel
-      - task: up-logs-with-otel
-      - task: up-metrics-with-otel
+      - task: up-tracing
+      - task: up-logs
+      - task: up-metrics
+      - task: up-otel
       - task: up-iam
       - task: up-rbac
       - task: up-envoy
@@ -655,15 +636,14 @@ tasks:
     desc: "Остановить и удалить все сервисы по очереди вместе с зависимостями"
     cmds:
       - task: down-envoy
-      - task: down-otel
       - task: down-rbac
       - task: down-iam
-      - task: down-cache
+      - task: down-otel
       - task: down-metrics
       - task: down-logs
       - task: down-tracing
+      - task: down-cache
       - task: down-eventbus
-      - task: down-core
       - task: down-network
       - echo "✅ Все сервисы остановлены!"
 
@@ -687,8 +667,6 @@ tasks:
     desc: "Показать логи всех сервисов"
     cmds:
       - echo "[task] 📋 Логи всех сервисов"
-      - echo "--- Core logs ---"
-      - docker compose -f deploy/compose/core/docker-compose.yaml logs --tail=20
       - echo "--- Eventbus logs ---"
       - docker compose -f deploy/compose/eventbus/docker-compose.yaml logs --tail=20
       - echo "--- IAM logs ---"
@@ -702,11 +680,6 @@ tasks:
       - echo "--- OTEL logs ---"
       - docker compose -f deploy/compose/otel/docker-compose.yml logs --tail=20
 
-  logs-core:
-    desc: "Логи core сервисов"
-    dir: deploy/compose/core
-    cmds:
-      - docker compose logs --tail=50
 
   logs-eventbus:
     desc: "Логи eventbus сервисов"

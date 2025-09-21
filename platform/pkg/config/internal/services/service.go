@@ -11,11 +11,11 @@ import (
 // Компиляционная проверка
 var _ contracts.ServiceConfig = (*ServiceConfig)(nil)
 
-// rawServiceConfig для загрузки данных из YAML/ENV
+// rawServiceConfig для загрузки данных из YAML
 type rawServiceConfig struct {
-	Host    string        `mapstructure:"host"    yaml:"host"    env:"SERVICE_HOST"`
-	Port    int           `mapstructure:"port"    yaml:"port"    env:"SERVICE_PORT"`
-	Timeout time.Duration `mapstructure:"timeout" yaml:"timeout" env:"SERVICE_TIMEOUT"`
+	Host    string        `mapstructure:"host"    yaml:"host"`
+	Port    int           `mapstructure:"port"    yaml:"port"`
+	Timeout time.Duration `mapstructure:"timeout" yaml:"timeout"`
 }
 
 // ServiceConfig публичная структура для использования

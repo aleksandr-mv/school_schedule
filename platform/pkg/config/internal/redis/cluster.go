@@ -24,19 +24,10 @@ type Cluster struct {
 // defaultCluster возвращает rawCluster с дефолтными значениями
 func defaultCluster() rawCluster {
 	return rawCluster{
-		Nodes: []string{
-			// 3 мастер шарда
-			"redis-node-1:7000", // shard 1 master
-			"redis-node-2:7001", // shard 2 master
-			"redis-node-3:7002", // shard 3 master
-			// 3 реплики (по одной для каждого шарда)
-			"redis-node-4:7003", // shard 1 replica
-			"redis-node-5:7004", // shard 2 replica
-			"redis-node-6:7005", // shard 3 replica
-		},
+		Nodes:            []string{}, // Пустой список - Redis отключен по умолчанию
 		Password:         "",
 		MaxRedirects:     3,
-		ReadOnlyCommands: true, // Теперь можно читать с реплик
+		ReadOnlyCommands: true,
 		RouteByLatency:   false,
 		RouteRandomly:    false,
 	}

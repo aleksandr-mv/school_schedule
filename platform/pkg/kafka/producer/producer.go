@@ -2,57 +2,49 @@ package producer
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
+
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
 )
 
-type Logger interface {
-	Info(ctx context.Context, msg string, fields ...zap.Field)
-	Error(ctx context.Context, msg string, fields ...zap.Field)
-}
-
 type producer struct {
-	asyncProducer sarama.AsyncProducer
-	syncProducer  sarama.SyncProducer
-	topic         string
+	syncProducer sarama.SyncProducer
+	topic        string
+	logger       kafka.Logger
 }
 
-func NewProducer(asyncProducer sarama.AsyncProducer, topic string) *producer {
-	return &producer{
-		asyncProducer: asyncProducer,
-		topic:         topic,
-	}
-}
-
-func NewSyncProducer(syncProducer sarama.SyncProducer, topic string) *producer {
+func NewProducer(syncProducer sarama.SyncProducer, topic string, logger kafka.Logger) *producer {
 	return &producer{
 		syncProducer: syncProducer,
 		topic:        topic,
+		logger:       logger,
 	}
 }
 
 func (p *producer) Send(ctx context.Context, key, value []byte) error {
-	message := &sarama.ProducerMessage{
+	partition, offset, err := p.syncProducer.SendMessage(&sarama.ProducerMessage{
 		Topic: p.topic,
 		Key:   sarama.ByteEncoder(key),
 		Value: sarama.ByteEncoder(value),
-	}
-
-	if p.syncProducer != nil {
-		_, _, err := p.syncProducer.SendMessage(message)
+	})
+	if err != nil {
+		p.logger.Error(ctx, "Failed to send message", zap.Error(err))
 		return err
 	}
 
-	if p.asyncProducer != nil {
-		select {
-		case p.asyncProducer.Input() <- message:
-			return nil
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
+	p.logger.Info(ctx, "Message sent",
+		zap.String("topic", p.topic),
+		zap.Int32("partition", partition),
+		zap.Int64("offset", offset),
+		zap.Int("key_length", len(key)),
+		zap.Int("value_length", len(value)),
+	)
 
-	return fmt.Errorf("no producer configured")
+	return nil
+}
+
+func (p *producer) Close() error {
+	return p.syncProducer.Close()
 }
