@@ -8,8 +8,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository/converter"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/converter"
 )
 
 func (r *roleRepository) Update(ctx context.Context, updateRole *model.UpdateRole) error {

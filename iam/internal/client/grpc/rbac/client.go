@@ -1,8 +1,8 @@
 package rbac
 
 import (
-	def "github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc"
-	rbacV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
+	def "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/grpc"
+	rbacV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
 var _ def.RBACClient = (*client)(nil)

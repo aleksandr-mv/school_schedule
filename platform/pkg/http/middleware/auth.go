@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	grpcAuth "github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/interceptor"
-	authV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
-	commonV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	grpcAuth "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
+	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
+	commonV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const SessionIDHeader = "X-Session-Id"

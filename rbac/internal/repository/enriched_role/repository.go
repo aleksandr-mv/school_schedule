@@ -1,8 +1,8 @@
 package enriched_role
 
 import (
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
-	def "github.com/aleksandr-mv/school_schedule/rbac/internal/repository"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/cache"
+	def "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository"
 )
 
 var _ def.EnrichedRoleRepository = (*repository)(nil)

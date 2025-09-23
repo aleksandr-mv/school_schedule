@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
 )
 
 func (r *roleRepository) Create(ctx context.Context, name, description string) (uuid.UUID, error) {

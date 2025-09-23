@@ -7,7 +7,7 @@ import "validate/validate.proto";
 import "common/v1/role.proto";
 import "common/v1/annotations.proto";
 
-option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1;user_role_v1";
+option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1;user_role_v1";
 
 // =============================================================================
 // UserRoleService (user_role.v1)

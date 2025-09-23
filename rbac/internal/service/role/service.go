@@ -3,8 +3,8 @@ package role
 import (
 	"time"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/service"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service"
 )
 
 var _ service.RoleServiceInterface = (*RoleService)(nil)

@@ -7,9 +7,9 @@ import (
 	redigo "github.com/gomodule/redigo/redis"
 	"github.com/pkg/errors"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository/converter"
-	repoModel "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/converter"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/model"
 )
 
 func (r *repository) Get(ctx context.Context, id string) (*model.EnrichedRole, error) {

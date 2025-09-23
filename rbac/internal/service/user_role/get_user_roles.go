@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/tracing"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
 )
 
 func (s *UserRoleService) GetUserRoles(ctx context.Context, userID string) ([]*model.EnrichedRole, error) {

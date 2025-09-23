@@ -7,7 +7,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/cache"
 )
 
 type client struct {

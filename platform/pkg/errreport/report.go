@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 // Report логирует ошибку и отправляет в трейс

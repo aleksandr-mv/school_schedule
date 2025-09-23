@@ -7,16 +7,14 @@
 package role_permission_v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
+	_ "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-
-	_ "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -145,7 +143,7 @@ const file_role_permission_v1_role_permission_proto_rawDesc = "" +
 	"\rpermission_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\fpermissionId2\xd7\x01\n" +
 	"\x15RolePermissionService\x12^\n" +
 	"\x06Assign\x12!.role_permission.v1.AssignRequest\x1a\x16.google.protobuf.Empty\"\x19\x8a\xb5\x18\x15role_permission:write\x12^\n" +
-	"\x06Revoke\x12!.role_permission.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"\x19\x8a\xb5\x18\x15role_permission:writeB`Z^github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role_permission/v1;role_permission_v1b\x06proto3"
+	"\x06Revoke\x12!.role_permission.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"\x19\x8a\xb5\x18\x15role_permission:writeBgZegithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role_permission/v1;role_permission_v1b\x06proto3"
 
 var (
 	file_role_permission_v1_role_permission_proto_rawDescOnce sync.Once
@@ -159,14 +157,12 @@ func file_role_permission_v1_role_permission_proto_rawDescGZIP() []byte {
 	return file_role_permission_v1_role_permission_proto_rawDescData
 }
 
-var (
-	file_role_permission_v1_role_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-	file_role_permission_v1_role_permission_proto_goTypes  = []any{
-		(*AssignRequest)(nil), // 0: role_permission.v1.AssignRequest
-		(*RevokeRequest)(nil), // 1: role_permission.v1.RevokeRequest
-		(*emptypb.Empty)(nil), // 2: google.protobuf.Empty
-	}
-)
+var file_role_permission_v1_role_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_role_permission_v1_role_permission_proto_goTypes = []any{
+	(*AssignRequest)(nil), // 0: role_permission.v1.AssignRequest
+	(*RevokeRequest)(nil), // 1: role_permission.v1.RevokeRequest
+	(*emptypb.Empty)(nil), // 2: google.protobuf.Empty
+}
 var file_role_permission_v1_role_permission_proto_depIdxs = []int32{
 	0, // 0: role_permission.v1.RolePermissionService.Assign:input_type -> role_permission.v1.AssignRequest
 	1, // 1: role_permission.v1.RolePermissionService.Revoke:input_type -> role_permission.v1.RevokeRequest

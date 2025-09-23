@@ -7,15 +7,13 @@
 package user_v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
+	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -229,7 +227,7 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\x04user\x18\x01 \x01(\v2\x0f.common.v1.UserB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04user2\x9d\x01\n" +
 	"\vUserService\x12A\n" +
 	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x19.user.v1.RegisterResponse\"\x00\x12K\n" +
-	"\aGetUser\x12\x17.user.v1.GetUserRequest\x1a\x18.user.v1.GetUserResponse\"\r\x8a\xb5\x18\tuser:readBJZHgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1;user_v1b\x06proto3"
+	"\aGetUser\x12\x17.user.v1.GetUserRequest\x1a\x18.user.v1.GetUserResponse\"\r\x8a\xb5\x18\tuser:readBQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user/v1;user_v1b\x06proto3"
 
 var (
 	file_user_v1_user_proto_rawDescOnce sync.Once
@@ -243,17 +241,15 @@ func file_user_v1_user_proto_rawDescGZIP() []byte {
 	return file_user_v1_user_proto_rawDescData
 }
 
-var (
-	file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-	file_user_v1_user_proto_goTypes  = []any{
-		(*RegisterRequest)(nil),  // 0: user.v1.RegisterRequest
-		(*RegisterResponse)(nil), // 1: user.v1.RegisterResponse
-		(*GetUserRequest)(nil),   // 2: user.v1.GetUserRequest
-		(*GetUserResponse)(nil),  // 3: user.v1.GetUserResponse
-		(*v1.UserInfo)(nil),      // 4: common.v1.UserInfo
-		(*v1.User)(nil),          // 5: common.v1.User
-	}
-)
+var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_user_v1_user_proto_goTypes = []any{
+	(*RegisterRequest)(nil),  // 0: user.v1.RegisterRequest
+	(*RegisterResponse)(nil), // 1: user.v1.RegisterResponse
+	(*GetUserRequest)(nil),   // 2: user.v1.GetUserRequest
+	(*GetUserResponse)(nil),  // 3: user.v1.GetUserResponse
+	(*v1.UserInfo)(nil),      // 4: common.v1.UserInfo
+	(*v1.User)(nil),          // 5: common.v1.User
+}
 var file_user_v1_user_proto_depIdxs = []int32{
 	4, // 0: user.v1.RegisterRequest.info:type_name -> common.v1.UserInfo
 	5, // 1: user.v1.GetUserResponse.user:type_name -> common.v1.User

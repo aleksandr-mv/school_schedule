@@ -3,7 +3,7 @@ package redis
 import (
 	"strings"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
 )
 
 // rawCluster для загрузки данных из YAML/ENV

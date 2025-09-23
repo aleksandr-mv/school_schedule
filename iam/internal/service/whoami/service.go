@@ -1,9 +1,9 @@
 package whoami
 
 import (
-	"github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/repository"
-	def "github.com/aleksandr-mv/school_schedule/iam/internal/service"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/grpc"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository"
+	def "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service"
 )
 
 var _ def.WhoAMIService = (*WhoAMIService)(nil)

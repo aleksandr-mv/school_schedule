@@ -6,7 +6,7 @@ import (
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
 )
 
 type producer struct {

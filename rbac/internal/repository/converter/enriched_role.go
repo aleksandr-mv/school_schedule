@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	repoModel "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/model"
 )
 
 func EnrichedRoleToRedis(enrichedRole *model.EnrichedRole) (repoModel.EnrichedRoleRedisView, error) {

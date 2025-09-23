@@ -1,18 +1,18 @@
-module github.com/aleksandr-mv/school_schedule/platform
+module github.com/Alexander-Mandzhiev/school_schedule/platform
 
 go 1.24.4
 
-replace github.com/aleksandr-mv/school_schedule/shared => ../shared
+replace github.com/Alexander-Mandzhiev/school_schedule/shared => ../shared
 
 require (
+	github.com/Alexander-Mandzhiev/school_schedule/shared v0.0.0-00010101000000-000000000000
 	github.com/IBM/sarama v1.45.2
-	github.com/aleksandr-mv/school_schedule/shared v0.0.0-00010101000000-000000000000
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/go-chi/chi/v5 v5.2.2
-	github.com/gomodule/redigo v1.9.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/pressly/goose/v3 v3.24.3
+	github.com/redis/go-redis/v9 v9.14.0
 	github.com/spf13/viper v1.20.1
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.14.0
@@ -26,7 +26,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.38.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.75.0
-	google.golang.org/protobuf v1.36.8
+	google.golang.org/protobuf v1.36.9
 )
 
 require (
@@ -59,7 +59,6 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
-	github.com/redis/go-redis/v9 v9.14.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

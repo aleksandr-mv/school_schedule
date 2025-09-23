@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	repoModel "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/model"
 )
 
 // PermissionToDomain преобразует модель репозитория в доменную модель

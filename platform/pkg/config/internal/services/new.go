@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/helpers"
 )
 
 // New создает Services конфигурацию из YAML

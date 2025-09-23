@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
 )
 
 type RoleServiceInterface interface {

@@ -4,7 +4,7 @@ package common.v1;
 
 import "google/protobuf/descriptor.proto";
 
-option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1";
+option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1";
 
 // Расширение для указания требуемых прав доступа
 extend google.protobuf.MethodOptions {

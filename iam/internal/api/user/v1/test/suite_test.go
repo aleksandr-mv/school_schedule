@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	api "github.com/aleksandr-mv/school_schedule/iam/internal/api/user/v1"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/service/mocks"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	api "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/api/user/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service/mocks"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 type APISuite struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
 )
 
 type UserService interface {

@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 // RecoveryInterceptor перехватывает паники в unary gRPC-обработчиках и возвращает внутр. ошибку.

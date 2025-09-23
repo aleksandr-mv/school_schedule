@@ -8,7 +8,7 @@ import (
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"github.com/google/uuid"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
 )
 
 func (api *API) extractSessionID(req *authv3.CheckRequest) (uuid.UUID, error) {

@@ -50,9 +50,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/helpers"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 // =============================================================================

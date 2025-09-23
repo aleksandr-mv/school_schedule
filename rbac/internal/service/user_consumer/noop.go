@@ -3,7 +3,7 @@ package user_consumer
 import (
 	"context"
 
-	def "github.com/aleksandr-mv/school_schedule/rbac/internal/service"
+	def "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service"
 )
 
 type noOpService struct{}

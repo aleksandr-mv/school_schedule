@@ -5,9 +5,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	def "github.com/aleksandr-mv/school_schedule/rbac/internal/service"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	def "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service"
 )
 
 var _ def.UserConsumerService = (*service)(nil)

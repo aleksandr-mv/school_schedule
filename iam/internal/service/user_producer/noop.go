@@ -3,8 +3,8 @@ package user_producer
 import (
 	"context"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	def "github.com/aleksandr-mv/school_schedule/iam/internal/service"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	def "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service"
 )
 
 type noOpService struct{}

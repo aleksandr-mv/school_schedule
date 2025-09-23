@@ -3,7 +3,7 @@ package kafka
 import (
 	"context"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka/model"
 )
 
 // MessageHandler — обработчик сообщений.

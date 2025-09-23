@@ -7,14 +7,12 @@
 package permission_v1
 
 import (
+	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
@@ -115,7 +113,7 @@ const file_permission_v1_permission_proto_rawDesc = "" +
 	"\fListResponse\x12)\n" +
 	"\x04data\x18\x01 \x03(\v2\x15.common.v1.PermissionR\x04data2i\n" +
 	"\x11PermissionService\x12T\n" +
-	"\x04List\x12\x1a.permission.v1.ListRequest\x1a\x1b.permission.v1.ListResponse\"\x13\x8a\xb5\x18\x0fpermission:readBVZTgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1;permission_v1b\x06proto3"
+	"\x04List\x12\x1a.permission.v1.ListRequest\x1a\x1b.permission.v1.ListResponse\"\x13\x8a\xb5\x18\x0fpermission:readB]Z[github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/permission/v1;permission_v1b\x06proto3"
 
 var (
 	file_permission_v1_permission_proto_rawDescOnce sync.Once
@@ -129,14 +127,12 @@ func file_permission_v1_permission_proto_rawDescGZIP() []byte {
 	return file_permission_v1_permission_proto_rawDescData
 }
 
-var (
-	file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-	file_permission_v1_permission_proto_goTypes  = []any{
-		(*ListRequest)(nil),   // 0: permission.v1.ListRequest
-		(*ListResponse)(nil),  // 1: permission.v1.ListResponse
-		(*v1.Permission)(nil), // 2: common.v1.Permission
-	}
-)
+var file_permission_v1_permission_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_permission_v1_permission_proto_goTypes = []any{
+	(*ListRequest)(nil),   // 0: permission.v1.ListRequest
+	(*ListResponse)(nil),  // 1: permission.v1.ListResponse
+	(*v1.Permission)(nil), // 2: common.v1.Permission
+}
 var file_permission_v1_permission_proto_depIdxs = []int32{
 	2, // 0: permission.v1.ListResponse.data:type_name -> common.v1.Permission
 	0, // 1: permission.v1.PermissionService.List:input_type -> permission.v1.ListRequest

@@ -2,8 +2,8 @@ package consumer
 
 import (
 	"github.com/IBM/sarama"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka/model"
 	"go.uber.org/zap"
 )
 

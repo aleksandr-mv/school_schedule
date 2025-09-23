@@ -3,9 +3,9 @@ package converter
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	commonV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
-	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	commonV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
+	roleV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role/v1"
 )
 
 // UpdateRoleToDomain преобразует protobuf запрос в доменную модель обновления роли

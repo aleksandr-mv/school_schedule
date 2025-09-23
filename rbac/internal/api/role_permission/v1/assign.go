@@ -6,8 +6,8 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	rolePermissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role_permission/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	rolePermissionV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role_permission/v1"
 )
 
 func (api *API) Assign(ctx context.Context, req *rolePermissionV1.AssignRequest) (*emptypb.Empty, error) {

@@ -6,9 +6,9 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/converter"
-	repoModel "github.com/aleksandr-mv/school_schedule/iam/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/converter"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/model"
 )
 
 func (r *userRepository) Update(ctx context.Context, user model.User) (*model.User, error) {

@@ -9,10 +9,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/app"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/closer"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/app"
 )
 
 func main() {

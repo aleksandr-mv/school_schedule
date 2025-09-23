@@ -39,7 +39,7 @@
 
 1. **Клонируйте репозиторий:**
    ```bash
-   git clone https://github.com/aleksandr-mv/school_schedule.git
+   git clone https://github.com/Alexander-Mandzhiev/school_schedule.git
    cd school_schedule
    ```
 

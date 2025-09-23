@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 // RecoveryMiddleware перехватывает паники в HTTP-обработчиках, логирует их и отдаёт 500 Internal Server Error.

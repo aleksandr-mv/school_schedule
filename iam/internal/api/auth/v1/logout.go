@@ -6,9 +6,9 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	authV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
 )
 
 func (api *API) Logout(ctx context.Context, req *authV1.LogoutRequest) (*authV1.LogoutResponse, error) {

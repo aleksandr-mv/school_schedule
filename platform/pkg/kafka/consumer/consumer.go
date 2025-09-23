@@ -3,7 +3,7 @@ package consumer
 import (
 	"context"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
 
 	"github.com/IBM/sarama"
 	"github.com/pkg/errors"

@@ -20,9 +20,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	customMiddleware "github.com/aleksandr-mv/school_schedule/platform/pkg/http/middleware"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/metric"
+	customMiddleware "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/http/middleware"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/metric"
 )
 
 // =============================================================================

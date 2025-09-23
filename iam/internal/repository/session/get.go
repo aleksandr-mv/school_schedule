@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/converter"
-	repoModel "github.com/aleksandr-mv/school_schedule/iam/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/converter"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/model"
 )
 
 func (r *sessionRepository) Get(ctx context.Context, sessionID uuid.UUID) (*model.WhoAMI, error) {

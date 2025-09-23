@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
-	grpcint "github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/interceptor"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	grpcint "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 const (

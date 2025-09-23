@@ -3,8 +3,8 @@ package auth
 import (
 	"context"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
 	"github.com/google/uuid"
 )
 

@@ -5,8 +5,8 @@ import (
 
 	"github.com/caarlos0/env/v11"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/helpers"
 )
 
 // New создает Metric конфигурацию по стратегии: Defaults → YAML → ENV

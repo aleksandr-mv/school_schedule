@@ -7,16 +7,14 @@
 package user_role_v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
+	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -397,7 +395,7 @@ const file_user_role_v1_user_role_proto_rawDesc = "" +
 	"\x06Assign\x12\x1b.user_role.v1.AssignRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12R\n" +
 	"\x06Revoke\x12\x1b.user_role.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12i\n" +
 	"\fGetUserRoles\x12!.user_role.v1.GetUserRolesRequest\x1a\".user_role.v1.GetUserRolesResponse\"\x12\x8a\xb5\x18\x0euser_role:read\x12i\n" +
-	"\fGetRoleUsers\x12!.user_role.v1.GetRoleUsersRequest\x1a\".user_role.v1.GetRoleUsersResponse\"\x12\x8a\xb5\x18\x0euser_role:readBTZRgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1;user_role_v1b\x06proto3"
+	"\fGetRoleUsers\x12!.user_role.v1.GetRoleUsersRequest\x1a\".user_role.v1.GetRoleUsersResponse\"\x12\x8a\xb5\x18\x0euser_role:readB[ZYgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1;user_role_v1b\x06proto3"
 
 var (
 	file_user_role_v1_user_role_proto_rawDescOnce sync.Once
@@ -411,19 +409,17 @@ func file_user_role_v1_user_role_proto_rawDescGZIP() []byte {
 	return file_user_role_v1_user_role_proto_rawDescData
 }
 
-var (
-	file_user_role_v1_user_role_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-	file_user_role_v1_user_role_proto_goTypes  = []any{
-		(*AssignRequest)(nil),          // 0: user_role.v1.AssignRequest
-		(*RevokeRequest)(nil),          // 1: user_role.v1.RevokeRequest
-		(*GetUserRolesRequest)(nil),    // 2: user_role.v1.GetUserRolesRequest
-		(*GetUserRolesResponse)(nil),   // 3: user_role.v1.GetUserRolesResponse
-		(*GetRoleUsersRequest)(nil),    // 4: user_role.v1.GetRoleUsersRequest
-		(*GetRoleUsersResponse)(nil),   // 5: user_role.v1.GetRoleUsersResponse
-		(*v1.RoleWithPermissions)(nil), // 6: common.v1.RoleWithPermissions
-		(*emptypb.Empty)(nil),          // 7: google.protobuf.Empty
-	}
-)
+var file_user_role_v1_user_role_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_user_role_v1_user_role_proto_goTypes = []any{
+	(*AssignRequest)(nil),          // 0: user_role.v1.AssignRequest
+	(*RevokeRequest)(nil),          // 1: user_role.v1.RevokeRequest
+	(*GetUserRolesRequest)(nil),    // 2: user_role.v1.GetUserRolesRequest
+	(*GetUserRolesResponse)(nil),   // 3: user_role.v1.GetUserRolesResponse
+	(*GetRoleUsersRequest)(nil),    // 4: user_role.v1.GetRoleUsersRequest
+	(*GetRoleUsersResponse)(nil),   // 5: user_role.v1.GetRoleUsersResponse
+	(*v1.RoleWithPermissions)(nil), // 6: common.v1.RoleWithPermissions
+	(*emptypb.Empty)(nil),          // 7: google.protobuf.Empty
+}
 var file_user_role_v1_user_role_proto_depIdxs = []int32{
 	6, // 0: user_role.v1.GetUserRolesResponse.data:type_name -> common.v1.RoleWithPermissions
 	0, // 1: user_role.v1.UserRoleService.Assign:input_type -> user_role.v1.AssignRequest

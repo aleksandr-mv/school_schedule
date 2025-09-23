@@ -6,10 +6,10 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/converter"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	userV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/converter"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	userV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user/v1"
 )
 
 func (api *API) GetUser(ctx context.Context, req *userV1.GetUserRequest) (*userV1.GetUserResponse, error) {

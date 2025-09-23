@@ -8,7 +8,6 @@ package user_role_v1
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -114,15 +113,12 @@ type UnimplementedUserRoleServiceServer struct{}
 func (UnimplementedUserRoleServiceServer) Assign(context.Context, *AssignRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Assign not implemented")
 }
-
 func (UnimplementedUserRoleServiceServer) Revoke(context.Context, *RevokeRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Revoke not implemented")
 }
-
 func (UnimplementedUserRoleServiceServer) GetUserRoles(context.Context, *GetUserRolesRequest) (*GetUserRolesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserRoles not implemented")
 }
-
 func (UnimplementedUserRoleServiceServer) GetRoleUsers(context.Context, *GetRoleUsersRequest) (*GetRoleUsersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRoleUsers not implemented")
 }

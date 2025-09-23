@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/service"
-	rolePermissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role_permission/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service"
+	rolePermissionV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role_permission/v1"
 )
 
 var _ rolePermissionV1.RolePermissionServiceServer = (*API)(nil)

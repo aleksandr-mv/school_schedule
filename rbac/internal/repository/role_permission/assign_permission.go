@@ -8,7 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
 )
 
 func (r *rolePermissionRepository) Assign(ctx context.Context, roleID, permissionID string) error {

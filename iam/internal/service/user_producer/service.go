@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	def "github.com/aleksandr-mv/school_schedule/iam/internal/service"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	def "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 var _ def.UserProducerService = (*service)(nil)

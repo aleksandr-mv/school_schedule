@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/converter"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/converter"
 )
 
 func (r *sessionRepository) Create(ctx context.Context, user model.User, expiresAt time.Time) (uuid.UUID, error) {

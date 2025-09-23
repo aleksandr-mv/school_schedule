@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository/mocks"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/service/permission"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/mocks"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service/permission"
 )
 
 type ServiceSuite struct {

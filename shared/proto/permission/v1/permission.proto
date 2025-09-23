@@ -5,7 +5,7 @@ package permission.v1;
 import "common/v1/permission.proto";
 import "common/v1/annotations.proto";
 
-option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1;permission_v1";
+option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/permission/v1;permission_v1";
 
 // =============================================================================
 // PermissionService (permission.v1)

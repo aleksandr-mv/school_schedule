@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	client "github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc/mocks"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/mocks"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/service/auth"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	client "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/grpc/mocks"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/mocks"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service/auth"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 type ServiceSuite struct {

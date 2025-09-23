@@ -1,8 +1,8 @@
 package user
 
 import (
-	"github.com/aleksandr-mv/school_schedule/iam/internal/repository"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/service"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service"
 )
 
 var _ service.UserService = (*UserService)(nil)

@@ -10,7 +10,7 @@ import (
 	statusv3 "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
 )
 
 func (api *API) denyRequest(message string, statusCode int32) *authv3.CheckResponse {

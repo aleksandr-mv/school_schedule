@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository/converter"
-	repoModel "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/converter"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/model"
 )
 
 func (r *roleRepository) Get(ctx context.Context, id string) (*model.Role, error) {

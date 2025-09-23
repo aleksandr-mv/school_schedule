@@ -15,7 +15,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 // Metrics управляет состоянием метрик и их инициализацией

@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	repoModel "github.com/aleksandr-mv/school_schedule/iam/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/model"
 )
 
 func ToRepoUser(user *model.User) *repoModel.User {

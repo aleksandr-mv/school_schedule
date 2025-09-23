@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/aleksandr-mv/school_schedule/iam/internal/service"
-	userV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service"
+	userV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user/v1"
 )
 
 type API struct {

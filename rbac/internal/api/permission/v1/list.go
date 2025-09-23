@@ -5,9 +5,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/converter"
-	permissionV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/permission/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/converter"
+	permissionV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/permission/v1"
 )
 
 func (api *API) List(ctx context.Context, req *permissionV1.ListRequest) (*permissionV1.ListResponse, error) {

@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 
-	commonV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	commonV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 )
 
 // PermissionInterceptor interceptor для проверки прав доступа

@@ -7,15 +7,13 @@
 package auth_v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
+	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -345,7 +343,7 @@ const file_auth_v1_auth_proto_rawDesc = "" +
 	"\vAuthService\x128\n" +
 	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\"\x00\x12;\n" +
 	"\x06Whoami\x12\x16.auth.v1.WhoamiRequest\x1a\x17.auth.v1.WhoamiResponse\"\x00\x12;\n" +
-	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x17.auth.v1.LogoutResponse\"\x00BJZHgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1;auth_v1b\x06proto3"
+	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x17.auth.v1.LogoutResponse\"\x00BQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1;auth_v1b\x06proto3"
 
 var (
 	file_auth_v1_auth_proto_rawDescOnce sync.Once
@@ -359,20 +357,18 @@ func file_auth_v1_auth_proto_rawDescGZIP() []byte {
 	return file_auth_v1_auth_proto_rawDescData
 }
 
-var (
-	file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-	file_auth_v1_auth_proto_goTypes  = []any{
-		(*LoginRequest)(nil),           // 0: auth.v1.LoginRequest
-		(*LoginResponse)(nil),          // 1: auth.v1.LoginResponse
-		(*WhoamiRequest)(nil),          // 2: auth.v1.WhoamiRequest
-		(*WhoamiResponse)(nil),         // 3: auth.v1.WhoamiResponse
-		(*LogoutRequest)(nil),          // 4: auth.v1.LogoutRequest
-		(*LogoutResponse)(nil),         // 5: auth.v1.LogoutResponse
-		(*v1.Session)(nil),             // 6: common.v1.Session
-		(*v1.User)(nil),                // 7: common.v1.User
-		(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
-	}
-)
+var file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_auth_v1_auth_proto_goTypes = []any{
+	(*LoginRequest)(nil),           // 0: auth.v1.LoginRequest
+	(*LoginResponse)(nil),          // 1: auth.v1.LoginResponse
+	(*WhoamiRequest)(nil),          // 2: auth.v1.WhoamiRequest
+	(*WhoamiResponse)(nil),         // 3: auth.v1.WhoamiResponse
+	(*LogoutRequest)(nil),          // 4: auth.v1.LogoutRequest
+	(*LogoutResponse)(nil),         // 5: auth.v1.LogoutResponse
+	(*v1.Session)(nil),             // 6: common.v1.Session
+	(*v1.User)(nil),                // 7: common.v1.User
+	(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
+}
 var file_auth_v1_auth_proto_depIdxs = []int32{
 	6, // 0: auth.v1.WhoamiResponse.session:type_name -> common.v1.Session
 	7, // 1: auth.v1.WhoamiResponse.user:type_name -> common.v1.User

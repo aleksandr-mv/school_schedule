@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/helpers"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/helpers"
 )
 
 func TestNew_DefaultsOnly(t *testing.T) {

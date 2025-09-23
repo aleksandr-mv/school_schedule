@@ -6,7 +6,7 @@ import "validate/validate.proto";
 import "common/v1/user.proto";
 import "common/v1/annotations.proto";
 
-option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1;user_v1";
+option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user/v1;user_v1";
 
 service UserService {
   // Регистрация нового пользователя

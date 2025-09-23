@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	rbacV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	rbacV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
 // GetUserRolesResponseToDomain конвертирует protobuf ответ в доменные модели

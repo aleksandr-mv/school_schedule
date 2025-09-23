@@ -5,9 +5,9 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/repository/converter"
-	repoModel "github.com/aleksandr-mv/school_schedule/iam/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/converter"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/model"
 )
 
 func (r *userRepository) Get(ctx context.Context, value string) (*model.User, error) {

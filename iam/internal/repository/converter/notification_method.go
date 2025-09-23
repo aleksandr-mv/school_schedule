@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	repoModel "github.com/aleksandr-mv/school_schedule/iam/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/model"
 )
 
 func NotificationMethodToRepo(notificationMethod *model.NotificationMethod) *repoModel.NotificationMethod {

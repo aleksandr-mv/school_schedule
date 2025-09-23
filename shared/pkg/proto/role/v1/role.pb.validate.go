@@ -306,6 +306,7 @@ func (m *UpdateRequest) validate(all bool) error {
 	}
 
 	if m.Name != nil {
+
 		if l := utf8.RuneCountInString(m.GetName()); l < 2 || l > 50 {
 			err := UpdateRequestValidationError{
 				field:  "Name",
@@ -316,6 +317,7 @@ func (m *UpdateRequest) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
+
 	}
 
 	if m.Description != nil {

@@ -3,7 +3,7 @@ package tracing
 import (
 	"time"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
 )
 
 // Компиляционная проверка

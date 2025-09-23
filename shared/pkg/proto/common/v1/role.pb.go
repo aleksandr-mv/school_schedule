@@ -7,14 +7,13 @@
 package common_v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -170,7 +169,7 @@ const file_common_v1_role_proto_rawDesc = "" +
 	"\v_updated_at\"s\n" +
 	"\x13RoleWithPermissions\x12#\n" +
 	"\x04role\x18\x01 \x01(\v2\x0f.common.v1.RoleR\x04role\x127\n" +
-	"\vpermissions\x18\x02 \x03(\v2\x15.common.v1.PermissionR\vpermissionsBNZLgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
+	"\vpermissions\x18\x02 \x03(\v2\x15.common.v1.PermissionR\vpermissionsBUZSgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
 
 var (
 	file_common_v1_role_proto_rawDescOnce sync.Once
@@ -184,15 +183,13 @@ func file_common_v1_role_proto_rawDescGZIP() []byte {
 	return file_common_v1_role_proto_rawDescData
 }
 
-var (
-	file_common_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-	file_common_v1_role_proto_goTypes  = []any{
-		(*Role)(nil),                  // 0: common.v1.Role
-		(*RoleWithPermissions)(nil),   // 1: common.v1.RoleWithPermissions
-		(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
-		(*Permission)(nil),            // 3: common.v1.Permission
-	}
-)
+var file_common_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_common_v1_role_proto_goTypes = []any{
+	(*Role)(nil),                  // 0: common.v1.Role
+	(*RoleWithPermissions)(nil),   // 1: common.v1.RoleWithPermissions
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*Permission)(nil),            // 3: common.v1.Permission
+}
 var file_common_v1_role_proto_depIdxs = []int32{
 	2, // 0: common.v1.Role.created_at:type_name -> google.protobuf.Timestamp
 	2, // 1: common.v1.Role.updated_at:type_name -> google.protobuf.Timestamp

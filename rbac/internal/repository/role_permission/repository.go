@@ -3,7 +3,7 @@ package role_permission
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	def "github.com/aleksandr-mv/school_schedule/rbac/internal/repository"
+	def "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository"
 )
 
 var _ def.RolePermissionRepository = (*rolePermissionRepository)(nil)

@@ -3,8 +3,8 @@ package user_role
 import (
 	"context"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/tracing"
 )
 
 func (s *UserRoleService) GetRoleUsers(ctx context.Context, roleID string, limit int32, cursor string) ([]string, *string, error) {

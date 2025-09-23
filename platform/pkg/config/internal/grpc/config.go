@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
 )
 
 // rawConfig для загрузки данных из YAML/ENV

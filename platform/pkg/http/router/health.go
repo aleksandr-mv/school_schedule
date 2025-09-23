@@ -3,7 +3,7 @@ package http_router
 import (
 	"github.com/go-chi/chi/v5"
 
-	healthhttp "github.com/aleksandr-mv/school_schedule/platform/pkg/http/health"
+	healthhttp "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/http/health"
 )
 
 // RegisterHealthRoutes регистрирует стандартные health check маршруты

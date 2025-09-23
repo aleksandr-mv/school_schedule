@@ -7,9 +7,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka/model"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	rbacModel "github.com/aleksandr-mv/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	rbacModel "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
 )
 
 func (s *service) UserCreatedHandler(ctx context.Context, msg model.Message) error {

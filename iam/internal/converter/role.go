@@ -3,8 +3,8 @@ package converter
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	commonV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	commonV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 )
 
 // RoleToProto конвертирует доменную модель роли в protobuf

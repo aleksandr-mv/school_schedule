@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	authV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
-	commonV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
+	commonV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (

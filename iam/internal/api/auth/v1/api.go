@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/aleksandr-mv/school_schedule/iam/internal/service"
-	authV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service"
+	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
 )
 
 // API реализует AuthService gRPC сервер

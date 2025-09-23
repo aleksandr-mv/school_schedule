@@ -3,10 +3,10 @@ package builder
 import (
 	"github.com/redis/go-redis/v9"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/cache"
-	redisclient "github.com/aleksandr-mv/school_schedule/platform/pkg/cache/redis"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/cache"
+	redisclient "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/cache/redis"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 type RedisBuilder struct {

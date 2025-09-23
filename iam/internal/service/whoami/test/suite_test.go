@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	grpcMocks "github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc/mocks"
-	repositoryMocks "github.com/aleksandr-mv/school_schedule/iam/internal/repository/mocks"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/service/whoami"
+	grpcMocks "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/grpc/mocks"
+	repositoryMocks "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/mocks"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service/whoami"
 )
 
 type ServiceSuite struct {

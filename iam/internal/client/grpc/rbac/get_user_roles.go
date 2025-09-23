@@ -5,9 +5,9 @@ import (
 
 	"github.com/google/uuid"
 
-	converter "github.com/aleksandr-mv/school_schedule/iam/internal/client/converter/rbac"
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	rbacV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
+	converter "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/converter/rbac"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	rbacV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
 func (c *client) GetUserRoles(ctx context.Context, userID uuid.UUID) ([]*model.RoleWithPermissions, error) {

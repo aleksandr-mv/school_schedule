@@ -3,17 +3,17 @@ package config
 import (
 	"fmt"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/app"
-	grpcmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/grpc"
-	kafkamodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/kafka"
-	loggermodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/logger"
-	metricmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/metric"
-	mongomodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/mongo"
-	postgresmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/postgres"
-	redismodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/redis"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/services"
-	sessionmodule "github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/session"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/internal/tracing"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/app"
+	grpcmodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/grpc"
+	kafkamodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/kafka"
+	loggermodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/logger"
+	metricmodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/metric"
+	mongomodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/mongo"
+	postgresmodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/postgres"
+	redismodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/redis"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/services"
+	sessionmodule "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/session"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/internal/tracing"
 )
 
 // =============================================================================

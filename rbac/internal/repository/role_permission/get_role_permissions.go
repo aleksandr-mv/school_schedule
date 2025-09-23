@@ -6,9 +6,9 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository/converter"
-	repoModel "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/converter"
+	repoModel "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/model"
 )
 
 func (r *rolePermissionRepository) GetRolePermissions(ctx context.Context, roleID string) ([]*model.Permission, error) {

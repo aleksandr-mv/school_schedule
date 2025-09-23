@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "common/v1/permission.proto";
 
-option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1";
+option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1";
 
 // =============================================================================
 // Role Common Types (common.v1)

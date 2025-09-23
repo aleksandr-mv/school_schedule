@@ -7,16 +7,14 @@
 package role_v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
+	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-
-	v1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -436,7 +434,7 @@ const file_role_v1_role_proto_rawDesc = "" +
 	"\x06Delete\x12\x16.role.v1.DeleteRequest\x1a\x16.google.protobuf.Empty\"\x0e\x8a\xb5\x18\n" +
 	"role:write\x12?\n" +
 	"\x03Get\x12\x13.role.v1.GetRequest\x1a\x14.role.v1.GetResponse\"\r\x8a\xb5\x18\trole:read\x12B\n" +
-	"\x04List\x12\x14.role.v1.ListRequest\x1a\x15.role.v1.ListResponse\"\r\x8a\xb5\x18\trole:readBJZHgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1;role_v1b\x06proto3"
+	"\x04List\x12\x14.role.v1.ListRequest\x1a\x15.role.v1.ListResponse\"\r\x8a\xb5\x18\trole:readBQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role/v1;role_v1b\x06proto3"
 
 var (
 	file_role_v1_role_proto_rawDescOnce sync.Once
@@ -450,22 +448,20 @@ func file_role_v1_role_proto_rawDescGZIP() []byte {
 	return file_role_v1_role_proto_rawDescData
 }
 
-var (
-	file_role_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-	file_role_v1_role_proto_goTypes  = []any{
-		(*CreateRequest)(nil),          // 0: role.v1.CreateRequest
-		(*CreateResponse)(nil),         // 1: role.v1.CreateResponse
-		(*UpdateRequest)(nil),          // 2: role.v1.UpdateRequest
-		(*DeleteRequest)(nil),          // 3: role.v1.DeleteRequest
-		(*GetRequest)(nil),             // 4: role.v1.GetRequest
-		(*GetResponse)(nil),            // 5: role.v1.GetResponse
-		(*ListRequest)(nil),            // 6: role.v1.ListRequest
-		(*ListResponse)(nil),           // 7: role.v1.ListResponse
-		(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
-		(*v1.Role)(nil),                // 9: common.v1.Role
-		(*emptypb.Empty)(nil),          // 10: google.protobuf.Empty
-	}
-)
+var file_role_v1_role_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_role_v1_role_proto_goTypes = []any{
+	(*CreateRequest)(nil),          // 0: role.v1.CreateRequest
+	(*CreateResponse)(nil),         // 1: role.v1.CreateResponse
+	(*UpdateRequest)(nil),          // 2: role.v1.UpdateRequest
+	(*DeleteRequest)(nil),          // 3: role.v1.DeleteRequest
+	(*GetRequest)(nil),             // 4: role.v1.GetRequest
+	(*GetResponse)(nil),            // 5: role.v1.GetResponse
+	(*ListRequest)(nil),            // 6: role.v1.ListRequest
+	(*ListResponse)(nil),           // 7: role.v1.ListResponse
+	(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
+	(*v1.Role)(nil),                // 9: common.v1.Role
+	(*emptypb.Empty)(nil),          // 10: google.protobuf.Empty
+}
 var file_role_v1_role_proto_depIdxs = []int32{
 	8,  // 0: role.v1.GetResponse.data:type_name -> common.v1.RoleWithPermissions
 	9,  // 1: role.v1.ListResponse.data:type_name -> common.v1.Role

@@ -7,14 +7,13 @@
 package common_v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -226,7 +225,7 @@ const file_common_v1_user_proto_rawDesc = "" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12>\n" +
 	"\n" +
 	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\tupdatedAt\x88\x01\x01B\r\n" +
-	"\v_updated_atBNZLgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
+	"\v_updated_atBUZSgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
 
 var (
 	file_common_v1_user_proto_rawDescOnce sync.Once
@@ -240,15 +239,13 @@ func file_common_v1_user_proto_rawDescGZIP() []byte {
 	return file_common_v1_user_proto_rawDescData
 }
 
-var (
-	file_common_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-	file_common_v1_user_proto_goTypes  = []any{
-		(*NotificationMethod)(nil),    // 0: common.v1.NotificationMethod
-		(*UserInfo)(nil),              // 1: common.v1.UserInfo
-		(*User)(nil),                  // 2: common.v1.User
-		(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
-	}
-)
+var file_common_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_common_v1_user_proto_goTypes = []any{
+	(*NotificationMethod)(nil),    // 0: common.v1.NotificationMethod
+	(*UserInfo)(nil),              // 1: common.v1.UserInfo
+	(*User)(nil),                  // 2: common.v1.User
+	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+}
 var file_common_v1_user_proto_depIdxs = []int32{
 	0, // 0: common.v1.UserInfo.notification_methods:type_name -> common.v1.NotificationMethod
 	1, // 1: common.v1.User.info:type_name -> common.v1.UserInfo

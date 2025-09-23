@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
 )
 
 // Создаем валидный bcrypt хеш для тестов

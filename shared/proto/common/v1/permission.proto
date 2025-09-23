@@ -4,7 +4,7 @@ package common.v1;
 
 import "validate/validate.proto";
 
-option go_package = "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1";
+option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1";
 
 // =============================================================================
 // Permission Common Types (common.v1)

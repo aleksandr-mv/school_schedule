@@ -7,8 +7,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	roleV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role/v1"
 )
 
 func (s *APISuite) TestDeleteSuccess() {

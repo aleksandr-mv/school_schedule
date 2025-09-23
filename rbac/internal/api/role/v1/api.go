@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/service"
-	roleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/role/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service"
+	roleV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role/v1"
 )
 
 // Compile-time проверка интерфейса

@@ -3,7 +3,7 @@ package notification
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	def "github.com/aleksandr-mv/school_schedule/iam/internal/repository"
+	def "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository"
 )
 
 var _ def.NotificationRepository = (*notificationRepository)(nil)

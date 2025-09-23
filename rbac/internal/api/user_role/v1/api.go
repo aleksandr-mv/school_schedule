@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/service"
-	userRoleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service"
+	userRoleV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
 var _ userRoleV1.UserRoleServiceServer = (*API)(nil)

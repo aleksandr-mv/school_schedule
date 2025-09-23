@@ -7,12 +7,11 @@
 package common_v1
 
 import (
-	reflect "reflect"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
+	reflect "reflect"
+	unsafe "unsafe"
 )
 
 const (
@@ -48,12 +47,11 @@ const file_common_v1_annotations_proto_rawDesc = "" +
 	"\x1bcommon/v1/annotations.proto\x12\tcommon.v1\x1a google/protobuf/descriptor.proto:@\n" +
 	"\n" +
 	"permission\x12\x1e.google.protobuf.MethodOptions\x18ц\x03 \x01(\tR\n" +
-	"permissionBNZLgithub.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
+	"permissionBUZSgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
 
 var file_common_v1_annotations_proto_goTypes = []any{
 	(*descriptorpb.MethodOptions)(nil), // 0: google.protobuf.MethodOptions
 }
-
 var file_common_v1_annotations_proto_depIdxs = []int32{
 	0, // 0: common.v1.permission:extendee -> google.protobuf.MethodOptions
 	1, // [1:1] is the sub-list for method output_type

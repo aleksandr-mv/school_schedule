@@ -11,15 +11,15 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/closer"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/config/contracts"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/health"
-	platformgrpc "github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/server"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/metric"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
-	authV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/auth/v1"
-	userV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/closer"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/health"
+	platformgrpc "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/server"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/metric"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/tracing"
+	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
+	userV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user/v1"
 )
 
 type App struct {

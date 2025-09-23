@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	commonV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/common/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	commonV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 )
 
 func PermissionsToProto(permissions []*model.Permission) []*commonV1.Permission {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository/converter"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/converter"
 )
 
 func (r *repository) Set(ctx context.Context, role *model.EnrichedRole, expiresAt time.Time) error {

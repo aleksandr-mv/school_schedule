@@ -1,8 +1,8 @@
 package role_permission
 
 import (
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/repository"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/service"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service"
 )
 
 var _ service.RolePermissionServiceInterface = (*RolePermissionService)(nil)

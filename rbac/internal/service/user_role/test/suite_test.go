@@ -6,10 +6,10 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	repositoryMocks "github.com/aleksandr-mv/school_schedule/rbac/internal/repository/mocks"
-	serviceMocks "github.com/aleksandr-mv/school_schedule/rbac/internal/service/mocks"
-	"github.com/aleksandr-mv/school_schedule/rbac/internal/service/user_role"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	repositoryMocks "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/mocks"
+	serviceMocks "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service/mocks"
+	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service/user_role"
 )
 
 type ServiceSuite struct {

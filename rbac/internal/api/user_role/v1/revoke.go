@@ -6,8 +6,8 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
-	userRoleV1 "github.com/aleksandr-mv/school_schedule/shared/pkg/proto/user_role/v1"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
+	userRoleV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1"
 )
 
 func (api *API) Revoke(ctx context.Context, req *userRoleV1.RevokeRequest) (*emptypb.Empty, error) {

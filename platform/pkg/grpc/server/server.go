@@ -7,8 +7,8 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/grpc/interceptor"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 // BuildUnaryInterceptors строит базовую цепочку Unary-интерсепторов сервера gRPC

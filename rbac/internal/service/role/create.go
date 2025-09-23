@@ -3,8 +3,8 @@ package role
 import (
 	"context"
 
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/tracing"
 	"github.com/google/uuid"
 )
 
