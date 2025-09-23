@@ -80,3 +80,10 @@ ehthumbs.db
 Icon?
 Thumbs.db
 *.lnk
+
+# Binary files
+kubectl
+minikube
+*.exe
+*.dmg
+*.pkg
