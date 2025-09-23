@@ -130,65 +130,6 @@ func (_c *AuthService_Logout_Call) RunAndReturn(run func(context.Context, uuid.U
 	return _c
 }
 
-// Whoami provides a mock function with given fields: ctx, sessionID
-func (_m *AuthService) Whoami(ctx context.Context, sessionID uuid.UUID) (*model.WhoAMI, error) {
-	ret := _m.Called(ctx, sessionID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for Whoami")
-	}
-
-	var r0 *model.WhoAMI
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*model.WhoAMI, error)); ok {
-		return rf(ctx, sessionID)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *model.WhoAMI); ok {
-		r0 = rf(ctx, sessionID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.WhoAMI)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = rf(ctx, sessionID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// AuthService_Whoami_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Whoami'
-type AuthService_Whoami_Call struct {
-	*mock.Call
-}
-
-// Whoami is a helper method to define mock.On call
-//   - ctx context.Context
-//   - sessionID uuid.UUID
-func (_e *AuthService_Expecter) Whoami(ctx interface{}, sessionID interface{}) *AuthService_Whoami_Call {
-	return &AuthService_Whoami_Call{Call: _e.mock.On("Whoami", ctx, sessionID)}
-}
-
-func (_c *AuthService_Whoami_Call) Run(run func(ctx context.Context, sessionID uuid.UUID)) *AuthService_Whoami_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID))
-	})
-	return _c
-}
-
-func (_c *AuthService_Whoami_Call) Return(_a0 *model.WhoAMI, _a1 error) *AuthService_Whoami_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *AuthService_Whoami_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*model.WhoAMI, error)) *AuthService_Whoami_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // NewAuthService creates a new instance of AuthService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewAuthService(t interface {

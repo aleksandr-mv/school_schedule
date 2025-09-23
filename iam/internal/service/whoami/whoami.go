@@ -4,22 +4,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-
 	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
+	"github.com/google/uuid"
 )
 
 func (s *WhoAMIService) Whoami(ctx context.Context, sessionID uuid.UUID) (*model.WhoAMI, error) {
 	iam, err := s.sessionRepository.Get(ctx, sessionID)
 	if err != nil {
-		logger.Error(ctx,
-			"❌ [Service] Ошибка получения сессии",
-			zap.Error(err),
-			zap.String("operation", "whoami.Service.Whoami"),
-		)
-
+		errreport.Report(ctx, "❌ [Service] Ошибка получения сессии", err)
 		return nil, err
 	}
 
@@ -29,11 +22,7 @@ func (s *WhoAMIService) Whoami(ctx context.Context, sessionID uuid.UUID) (*model
 
 	roles, err := s.rbacClient.GetUserRoles(ctx, iam.User.ID)
 	if err != nil {
-		logger.Error(ctx,
-			"❌ [Service] Ошибка получения ролей пользователя",
-			zap.Error(err),
-			zap.String("operation", "whoami.Service.Whoami"),
-		)
+		errreport.Report(ctx, "❌ [Service] Ошибка получения ролей пользователя", err)
 		roles = []*model.RoleWithPermissions{}
 	}
 

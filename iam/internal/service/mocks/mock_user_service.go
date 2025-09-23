@@ -83,9 +83,9 @@ func (_c *UserService_GetUser_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
-// Register provides a mock function with given fields: ctx, createUser
-func (_m *UserService) Register(ctx context.Context, createUser *model.CreateUser) (*model.User, error) {
-	ret := _m.Called(ctx, createUser)
+// Register provides a mock function with given fields: ctx, login, email, password
+func (_m *UserService) Register(ctx context.Context, login string, email string, password string) (*model.User, error) {
+	ret := _m.Called(ctx, login, email, password)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Register")
@@ -93,19 +93,19 @@ func (_m *UserService) Register(ctx context.Context, createUser *model.CreateUse
 
 	var r0 *model.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.CreateUser) (*model.User, error)); ok {
-		return rf(ctx, createUser)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) (*model.User, error)); ok {
+		return rf(ctx, login, email, password)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.CreateUser) *model.User); ok {
-		r0 = rf(ctx, createUser)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *model.User); ok {
+		r0 = rf(ctx, login, email, password)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.CreateUser) error); ok {
-		r1 = rf(ctx, createUser)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, login, email, password)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -120,14 +120,16 @@ type UserService_Register_Call struct {
 
 // Register is a helper method to define mock.On call
 //   - ctx context.Context
-//   - createUser *model.CreateUser
-func (_e *UserService_Expecter) Register(ctx interface{}, createUser interface{}) *UserService_Register_Call {
-	return &UserService_Register_Call{Call: _e.mock.On("Register", ctx, createUser)}
+//   - login string
+//   - email string
+//   - password string
+func (_e *UserService_Expecter) Register(ctx interface{}, login interface{}, email interface{}, password interface{}) *UserService_Register_Call {
+	return &UserService_Register_Call{Call: _e.mock.On("Register", ctx, login, email, password)}
 }
 
-func (_c *UserService_Register_Call) Run(run func(ctx context.Context, createUser *model.CreateUser)) *UserService_Register_Call {
+func (_c *UserService_Register_Call) Run(run func(ctx context.Context, login string, email string, password string)) *UserService_Register_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*model.CreateUser))
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string))
 	})
 	return _c
 }
@@ -137,7 +139,7 @@ func (_c *UserService_Register_Call) Return(_a0 *model.User, _a1 error) *UserSer
 	return _c
 }
 
-func (_c *UserService_Register_Call) RunAndReturn(run func(context.Context, *model.CreateUser) (*model.User, error)) *UserService_Register_Call {
+func (_c *UserService_Register_Call) RunAndReturn(run func(context.Context, string, string, string) (*model.User, error)) *UserService_Register_Call {
 	_c.Call.Return(run)
 	return _c
 }

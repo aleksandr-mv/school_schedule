@@ -3,22 +3,14 @@ package auth
 import (
 	"context"
 
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-
 	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
+	"github.com/google/uuid"
 )
 
 func (s *AuthService) Logout(ctx context.Context, sessionID uuid.UUID) error {
 	if err := s.sessionRepository.Delete(ctx, sessionID); err != nil {
-		logger.Error(ctx,
-			"❌ [Service] Ошибка удаления сессии",
-			zap.Error(err),
-			zap.String("operation", "auth.Service.Logout"),
-			zap.String("session_id", sessionID.String()),
-		)
-
+		errreport.Report(ctx, "❌ [Service] Ошибка удаления сессии", err)
 		return model.ErrFailedToDeleteSession
 	}
 

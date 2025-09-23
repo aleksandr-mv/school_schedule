@@ -4,12 +4,11 @@ import (
 	"context"
 	"time"
 
-	"go.opentelemetry.io/otel/codes"
-	"go.uber.org/zap"
-
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
+	"go.uber.org/zap"
 )
 
 func (s *RoleService) Get(ctx context.Context, id string) (*model.EnrichedRole, error) {
@@ -23,17 +22,13 @@ func (s *RoleService) Get(ctx context.Context, id string) (*model.EnrichedRole, 
 
 	role, err := s.roleRepo.Get(ctx, id)
 	if err != nil {
-		logger.Error(ctx, "❌ [Service] Ошибка получения роли из репозитория", zap.Error(err))
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
+		errreport.Report(ctx, "❌ [Service] Ошибка получения роли из репозитория", err)
 		return nil, err
 	}
 
 	permissions, err := s.rolePermissionRepo.GetRolePermissions(ctx, id)
 	if err != nil {
-		logger.Error(ctx, "❌ [Service] Ошибка получения прав роли", zap.Error(err))
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
+		errreport.Report(ctx, "❌ [Service] Ошибка получения прав роли", err)
 		return nil, err
 	}
 

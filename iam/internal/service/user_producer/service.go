@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"go.uber.org/zap"
-
 	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
 	def "github.com/aleksandr-mv/school_schedule/iam/internal/service"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/kafka"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
 )
@@ -28,12 +27,12 @@ func NewService(producer kafka.Producer) def.UserProducerService {
 func (s *service) ProduceUserCreated(ctx context.Context, event model.UserCreated) error {
 	payload, err := json.Marshal(event)
 	if err != nil {
-		logger.Error(ctx, "❌ Ошибка кодирования UserCreated", zap.Error(err))
+		errreport.Report(ctx, "❌ [Producer] Ошибка кодирования UserCreated", err)
 		return fmt.Errorf("encode user created: %w", err)
 	}
 
 	if err = s.producer.Send(ctx, []byte(event.UserID.String()), payload); err != nil {
-		logger.Error(ctx, "❌ Ошибка отправки UserCreated", zap.Error(err))
+		errreport.Report(ctx, "❌ [Producer] Ошибка отправки UserCreated", err)
 		return fmt.Errorf("send user created to kafka: %w", err)
 	}
 

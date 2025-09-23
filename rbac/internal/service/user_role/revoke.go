@@ -3,10 +3,7 @@ package user_role
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/codes"
-	"go.uber.org/zap"
-
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
 )
 
@@ -16,9 +13,7 @@ func (s *UserRoleService) Revoke(ctx context.Context, userID, roleID string) err
 
 	err := s.userRoleRepo.Revoke(ctx, userID, roleID)
 	if err != nil {
-		logger.Error(ctx, "❌ [Service] Ошибка отзыва роли у пользователя", zap.Error(err))
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
+		errreport.Report(ctx, "❌ [Service] Ошибка отзыва роли у пользователя", err)
 		return err
 	}
 

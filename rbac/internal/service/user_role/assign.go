@@ -3,10 +3,7 @@ package user_role
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/codes"
-	"go.uber.org/zap"
-
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
 )
 
@@ -16,9 +13,7 @@ func (s *UserRoleService) Assign(ctx context.Context, userID, roleID string, ass
 
 	err := s.userRoleRepo.Assign(ctx, userID, roleID, assignedBy)
 	if err != nil {
-		logger.Error(ctx, "❌ [Service] Ошибка назначения роли пользователю", zap.Error(err))
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
+		errreport.Report(ctx, "❌ [Service] Ошибка назначения роли пользователю", err)
 		return err
 	}
 

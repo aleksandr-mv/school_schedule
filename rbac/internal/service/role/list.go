@@ -3,10 +3,7 @@ package role
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/codes"
-	"go.uber.org/zap"
-
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
 	"github.com/aleksandr-mv/school_schedule/platform/pkg/tracing"
 	"github.com/aleksandr-mv/school_schedule/rbac/internal/model"
 )
@@ -17,9 +14,7 @@ func (s *RoleService) List(ctx context.Context) ([]*model.Role, error) {
 
 	roles, err := s.roleRepo.List(ctx)
 	if err != nil {
-		logger.Error(ctx, "❌ [Service] Ошибка получения списка ролей из репозитория", zap.Error(err))
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
+		errreport.Report(ctx, "❌ [Service] Ошибка получения списка ролей из репозитория", err)
 		return nil, err
 	}
 

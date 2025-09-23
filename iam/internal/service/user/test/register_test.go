@@ -13,11 +13,9 @@ import (
 func (s *ServiceSuite) TestRegisterSuccess() {
 	userID := uuid.New()
 
-	createUser := &model.CreateUser{
-		Login:    "testuser123",
-		Email:    "test@example.com",
-		Password: "password123456",
-	}
+	login := "testuser123"
+	email := "test@example.com"
+	password := "password123456"
 
 	expectedUser := &model.User{
 		ID:           userID,
@@ -31,7 +29,7 @@ func (s *ServiceSuite) TestRegisterSuccess() {
 	s.userRepository.On("Create", mock.Anything, mock.AnythingOfType("model.User")).Return(expectedUser, nil)
 	s.userProducerService.On("ProduceUserCreated", mock.Anything, mock.AnythingOfType("model.UserCreated")).Return(nil)
 
-	result, err := s.service.Register(s.ctx, createUser)
+	result, err := s.service.Register(s.ctx, login, email, password)
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), result)
@@ -44,15 +42,13 @@ func (s *ServiceSuite) TestRegisterSuccess() {
 }
 
 func (s *ServiceSuite) TestRegisterUserAlreadyExists() {
-	createUser := &model.CreateUser{
-		Login:    "existinguser",
-		Email:    "existing@example.com",
-		Password: "password123456",
-	}
+	login := "existinguser"
+	email := "existing@example.com"
+	password := "password123456"
 
 	s.userRepository.On("Create", mock.Anything, mock.AnythingOfType("model.User")).Return(nil, model.ErrUserAlreadyExists)
 
-	result, err := s.service.Register(s.ctx, createUser)
+	result, err := s.service.Register(s.ctx, login, email, password)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrUserAlreadyExists, err)
@@ -63,33 +59,14 @@ func (s *ServiceSuite) TestRegisterUserAlreadyExists() {
 	s.userProducerService.AssertNotCalled(s.T(), "ProduceUserCreated")
 }
 
-func (s *ServiceSuite) TestRegisterInvalidData() {
-	createUser := &model.CreateUser{
-		Login:    "", // Невалидный логин
-		Email:    "test@example.com",
-		Password: "password123456",
-	}
-
-	result, err := s.service.Register(s.ctx, createUser)
-
-	assert.Error(s.T(), err)
-	assert.Equal(s.T(), model.ErrBadRequest, err)
-	assert.Nil(s.T(), result)
-
-	s.userRepository.AssertNotCalled(s.T(), "Create")
-	s.userProducerService.AssertNotCalled(s.T(), "ProduceUserCreated")
-}
-
 func (s *ServiceSuite) TestRegisterRepositoryError() {
-	createUser := &model.CreateUser{
-		Login:    "testuser123",
-		Email:    "test@example.com",
-		Password: "password123456",
-	}
+	login := "testuser123"
+	email := "test@example.com"
+	password := "password123456"
 
 	s.userRepository.On("Create", mock.Anything, mock.AnythingOfType("model.User")).Return(nil, model.ErrInternal)
 
-	result, err := s.service.Register(s.ctx, createUser)
+	result, err := s.service.Register(s.ctx, login, email, password)
 
 	assert.Error(s.T(), err)
 	assert.Equal(s.T(), model.ErrInternal, err)

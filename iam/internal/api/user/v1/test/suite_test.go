@@ -15,7 +15,7 @@ type APISuite struct {
 	suite.Suite
 	ctx context.Context // nolint:containedctx
 
-	userService *mocks.UserServiceInterface
+	userService *mocks.UserService
 	api         *api.API
 }
 
@@ -26,7 +26,7 @@ func (s *APISuite) SetupTest() {
 		panic(err)
 	}
 
-	s.userService = mocks.NewUserServiceInterface(s.T())
+	s.userService = mocks.NewUserService(s.T())
 	s.api = api.NewAPI(s.userService)
 }
 

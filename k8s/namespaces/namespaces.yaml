@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: school-schedule-system
+  labels:
+    name: school-schedule-system
+    purpose: system-components
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: school-schedule-infrastructure
+  labels:
+    name: school-schedule-infrastructure
+    purpose: infrastructure
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: school-schedule-services
+  labels:
+    name: school-schedule-services
+    purpose: microservices
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: school-schedule-monitoring
+  labels:
+    name: school-schedule-monitoring
+    purpose: monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: school-schedule-ingress
+  labels:
+    name: school-schedule-ingress
+    purpose: ingress

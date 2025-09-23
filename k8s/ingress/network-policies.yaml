@@ -1,0 +1,62 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: school-schedule-services-policy
+  namespace: school-schedule-services
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: school-schedule-ingress
+    - namespaceSelector:
+        matchLabels:
+          name: school-schedule-monitoring
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: school-schedule-infrastructure
+    - namespaceSelector:
+        matchLabels:
+          name: school-schedule-monitoring
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: school-schedule-infrastructure-policy
+  namespace: school-schedule-infrastructure
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: school-schedule-services
+  egress:
+  - to: []
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: school-schedule-monitoring-policy
+  namespace: school-schedule-monitoring
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: school-schedule-services
+  egress:
+  - to: []

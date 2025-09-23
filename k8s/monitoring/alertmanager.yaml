@@ -1,0 +1,369 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: school-schedule-monitoring
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'localhost:587'
+      smtp_from: 'alerts@school-schedule.com'
+      smtp_auth_username: 'alerts@school-schedule.com'
+      smtp_auth_password: 'password'
+    
+    # Маршрутизация алертов
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'default-receiver'
+      routes:
+      # Критические алерты - немедленно
+      - match:
+          severity: critical
+        receiver: 'critical-alerts'
+        group_wait: 5s
+        repeat_interval: 5m
+      
+      # Предупреждения - группировка
+      - match:
+          severity: warning
+        receiver: 'warning-alerts'
+        group_wait: 30s
+        repeat_interval: 1h
+      
+      # Алерты по сервисам
+      - match:
+          service: iam-service
+        receiver: 'iam-alerts'
+        group_wait: 10s
+        repeat_interval: 30m
+      
+      - match:
+          service: rbac-service
+        receiver: 'rbac-alerts'
+        group_wait: 10s
+        repeat_interval: 30m
+    
+    # Получатели уведомлений
+    receivers:
+    - name: 'default-receiver'
+      webhook_configs:
+      - url: 'http://webhook-receiver:8080/webhook'
+        send_resolved: true
+    
+    - name: 'critical-alerts'
+      email_configs:
+      - to: 'oncall@school-schedule.com'
+        subject: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          Instance: {{ .Labels.instance }}
+          {{ end }}
+      slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#alerts-critical'
+        title: '🚨 Critical Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+        send_resolved: true
+    
+    - name: 'warning-alerts'
+      email_configs:
+      - to: 'devops@school-schedule.com'
+        subject: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          {{ end }}
+      slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#alerts-warning'
+        title: '⚠️ Warning Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+    
+    - name: 'iam-alerts'
+      email_configs:
+      - to: 'iam-team@school-schedule.com'
+        subject: '🔐 IAM Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          IAM Service Alert: {{ .Annotations.summary }}
+          {{ end }}
+      slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#iam-alerts'
+        title: '🔐 IAM Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+    
+    - name: 'rbac-alerts'
+      email_configs:
+      - to: 'rbac-team@school-schedule.com'
+        subject: '🛡️ RBAC Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          RBAC Service Alert: {{ .Annotations.summary }}
+          {{ end }}
+      slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#rbac-alerts'
+        title: '🛡️ RBAC Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: school-schedule-monitoring
+  labels:
+    app: alertmanager
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.25.0
+        ports:
+        - containerPort: 9093
+          name: web
+        args:
+        - '--config.file=/etc/alertmanager/alertmanager.yml'
+        - '--storage.path=/alertmanager'
+        - '--web.external-url=http://alertmanager.school-schedule.com'
+        - '--web.route-prefix=/'
+        - '--cluster.listen-address=0.0.0.0:9094'
+        - '--cluster.peer=alertmanager-0.alertmanager.school-schedule-monitoring.svc.cluster.local:9094'
+        - '--cluster.peer=alertmanager-1.alertmanager.school-schedule-monitoring.svc.cluster.local:9094'
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alertmanager
+        - name: storage
+          mountPath: /alertmanager
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: alertmanager-config
+      - name: storage
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: school-schedule-monitoring
+  labels:
+    app: alertmanager
+spec:
+  selector:
+    app: alertmanager
+  ports:
+  - name: web
+    port: 9093
+    targetPort: 9093
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: school-schedule-monitoring
+data:
+  iam-alerts.yml: |
+    groups:
+    - name: iam-service
+      rules:
+      # Высокая загрузка CPU
+      - alert: IAMHighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="iam-service"}[5m]) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+          service: iam-service
+        annotations:
+          summary: "IAM Service high CPU usage"
+          description: "IAM Service CPU usage is above 80% for more than 2 minutes"
+      
+      # Высокое использование памяти
+      - alert: IAMHighMemoryUsage
+        expr: process_resident_memory_bytes{job="iam-service"} / 1024 / 1024 > 200
+        for: 2m
+        labels:
+          severity: warning
+          service: iam-service
+        annotations:
+          summary: "IAM Service high memory usage"
+          description: "IAM Service memory usage is above 200MB for more than 2 minutes"
+      
+      # Ошибки gRPC
+      - alert: IAMGrpcErrors
+        expr: rate(grpc_server_handled_total{job="iam-service",grpc_code!="OK"}[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: iam-service
+        annotations:
+          summary: "IAM Service gRPC errors"
+          description: "IAM Service gRPC error rate is above 0.1/s for more than 1 minute"
+      
+      # Медленные запросы
+      - alert: IAMSlowRequests
+        expr: histogram_quantile(0.95, rate(grpc_server_handled_seconds_bucket{job="iam-service"}[5m])) > 1
+        for: 2m
+        labels:
+          severity: warning
+          service: iam-service
+        annotations:
+          summary: "IAM Service slow requests"
+          description: "IAM Service 95th percentile latency is above 1s for more than 2 minutes"
+      
+      # Недоступность сервиса
+      - alert: IAMServiceDown
+        expr: up{job="iam-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: iam-service
+        annotations:
+          summary: "IAM Service is down"
+          description: "IAM Service has been down for more than 30 seconds"
+      
+      # Проблемы с базой данных
+      - alert: IAMDatabaseErrors
+        expr: rate(pg_stat_database_deadlocks{job="iam-service"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+          service: iam-service
+        annotations:
+          summary: "IAM Database deadlocks"
+          description: "IAM Service database deadlocks detected"
+  
+  rbac-alerts.yml: |
+    groups:
+    - name: rbac-service
+      rules:
+      # Высокая загрузка CPU
+      - alert: RBACHighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="rbac-service"}[5m]) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+          service: rbac-service
+        annotations:
+          summary: "RBAC Service high CPU usage"
+          description: "RBAC Service CPU usage is above 80% for more than 2 minutes"
+      
+      # Высокое использование памяти
+      - alert: RBACHighMemoryUsage
+        expr: process_resident_memory_bytes{job="rbac-service"} / 1024 / 1024 > 200
+        for: 2m
+        labels:
+          severity: warning
+          service: rbac-service
+        annotations:
+          summary: "RBAC Service high memory usage"
+          description: "RBAC Service memory usage is above 200MB for more than 2 minutes"
+      
+      # Ошибки gRPC
+      - alert: RBACGrpcErrors
+        expr: rate(grpc_server_handled_total{job="rbac-service",grpc_code!="OK"}[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: rbac-service
+        annotations:
+          summary: "RBAC Service gRPC errors"
+          description: "RBAC Service gRPC error rate is above 0.1/s for more than 1 minute"
+      
+      # Недоступность сервиса
+      - alert: RBACServiceDown
+        expr: up{job="rbac-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: rbac-service
+        annotations:
+          summary: "RBAC Service is down"
+          description: "RBAC Service has been down for more than 30 seconds"
+  
+  infrastructure-alerts.yml: |
+    groups:
+    - name: infrastructure
+      rules:
+      # Проблемы с PostgreSQL
+      - alert: PostgreSQLDown
+        expr: up{job="postgres-iam"} == 0 or up{job="postgres-rbac"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: database
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database is down for more than 30 seconds"
+      
+      # Проблемы с Redis
+      - alert: RedisDown
+        expr: up{job="redis-cluster"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cluster is down for more than 30 seconds"
+      
+      # Проблемы с Kafka
+      - alert: KafkaDown
+        expr: up{job="kafka"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: kafka
+        annotations:
+          summary: "Kafka is down"
+          description: "Kafka cluster is down for more than 30 seconds"
+      
+      # Высокое использование диска
+      - alert: HighDiskUsage
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "High disk usage"
+          description: "Disk usage is above 90% for more than 5 minutes"

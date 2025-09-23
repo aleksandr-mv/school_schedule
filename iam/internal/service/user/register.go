@@ -2,61 +2,41 @@ package user
 
 import (
 	"context"
-
-	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
+	"fmt"
 
 	"github.com/aleksandr-mv/school_schedule/iam/internal/model"
-	"github.com/aleksandr-mv/school_schedule/platform/pkg/logger"
+	"github.com/aleksandr-mv/school_schedule/platform/pkg/errreport"
+	"golang.org/x/crypto/bcrypt"
 )
 
-func (s *UserService) Register(ctx context.Context, createUser *model.CreateUser) (*model.User, error) {
-	if err := createUser.Validate(); err != nil {
-		logger.Error(ctx,
-			"❌ [Service] Невалидные данные для регистрации",
-			zap.Error(err),
-			zap.String("operation", "user.Service.Register"),
-		)
-
-		return nil, model.ErrBadRequest
-	}
-
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(createUser.Password), bcrypt.DefaultCost)
+func (s *UserService) Register(ctx context.Context, login, email, password string) (*model.User, error) {
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		logger.Error(ctx,
-			"❌ [Service] Ошибка хэширования пароля",
-			zap.Error(err),
-			zap.String("operation", "user.Service.Register"),
-		)
-
+		errreport.Report(ctx, "❌ [Service] Ошибка хэширования пароля", err)
 		return nil, model.ErrInternal
 	}
 
 	user := model.User{
-		Login:        createUser.Login,
-		Email:        createUser.Email,
+		Login:        login,
+		Email:        email,
 		PasswordHash: string(hashedBytes),
 	}
 
 	createdUser, err := s.userRepository.Create(ctx, user)
 	if err != nil {
-		logger.Error(ctx,
-			"❌ [Service] Ошибка создания пользователя в БД",
-			zap.Error(err),
-			zap.String("operation", "user.Service.Register"),
-		)
-
+		errreport.Report(ctx, "❌ [Service] Ошибка создания пользователя в БД", err)
 		return nil, err
 	}
 
-	// Все новые пользователи получают роль admin по умолчанию
 	defaultRoleID := model.DefaultRoleID
 	if err := s.userProducerService.ProduceUserCreated(ctx, model.NewUserCreated(createdUser, defaultRoleID)); err != nil {
-		logger.Error(ctx,
-			"❌ [Service] Ошибка отправки события UserCreated",
-			zap.Error(err),
-			zap.String("operation", "user.Service.Register"),
-		)
+		errreport.Report(ctx, "❌ [Service] Ошибка отправки события UserCreated", err)
+
+		if deleteErr := s.userRepository.Delete(ctx, createdUser.ID); deleteErr != nil {
+			errreport.Report(ctx, "❌ [Service] Критическая ошибка: не удалось удалить пользователя при откате", deleteErr)
+		}
+
+		return nil, fmt.Errorf("failed to send user created event: %w", err)
 	}
 
 	return createdUser, nil

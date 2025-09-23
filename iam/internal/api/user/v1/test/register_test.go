@@ -79,7 +79,7 @@ func (s *APISuite) TestRegister() {
 
 	for _, tc := range testCases {
 		s.T().Run(tc.name, func(t *testing.T) {
-			s.userService.On("Register", mock.Anything, mock.AnythingOfType("*model.CreateUser")).Return(tc.serviceUser, tc.serviceError).Once()
+			s.userService.On("Register", mock.Anything, mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(tc.serviceUser, tc.serviceError).Once()
 
 			result, err := s.api.Register(s.ctx, tc.req)
 

@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster
+  namespace: school-schedule-infrastructure
+spec:
+  selector:
+    app: redis-cluster
+  ports:
+    - port: 6379
+      targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-cluster
+  namespace: school-schedule-infrastructure
+spec:
+  serviceName: redis-cluster
+  replicas: 6
+  selector:
+    matchLabels:
+      app: redis-cluster
+  template:
+    metadata:
+      labels:
+        app: redis-cluster
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        - containerPort: 16379
+        command:
+        - redis-server
+        - /etc/redis/redis.conf
+        - --cluster-enabled
+        - "yes"
+        - --cluster-config-file
+        - nodes.conf
+        - --cluster-node-timeout
+        - "5000"
+        - --appendonly
+        - "yes"
+        - --port
+        - "6379"
+        - --cluster-announce-ip
+        - $(POD_IP)
+        - --cluster-announce-port
+        - "6379"
+        - --cluster-announce-bus-port
+        - "16379"
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: redis-config
+          mountPath: /etc/redis
+        - name: redis-storage
+          mountPath: /data
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: redis-config
+        configMap:
+          name: redis-config
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redis-cluster-init
+  namespace: school-schedule-infrastructure
+spec:
+  template:
+    spec:
+      containers:
+      - name: redis-cluster-init
+        image: redis:7-alpine
+        command:
+        - sh
+        - -c
+        - |
+          sleep 10
+          redis-cli --cluster create \
+            redis-cluster-0.redis-cluster:6379 \
+            redis-cluster-1.redis-cluster:6379 \
+            redis-cluster-2.redis-cluster:6379 \
+            redis-cluster-3.redis-cluster:6379 \
+            redis-cluster-4.redis-cluster:6379 \
+            redis-cluster-5.redis-cluster:6379 \
+            --cluster-replicas 1 \
+            --cluster-yes
+      restartPolicy: OnFailure
+  backoffLimit: 3
