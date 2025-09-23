@@ -87,3 +87,6 @@ minikube
 *.exe
 *.dmg
 *.pkg
+
+# Compiled binaries
+main
