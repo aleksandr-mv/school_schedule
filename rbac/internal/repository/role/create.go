@@ -17,8 +17,7 @@ func (r *roleRepository) Create(ctx context.Context, name, description string) (
 	if err := r.writePool.QueryRow(ctx, query, name, description).Scan(&id); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-			switch pgErr.Code {
-			case "23505":
+			if pgErr.Code == "23505" {
 				return uuid.Nil, model.ErrRoleAlreadyExists
 			}
 		}

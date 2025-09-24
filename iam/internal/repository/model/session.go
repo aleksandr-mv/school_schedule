@@ -1,13 +1,9 @@
 package model
 
-import (
-	"time"
-
-	"github.com/google/uuid"
-)
-
-type Session struct {
-	ID        uuid.UUID `db:"id"`
-	ExpiresAt time.Time `db:"expires_at"`
-	CreatedAt time.Time `db:"created_at"`
+// SessionRedisView представляет сессию в Redis
+type SessionRedisView struct {
+	ID          string `redis:"session_id"`
+	ExpiresAtNs int64  `redis:"session_expires_at"`
+	CreatedAtNs int64  `redis:"session_created_at"`
+	UpdatedAtNs int64  `redis:"session_updated_at"`
 }

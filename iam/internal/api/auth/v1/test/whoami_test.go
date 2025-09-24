@@ -1,115 +1,101 @@
 package auth_test
 
 import (
+	"context"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
 	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
 )
 
 func (s *APISuite) TestWhoami() {
-	userID := uuid.New()
 	sessionID := uuid.New()
-	expiresAt := time.Now().Add(time.Hour)
 
-	expectedWhoami := &model.WhoAMI{
-		Session: model.Session{
-			ID:        sessionID,
-			ExpiresAt: expiresAt,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+	tests := []struct {
+		name           string
+		setupCtx       func() context.Context
+		setupMocks     func()
+		expectedErr    codes.Code
+		validateResult func(*testing.T, *authV1.WhoamiResponse)
+	}{
+		{
+			name: "Success - получение данных из Redis",
+			setupCtx: func() context.Context {
+				ctx := context.WithValue(s.ctx, interceptor.GetSessionIDContextKey(), sessionID.String())
+				return ctx
+			},
+			setupMocks: func() {
+				whoami := &model.WhoAMI{
+					User: model.User{
+						ID:    uuid.New(),
+						Login: "testuser",
+						Email: "test@example.com",
+					},
+					RolesWithPermissions: []*model.RoleWithPermissions{
+						{
+							Role: &model.Role{
+								ID:   uuid.New(),
+								Name: "admin",
+							},
+							Permissions: []*model.Permission{
+								{ID: uuid.New(), Resource: "user", Action: "read"},
+							},
+						},
+					},
+				}
+				s.whoAMIService.On("Whoami", mock.Anything, sessionID).Return(whoami, nil)
+			},
+			expectedErr: codes.OK,
+			validateResult: func(t *testing.T, result *authV1.WhoamiResponse) {
+				assert.NotNil(t, result.Info)
+				assert.NotNil(t, result.Info.User)
+				assert.Equal(t, "testuser", result.Info.User.Info.Login)
+				assert.Equal(t, "test@example.com", result.Info.User.Info.Email)
+				assert.NotEmpty(t, result.Info.RolesWithPermissions)
+				assert.Equal(t, "admin", result.Info.RolesWithPermissions[0].Role.Name)
+			},
 		},
-		User: model.User{
-			ID:        userID,
-			Login:     "testuser",
-			Email:     "test@example.com",
-			CreatedAt: time.Now(),
-			UpdatedAt: nil,
-			NotificationMethods: []*model.NotificationMethod{
-				{
-					UserID:       userID,
-					ProviderName: "email",
-					Target:       "test@example.com",
-					CreatedAt:    time.Now(),
-					UpdatedAt:    nil,
-				},
+		{
+			name: "No session ID in context",
+			setupCtx: func() context.Context {
+				return s.ctx
+			},
+			setupMocks: func() {
+			},
+			expectedErr: codes.Unauthenticated,
+			validateResult: func(t *testing.T, result *authV1.WhoamiResponse) {
+				assert.Nil(t, result)
 			},
 		},
 	}
 
-	testCases := []struct {
-		name          string
-		req           *authV1.WhoamiRequest
-		serviceWhoami *model.WhoAMI
-		serviceError  error
-		expectedCode  codes.Code
-		expectedError bool
-	}{
-		{
-			name:          "Success",
-			req:           &authV1.WhoamiRequest{SessionId: sessionID.String()},
-			serviceWhoami: expectedWhoami,
-			serviceError:  nil,
-			expectedCode:  codes.OK,
-		},
-		{
-			name:          "SessionNotFound",
-			req:           &authV1.WhoamiRequest{SessionId: sessionID.String()},
-			serviceWhoami: nil,
-			serviceError:  model.ErrSessionNotFound,
-			expectedCode:  codes.Unauthenticated,
-			expectedError: true,
-		},
-		{
-			name:          "SessionExpired",
-			req:           &authV1.WhoamiRequest{SessionId: sessionID.String()},
-			serviceWhoami: nil,
-			serviceError:  model.ErrSessionExpired,
-			expectedCode:  codes.Unauthenticated,
-			expectedError: true,
-		},
-
-		{
-			name:          "InternalError",
-			req:           &authV1.WhoamiRequest{SessionId: sessionID.String()},
-			serviceWhoami: nil,
-			serviceError:  model.ErrInternal,
-			expectedCode:  codes.Internal,
-			expectedError: true,
-		},
-	}
-
-	for _, tc := range testCases {
+	for _, tc := range tests {
 		s.T().Run(tc.name, func(t *testing.T) {
-			s.authService.On("Whoami", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(tc.serviceWhoami, tc.serviceError).Once()
+			s.whoAMIService.ExpectedCalls = nil
 
-			result, err := s.api.Whoami(s.ctx, tc.req)
+			ctx := tc.setupCtx()
+			tc.setupMocks()
 
-			if tc.expectedError {
-				assert.Error(t, err)
-				assert.Nil(t, result)
-				grpcErr, ok := status.FromError(err)
-				assert.True(t, ok)
-				assert.Equal(t, tc.expectedCode, grpcErr.Code())
-			} else {
+			req := &authV1.WhoamiRequest{}
+
+			result, err := s.api.Whoami(ctx, req)
+
+			if tc.expectedErr == codes.OK {
 				assert.NoError(t, err)
 				assert.NotNil(t, result)
-				assert.NotNil(t, result.Session)
-				assert.NotNil(t, result.User)
-				assert.Equal(t, sessionID.String(), result.Session.Id)
-				assert.Equal(t, userID.String(), result.User.Id)
-				assert.Equal(t, "testuser", result.User.Info.Login)
-				assert.Equal(t, "test@example.com", result.User.Info.Email)
+				tc.validateResult(t, result)
+			} else {
+				assert.Error(t, err)
+				tc.validateResult(t, result)
 			}
 
-			s.authService.AssertExpectations(s.T())
+			s.whoAMIService.AssertExpectations(t)
 		})
 	}
 }

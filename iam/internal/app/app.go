@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -14,6 +15,7 @@ import (
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/closer"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/config/contracts"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/health"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
 	platformgrpc "github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/server"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/metric"
@@ -188,7 +190,11 @@ func (app *App) initGRPCServer(ctx context.Context) error {
 		app.cfg.GRPC().MaxRecvMsgSize(),
 		app.cfg.GRPC().MaxSendMsgSize(),
 		tracing.UnaryServerInterceptor(app.cfg.App().Name()),
-		metric.UnaryServerInterceptor(ctx, app.cfg.Metric().BucketBoundaries()))
+		metric.UnaryServerInterceptor(ctx, app.cfg.Metric().BucketBoundaries()),
+		interceptor.NewPublicFilter().Unary(),
+		interceptor.NewAuthInterceptor().Unary(),
+		interceptor.NewPermissionInterceptor().UnaryServerInterceptor(),
+	)
 
 	closer.AddNamed("gRPC server", func(ctx context.Context) error {
 		logger.Info(ctx, "⚡ [Shutdown] Остановка gRPC сервера")
@@ -206,13 +212,20 @@ func (app *App) initGRPCServer(ctx context.Context) error {
 		return fmt.Errorf("create user v1 api: %w", err)
 	}
 
+	externalAuthAPI, err := app.diContainer.ExternalAuthV1API(ctx)
+	if err != nil {
+		return fmt.Errorf("create external auth v1 api: %w", err)
+	}
+
 	reflection.Register(app.grpcServer)
 	health.RegisterService(app.grpcServer)
 	authV1.RegisterAuthServiceServer(app.grpcServer, authAPI)
 	userV1.RegisterUserServiceServer(app.grpcServer, userAPI)
+	authv3.RegisterAuthorizationServer(app.grpcServer, externalAuthAPI)
 
 	logger.Info(ctx, "✅ [App] Auth API инициализирован")
 	logger.Info(ctx, "✅ [App] User API инициализирован")
+	logger.Info(ctx, "✅ [App] External Auth API инициализирован")
 	logger.Info(ctx, "✅ [gRPC] Сервер успешно инициализирован")
 
 	return nil

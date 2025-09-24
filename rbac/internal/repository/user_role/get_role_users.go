@@ -26,7 +26,7 @@ func (r *userRoleRepository) GetRoleUsers(ctx context.Context, roleID string, li
 	}
 
 	var nextCursor *string
-	if int32(len(userIDs)) > limit {
+	if len(userIDs) > int(limit) {
 		next := userIDs[limit]
 		userIDs = userIDs[:limit]
 		nextCursor = &next

@@ -3,11 +3,11 @@ package consumer
 import (
 	"context"
 
-	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
-
 	"github.com/IBM/sarama"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
 )
 
 type consumer struct {

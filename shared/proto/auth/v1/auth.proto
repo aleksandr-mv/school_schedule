@@ -3,9 +3,9 @@ syntax = "proto3";
 package auth.v1;
 
 import "validate/validate.proto";
-import "common/v1/user.proto";
 import "common/v1/session.proto";
-import "common/v1/role.proto";
+import "common/v1/annotations.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1;auth_v1";
 
@@ -16,14 +16,26 @@ option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/p
 service AuthService {
   // Аутентификация пользователя
   rpc Login(LoginRequest) returns (LoginResponse) {
+    option (common.v1.public) = true;
+    option (google.api.http) = {
+      post: "/api/v1/auth/login"
+      body: "*"
+    };
   }
 
   // Получение информации о текущей сессии
   rpc Whoami(WhoamiRequest) returns (WhoamiResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/whoami"
+    };
   }
 
   // Выход из системы
   rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/logout"
+      body: "*"
+    };
   }
 }
 
@@ -38,21 +50,17 @@ message LoginResponse {
   string session_id = 1 [(validate.rules).string.uuid = true];
 }
 
-// Запрос информации о текущей сессии
+// Запрос информации о текущей сессии (пустой - данные берутся из контекста)
 message WhoamiRequest {
-  string session_id = 1 [(validate.rules).string.uuid = true];
 }
 
 // Ответ с информацией о текущей сессии
 message WhoamiResponse {
-  common.v1.Session session = 1 [(validate.rules).message.required = true];
-  common.v1.User user = 2 [(validate.rules).message.required = true];
-  repeated common.v1.RoleWithPermissions roles_with_permissions = 3;
+  common.v1.WhoamiInfo info = 1 [(validate.rules).message.required = true];
 }
 
 // Запрос на выход из системы
 message LogoutRequest {
-  string session_id = 1 [(validate.rules).string.uuid = true];
 }
 
 // Ответ на выход из системы

@@ -9,6 +9,7 @@ package auth_v1
 import (
 	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -121,10 +122,9 @@ func (x *LoginResponse) GetSessionId() string {
 	return ""
 }
 
-// Запрос информации о текущей сессии
+// Запрос информации о текущей сессии (пустой - данные берутся из контекста)
 type WhoamiRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -159,21 +159,12 @@ func (*WhoamiRequest) Descriptor() ([]byte, []int) {
 	return file_auth_v1_auth_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *WhoamiRequest) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
 // Ответ с информацией о текущей сессии
 type WhoamiResponse struct {
-	state                protoimpl.MessageState    `protogen:"open.v1"`
-	Session              *v1.Session               `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
-	User                 *v1.User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	RolesWithPermissions []*v1.RoleWithPermissions `protobuf:"bytes,3,rep,name=roles_with_permissions,json=rolesWithPermissions,proto3" json:"roles_with_permissions,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Info          *v1.WhoamiInfo         `protobuf:"bytes,1,opt,name=info,proto3" json:"info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WhoamiResponse) Reset() {
@@ -206,23 +197,9 @@ func (*WhoamiResponse) Descriptor() ([]byte, []int) {
 	return file_auth_v1_auth_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *WhoamiResponse) GetSession() *v1.Session {
+func (x *WhoamiResponse) GetInfo() *v1.WhoamiInfo {
 	if x != nil {
-		return x.Session
-	}
-	return nil
-}
-
-func (x *WhoamiResponse) GetUser() *v1.User {
-	if x != nil {
-		return x.User
-	}
-	return nil
-}
-
-func (x *WhoamiResponse) GetRolesWithPermissions() []*v1.RoleWithPermissions {
-	if x != nil {
-		return x.RolesWithPermissions
+		return x.Info
 	}
 	return nil
 }
@@ -230,7 +207,6 @@ func (x *WhoamiResponse) GetRolesWithPermissions() []*v1.RoleWithPermissions {
 // Запрос на выход из системы
 type LogoutRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -263,13 +239,6 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
 	return file_auth_v1_auth_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *LogoutRequest) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
 }
 
 // Ответ на выход из системы
@@ -321,29 +290,23 @@ var File_auth_v1_auth_proto protoreflect.FileDescriptor
 
 const file_auth_v1_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x12auth/v1/auth.proto\x12\aauth.v1\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x17common/v1/session.proto\x1a\x14common/v1/role.proto\"R\n" +
+	"\x12auth/v1/auth.proto\x12\aauth.v1\x1a\x17validate/validate.proto\x1a\x17common/v1/session.proto\x1a\x1bcommon/v1/annotations.proto\x1a\x1cgoogle/api/annotations.proto\"R\n" +
 	"\fLoginRequest\x12\x1d\n" +
 	"\x05login\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x03R\x05login\x12#\n" +
 	"\bpassword\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x06R\bpassword\"8\n" +
 	"\rLoginResponse\x12'\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"8\n" +
-	"\rWhoamiRequest\x12'\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"\xcd\x01\n" +
-	"\x0eWhoamiResponse\x126\n" +
-	"\asession\x18\x01 \x01(\v2\x12.common.v1.SessionB\b\xfaB\x05\x8a\x01\x02\x10\x01R\asession\x12-\n" +
-	"\x04user\x18\x02 \x01(\v2\x0f.common.v1.UserB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04user\x12T\n" +
-	"\x16roles_with_permissions\x18\x03 \x03(\v2\x1e.common.v1.RoleWithPermissionsR\x14rolesWithPermissions\"8\n" +
-	"\rLogoutRequest\x12'\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"*\n" +
+	"session_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\tsessionId\"\x0f\n" +
+	"\rWhoamiRequest\"E\n" +
+	"\x0eWhoamiResponse\x123\n" +
+	"\x04info\x18\x01 \x01(\v2\x15.common.v1.WhoamiInfoB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04info\"\x0f\n" +
+	"\rLogoutRequest\"*\n" +
 	"\x0eLogoutResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xc1\x01\n" +
-	"\vAuthService\x128\n" +
-	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\"\x00\x12;\n" +
-	"\x06Whoami\x12\x16.auth.v1.WhoamiRequest\x1a\x17.auth.v1.WhoamiResponse\"\x00\x12;\n" +
-	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x17.auth.v1.LogoutResponse\"\x00BQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1;auth_v1b\x06proto3"
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\x9b\x02\n" +
+	"\vAuthService\x12Y\n" +
+	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\"!\x90\xb5\x18\x01\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/auth/login\x12V\n" +
+	"\x06Whoami\x12\x16.auth.v1.WhoamiRequest\x1a\x17.auth.v1.WhoamiResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/auth/whoami\x12Y\n" +
+	"\x06Logout\x12\x16.auth.v1.LogoutRequest\x1a\x17.auth.v1.LogoutResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/auth/logoutBQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1;auth_v1b\x06proto3"
 
 var (
 	file_auth_v1_auth_proto_rawDescOnce sync.Once
@@ -359,31 +322,27 @@ func file_auth_v1_auth_proto_rawDescGZIP() []byte {
 
 var file_auth_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_auth_v1_auth_proto_goTypes = []any{
-	(*LoginRequest)(nil),           // 0: auth.v1.LoginRequest
-	(*LoginResponse)(nil),          // 1: auth.v1.LoginResponse
-	(*WhoamiRequest)(nil),          // 2: auth.v1.WhoamiRequest
-	(*WhoamiResponse)(nil),         // 3: auth.v1.WhoamiResponse
-	(*LogoutRequest)(nil),          // 4: auth.v1.LogoutRequest
-	(*LogoutResponse)(nil),         // 5: auth.v1.LogoutResponse
-	(*v1.Session)(nil),             // 6: common.v1.Session
-	(*v1.User)(nil),                // 7: common.v1.User
-	(*v1.RoleWithPermissions)(nil), // 8: common.v1.RoleWithPermissions
+	(*LoginRequest)(nil),   // 0: auth.v1.LoginRequest
+	(*LoginResponse)(nil),  // 1: auth.v1.LoginResponse
+	(*WhoamiRequest)(nil),  // 2: auth.v1.WhoamiRequest
+	(*WhoamiResponse)(nil), // 3: auth.v1.WhoamiResponse
+	(*LogoutRequest)(nil),  // 4: auth.v1.LogoutRequest
+	(*LogoutResponse)(nil), // 5: auth.v1.LogoutResponse
+	(*v1.WhoamiInfo)(nil),  // 6: common.v1.WhoamiInfo
 }
 var file_auth_v1_auth_proto_depIdxs = []int32{
-	6, // 0: auth.v1.WhoamiResponse.session:type_name -> common.v1.Session
-	7, // 1: auth.v1.WhoamiResponse.user:type_name -> common.v1.User
-	8, // 2: auth.v1.WhoamiResponse.roles_with_permissions:type_name -> common.v1.RoleWithPermissions
-	0, // 3: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
-	2, // 4: auth.v1.AuthService.Whoami:input_type -> auth.v1.WhoamiRequest
-	4, // 5: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
-	1, // 6: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
-	3, // 7: auth.v1.AuthService.Whoami:output_type -> auth.v1.WhoamiResponse
-	5, // 8: auth.v1.AuthService.Logout:output_type -> auth.v1.LogoutResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	6, // 0: auth.v1.WhoamiResponse.info:type_name -> common.v1.WhoamiInfo
+	0, // 1: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
+	2, // 2: auth.v1.AuthService.Whoami:input_type -> auth.v1.WhoamiRequest
+	4, // 3: auth.v1.AuthService.Logout:input_type -> auth.v1.LogoutRequest
+	1, // 4: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
+	3, // 5: auth.v1.AuthService.Whoami:output_type -> auth.v1.WhoamiResponse
+	5, // 6: auth.v1.AuthService.Logout:output_type -> auth.v1.LogoutResponse
+	4, // [4:7] is the sub-list for method output_type
+	1, // [1:4] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_auth_v1_auth_proto_init() }

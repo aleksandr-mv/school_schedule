@@ -6,8 +6,10 @@ import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1";
 
-// Расширение для указания требуемых прав доступа
+// Расширения для управления доступом и аутентификацией
 extend google.protobuf.MethodOptions {
-  // Право доступа в формате "resource:action"
+  // Право доступа в формате "resource:action" 
   string permission = 50001;
+  // Публичный метод (без требования аутентификации)
+  bool public = 50002;
 }

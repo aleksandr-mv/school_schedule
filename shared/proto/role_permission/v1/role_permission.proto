@@ -3,6 +3,7 @@ syntax = "proto3";
 package role_permission.v1;
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 import "validate/validate.proto";
 import "common/v1/annotations.proto";
 
@@ -20,11 +21,18 @@ service RolePermissionService {
   // Назначение права роли
   rpc Assign(AssignRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "role_permission:write";
+    option (google.api.http) = {
+      post: "/api/v1/roles/{role_id}/permissions"
+      body: "*"
+    };
   }
 
   // Отзыв права у роли
   rpc Revoke(RevokeRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "role_permission:write";
+    option (google.api.http) = {
+      delete: "/api/v1/roles/{role_id}/permissions/{permission_id}"
+    };
   }
 }
 

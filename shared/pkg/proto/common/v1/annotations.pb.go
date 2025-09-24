@@ -30,6 +30,14 @@ var file_common_v1_annotations_proto_extTypes = []protoimpl.ExtensionInfo{
 		Tag:           "bytes,50001,opt,name=permission",
 		Filename:      "common/v1/annotations.proto",
 	},
+	{
+		ExtendedType:  (*descriptorpb.MethodOptions)(nil),
+		ExtensionType: (*bool)(nil),
+		Field:         50002,
+		Name:          "common.v1.public",
+		Tag:           "varint,50002,opt,name=public",
+		Filename:      "common/v1/annotations.proto",
+	},
 }
 
 // Extension fields to descriptorpb.MethodOptions.
@@ -38,6 +46,10 @@ var (
 	//
 	// optional string permission = 50001;
 	E_Permission = &file_common_v1_annotations_proto_extTypes[0]
+	// Публичный метод (без требования аутентификации)
+	//
+	// optional bool public = 50002;
+	E_Public = &file_common_v1_annotations_proto_extTypes[1]
 )
 
 var File_common_v1_annotations_proto protoreflect.FileDescriptor
@@ -47,17 +59,19 @@ const file_common_v1_annotations_proto_rawDesc = "" +
 	"\x1bcommon/v1/annotations.proto\x12\tcommon.v1\x1a google/protobuf/descriptor.proto:@\n" +
 	"\n" +
 	"permission\x12\x1e.google.protobuf.MethodOptions\x18ц\x03 \x01(\tR\n" +
-	"permissionBUZSgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
+	"permission:8\n" +
+	"\x06public\x12\x1e.google.protobuf.MethodOptions\x18҆\x03 \x01(\bR\x06publicBUZSgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
 
 var file_common_v1_annotations_proto_goTypes = []any{
 	(*descriptorpb.MethodOptions)(nil), // 0: google.protobuf.MethodOptions
 }
 var file_common_v1_annotations_proto_depIdxs = []int32{
 	0, // 0: common.v1.permission:extendee -> google.protobuf.MethodOptions
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	0, // [0:1] is the sub-list for extension extendee
+	0, // 1: common.v1.public:extendee -> google.protobuf.MethodOptions
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	0, // [0:2] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
 
@@ -73,7 +87,7 @@ func file_common_v1_annotations_proto_init() {
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_v1_annotations_proto_rawDesc), len(file_common_v1_annotations_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   0,
-			NumExtensions: 1,
+			NumExtensions: 2,
 			NumServices:   0,
 		},
 		GoTypes:           file_common_v1_annotations_proto_goTypes,

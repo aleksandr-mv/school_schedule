@@ -15,8 +15,96 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v1/roles/{roleId}/permissions": {
+      "post": {
+        "summary": "Назначение права роли",
+        "operationId": "RolePermissionService_Assign",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RolePermissionServiceAssignBody"
+            }
+          }
+        ],
+        "tags": [
+          "RolePermissionService"
+        ]
+      }
+    },
+    "/api/v1/roles/{roleId}/permissions/{permissionId}": {
+      "delete": {
+        "summary": "Отзыв права у роли",
+        "operationId": "RolePermissionService_Revoke",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "permissionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "RolePermissionService"
+        ]
+      }
+    }
+  },
   "definitions": {
+    "RolePermissionServiceAssignBody": {
+      "type": "object",
+      "properties": {
+        "permissionId": {
+          "type": "string"
+        }
+      },
+      "title": "Запрос на назначение права роли"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {

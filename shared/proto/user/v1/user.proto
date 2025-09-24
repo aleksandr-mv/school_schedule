@@ -5,12 +5,18 @@ package user.v1;
 import "validate/validate.proto";
 import "common/v1/user.proto";
 import "common/v1/annotations.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user/v1;user_v1";
 
 service UserService {
   // Регистрация нового пользователя
   rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (common.v1.public) = true;
+    option (google.api.http) = {
+      post: "/api/v1/users/register"
+      body: "*"
+    };
   }
 
   // Получение информации о пользователе

@@ -56,7 +56,7 @@ func initLogger(ctx context.Context, cfg *Config) {
 
 // Reinit сбрасывает состояние и инициализирует логгер заново с функциональными опциями.
 func Reinit(ctx context.Context, opts ...Option) error {
-	resetGlobalState()
+	resetGlobalState() //nolint:contextcheck // internal cleanup function
 	return Init(ctx, opts...)
 }
 
@@ -78,7 +78,7 @@ func resetGlobalState() {
 	initOnce = sync.Once{}
 	level = zap.AtomicLevel{}
 	if otelProvider != nil {
-		otelProvider.Shutdown(context.Background())
+		_ = otelProvider.Shutdown(context.Background()) //nolint:gosec // best effort cleanup
 		otelProvider = nil
 	}
 }

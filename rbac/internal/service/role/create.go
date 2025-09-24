@@ -3,9 +3,10 @@ package role
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/tracing"
-	"github.com/google/uuid"
 )
 
 func (s *RoleService) Create(ctx context.Context, name, description string) (uuid.UUID, error) {

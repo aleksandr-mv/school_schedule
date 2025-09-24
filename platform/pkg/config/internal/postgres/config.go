@@ -53,7 +53,7 @@ func (c *Config) ReplicaURI() string {
 	if len(c.replicaConns) == 0 {
 		return c.PrimaryURI() // fallback
 	}
-	replica := c.replicaConns[rand.Intn(len(c.replicaConns))]
+	replica := c.replicaConns[rand.Intn(len(c.replicaConns))] //nolint:gosec // load balancing, not security
 	return replica.URI()
 }
 

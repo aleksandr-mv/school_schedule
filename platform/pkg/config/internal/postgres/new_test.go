@@ -54,9 +54,9 @@ func TestNew_WithENVOverride(t *testing.T) {
 	clearPostgresEnv()
 
 	// Устанавливаем ENV переменные
-	os.Setenv("POSTGRES_USER", "envuser")
-	os.Setenv("POSTGRES_PASSWORD", "envpass")
-	os.Setenv("POSTGRES_DB", "envdb")
+	_ = os.Setenv("POSTGRES_USER", "envuser")
+	_ = os.Setenv("POSTGRES_PASSWORD", "envpass")
+	_ = os.Setenv("POSTGRES_DB", "envdb")
 	defer clearPostgresEnv()
 
 	err := helpers.InitViper("")
@@ -191,15 +191,8 @@ func TestConfig_ReplicaURI(t *testing.T) {
 			}
 
 			uri := cfg.ReplicaURI()
-			if tt.name == "no replicas - fallback to primary" {
-				if uri != tt.wantURI {
-					t.Errorf("ReplicaURI() = %v, expected %v", uri, tt.wantURI)
-				}
-			} else {
-				// Для единственной реплики должен вернуться её URI
-				if uri != tt.wantURI {
-					t.Errorf("ReplicaURI() = %v, expected %v", uri, tt.wantURI)
-				}
+			if uri != tt.wantURI {
+				t.Errorf("ReplicaURI() = %v, expected %v", uri, tt.wantURI)
 			}
 		})
 	}
@@ -252,6 +245,6 @@ func clearPostgresEnv() {
 	}
 
 	for _, envVar := range envVars {
-		os.Unsetenv(envVar)
+		_ = os.Unsetenv(envVar)
 	}
 }

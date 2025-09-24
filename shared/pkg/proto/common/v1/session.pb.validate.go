@@ -242,3 +242,216 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SessionValidationError{}
+
+// Validate checks the field values on WhoamiInfo with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *WhoamiInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on WhoamiInfo with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in WhoamiInfoMultiError, or
+// nil if none found.
+func (m *WhoamiInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WhoamiInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetSession() == nil {
+		err := WhoamiInfoValidationError{
+			field:  "Session",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetSession()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WhoamiInfoValidationError{
+					field:  "Session",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WhoamiInfoValidationError{
+					field:  "Session",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSession()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WhoamiInfoValidationError{
+				field:  "Session",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.GetUser() == nil {
+		err := WhoamiInfoValidationError{
+			field:  "User",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetUser()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WhoamiInfoValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WhoamiInfoValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WhoamiInfoValidationError{
+				field:  "User",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetRolesWithPermissions() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, WhoamiInfoValidationError{
+						field:  fmt.Sprintf("RolesWithPermissions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, WhoamiInfoValidationError{
+						field:  fmt.Sprintf("RolesWithPermissions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WhoamiInfoValidationError{
+					field:  fmt.Sprintf("RolesWithPermissions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return WhoamiInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// WhoamiInfoMultiError is an error wrapping multiple validation errors
+// returned by WhoamiInfo.ValidateAll() if the designated constraints aren't met.
+type WhoamiInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WhoamiInfoMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WhoamiInfoMultiError) AllErrors() []error { return m }
+
+// WhoamiInfoValidationError is the validation error returned by
+// WhoamiInfo.Validate if the designated constraints aren't met.
+type WhoamiInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WhoamiInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WhoamiInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WhoamiInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WhoamiInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WhoamiInfoValidationError) ErrorName() string { return "WhoamiInfoValidationError" }
+
+// Error satisfies the builtin error interface
+func (e WhoamiInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWhoamiInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WhoamiInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WhoamiInfoValidationError{}

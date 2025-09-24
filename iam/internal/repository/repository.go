@@ -24,7 +24,7 @@ type NotificationRepository interface {
 }
 
 type SessionRepository interface {
-	Create(ctx context.Context, user model.User, expiresAt time.Time) (uuid.UUID, error)
+	Create(ctx context.Context, whoami *model.WhoAMI, expiresAt time.Time) (uuid.UUID, error)
 	Get(ctx context.Context, sessionID uuid.UUID) (*model.WhoAMI, error)
 	Delete(ctx context.Context, sessionID uuid.UUID) error
 }

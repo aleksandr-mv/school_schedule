@@ -5,12 +5,14 @@ import (
 
 	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
+	"github.com/google/uuid"
 	statusv3 "google.golang.org/genproto/googleapis/rpc/status"
 
 	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
 )
 
-func (api *API) allowRequest(whoami *model.WhoAMI) *authv3.CheckResponse {
+func (api *API) allowRequest(whoami *model.WhoAMI, sessionID uuid.UUID) *authv3.CheckResponse {
 	roleNames := make([]string, len(whoami.RolesWithPermissions))
 	permissionsSet := make(map[string]bool)
 
@@ -29,25 +31,13 @@ func (api *API) allowRequest(whoami *model.WhoAMI) *authv3.CheckResponse {
 	headers := []*corev3.HeaderValueOption{
 		{
 			Header: &corev3.HeaderValue{
-				Key:   model.HeaderUserUUID,
-				Value: whoami.User.ID.String(),
+				Key:   interceptor.HeaderSessionID,
+				Value: sessionID.String(),
 			},
 		},
 		{
 			Header: &corev3.HeaderValue{
-				Key:   model.HeaderUserLogin,
-				Value: whoami.User.Login,
-			},
-		},
-		{
-			Header: &corev3.HeaderValue{
-				Key:   model.HeaderUserRoles,
-				Value: strings.Join(roleNames, ","),
-			},
-		},
-		{
-			Header: &corev3.HeaderValue{
-				Key:   model.HeaderUserPermissions,
+				Key:   interceptor.HeaderUserPermissions,
 				Value: strings.Join(permissions, ","),
 			},
 		},
@@ -58,7 +48,7 @@ func (api *API) allowRequest(whoami *model.WhoAMI) *authv3.CheckResponse {
 		HttpResponse: &authv3.CheckResponse_OkResponse{
 			OkResponse: &authv3.OkHttpResponse{
 				Headers:         headers,
-				HeadersToRemove: []string{model.HeaderCookie, model.HeaderAuthorization},
+				HeadersToRemove: []string{interceptor.HeaderCookie, interceptor.HeaderAuthorization},
 			},
 		},
 	}

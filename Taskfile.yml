@@ -476,14 +476,14 @@ tasks:
     dir: deploy/compose/eventbus
     cmds:
       - echo "[task] 🔄 Поднимаем eventbus контейнеры"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_eventbus up --build --detach
 
   down-eventbus:
     desc: "Остановить и удалить eventbus контейнеры"
     dir: deploy/compose/eventbus
     cmds:
       - echo "[task] 🛑 Останавливаем eventbus контейнеры"
-      - docker compose -p school_schedule down
+      - docker compose -p school_schedule_eventbus down
 
 
   # Tracing сервисы (Jaeger)
@@ -492,7 +492,7 @@ tasks:
     dir: deploy/compose/tracing
     cmds:
       - echo "[task] 🔍 Поднимаем tracing контейнеры"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_tracing up --build --detach
 
 
   down-tracing:
@@ -500,7 +500,7 @@ tasks:
     dir: deploy/compose/tracing
     cmds:
       - echo "[task] 🛑 Останавливаем tracing контейнеры"
-      - docker compose -p school_schedule down
+      - docker compose -p school_schedule_tracing down
 
   # Logs сервисы (ELK)
   up-logs:
@@ -508,7 +508,7 @@ tasks:
     dir: deploy/compose/logs
     cmds:
       - echo "[task] 📝 Поднимаем logs контейнеры"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_logs up --build --detach
 
 
   down-logs:
@@ -516,7 +516,7 @@ tasks:
     dir: deploy/compose/logs
     cmds:
       - echo "[task] 🛑 Останавливаем logs контейнеры"
-      - docker compose -p school_schedule down
+      - docker compose -p school_schedule_logs down
 
   # IAM сервис
   up-iam:
@@ -525,14 +525,14 @@ tasks:
     cmds: 
       - task: up-network
       - echo "[task] 🔐 Поднимаем iam сервис с зависимостями"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_iam up --build --detach
 
   down-iam:
     desc: "Остановить и удалить iam сервис и все его зависимости"
     dir: deploy/compose/iam
     cmds:
       - echo "[task] 🛑 Останавливаем iam сервис с зависимостями"
-      - docker compose -p school_schedule down --volumes
+      - docker compose -p school_schedule_iam down --volumes
 
   # RBAC сервис
   up-rbac:
@@ -541,14 +541,14 @@ tasks:
     cmds: 
       - task: up-network
       - echo "[task] 🔒 Поднимаем rbac сервис с зависимостями"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_rbac up --build --detach
 
   down-rbac:
     desc: "Остановить и удалить rbac сервис и все его зависимости"
     dir: deploy/compose/rbac
     cmds:
       - echo "[task] 🛑 Останавливаем rbac сервис с зависимостями"
-      - docker compose -p school_schedule down --volumes
+      - docker compose -p school_schedule_rbac down --volumes
 
   # Metrics сервисы (Prometheus + Grafana)
   up-metrics:
@@ -556,7 +556,7 @@ tasks:
     dir: deploy/compose/metrics
     cmds:
       - echo "[task] 📊 Поднимаем metrics контейнеры"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_metrics up --build --detach
 
 
   down-metrics:
@@ -564,7 +564,7 @@ tasks:
     dir: deploy/compose/metrics
     cmds:
       - echo "[task] 🛑 Останавливаем metrics контейнеры"
-      - docker compose -p school_schedule down --volumes
+      - docker compose -p school_schedule_metrics down --volumes
 
   # OTEL Collector
   up-otel:
@@ -572,14 +572,14 @@ tasks:
     dir: deploy/compose/otel
     cmds:
       - echo "[task] 📡 Поднимаем единый OTEL коллектор"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_otel up --build --detach
 
   down-otel:
     desc: "Остановить и удалить OTEL коллектор"
     dir: deploy/compose/otel
     cmds:
       - echo "[task] 🛑 Останавливаем OTEL коллектор"
-      - docker compose -p school_schedule down
+      - docker compose -p school_schedule_otel down
 
   up-cache:
     desc: "Поднять cache сервис (Redis) с зависимостями"
@@ -587,13 +587,13 @@ tasks:
     cmds:
       - task: up-network
       - echo "[task] 🚀 Поднимаем cache сервис"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_cache up --build --detach
   down-cache:
     desc: "Остановить и удалить cache сервис с зависимостями"
     dir: deploy/compose/cache
     cmds:
       - echo "[task] 🛑 Останавливаем cache сервис"
-      - docker compose -p school_schedule down --volumes
+      - docker compose -p school_schedule_cache down --volumes
       
   up-envoy:
     desc: "Поднять Envoy API Gateway"
@@ -602,14 +602,14 @@ tasks:
       - task: up-network
       - task: proto:build:microservices
       - echo "[task] 🌐 Поднимаем Envoy API Gateway"
-      - docker compose -p school_schedule up --build --detach
+      - docker compose -p school_schedule_envoy up --build --detach
 
   down-envoy:
     desc: "Остановить и удалить Envoy API Gateway"
     dir: deploy/compose/envoy
     cmds:
       - echo "[task] 🛑 Останавливаем Envoy API Gateway"
-      - docker compose -p school_schedule down --volumes
+      - docker compose -p school_schedule_envoy down --volumes
 
 # =============================================================================
 # DOCKER COMPOSE - УПРАВЛЕНИЕ ВСЕМИ СЕРВИСАМИ
@@ -668,54 +668,54 @@ tasks:
     cmds:
       - echo "[task] 📋 Логи всех сервисов"
       - echo "--- Eventbus logs ---"
-      - docker compose -f deploy/compose/eventbus/docker-compose.yaml logs --tail=20
+      - docker compose -p school_schedule_eventbus -f deploy/compose/eventbus/docker-compose.yaml logs --tail=20
       - echo "--- IAM logs ---"
-      - docker compose -f deploy/compose/iam/docker-compose.yml logs --tail=20
+      - docker compose -p school_schedule_iam -f deploy/compose/iam/docker-compose.yml logs --tail=20
       - echo "--- Metrics logs ---"
-      - docker compose -f deploy/compose/metrics/docker-compose.yaml logs --tail=20
+      - docker compose -p school_schedule_metrics -f deploy/compose/metrics/docker-compose.yaml logs --tail=20
       - echo "--- Logs logs ---"
-      - docker compose -f deploy/compose/logs/docker-compose.yml logs --tail=20
+      - docker compose -p school_schedule_logs -f deploy/compose/logs/docker-compose.yml logs --tail=20
       - echo "--- Tracing logs ---"
-      - docker compose -f deploy/compose/tracing/docker-compose.yml logs --tail=20
+      - docker compose -p school_schedule_tracing -f deploy/compose/tracing/docker-compose.yml logs --tail=20
       - echo "--- OTEL logs ---"
-      - docker compose -f deploy/compose/otel/docker-compose.yml logs --tail=20
+      - docker compose -p school_schedule_otel -f deploy/compose/otel/docker-compose.yml logs --tail=20
 
 
   logs-eventbus:
     desc: "Логи eventbus сервисов"
     dir: deploy/compose/eventbus
     cmds:
-      - docker compose logs --tail=50
+      - docker compose -p school_schedule_eventbus logs --tail=50
 
   logs-iam:
     desc: "Логи iam сервиса"
     dir: deploy/compose/iam
     cmds:
-      - docker compose logs --tail=50
+      - docker compose -p school_schedule_iam logs --tail=50
 
   logs-metrics:
     desc: "Логи metrics сервисов"
     dir: deploy/compose/metrics
     cmds:
-      - docker compose logs --tail=50
+      - docker compose -p school_schedule_metrics logs --tail=50
 
   logs-logs:
     desc: "Логи logs сервисов"
     dir: deploy/compose/logs
     cmds:
-      - docker compose logs --tail=50
+      - docker compose -p school_schedule_logs logs --tail=50
 
   logs-tracing:
     desc: "Логи tracing сервисов"
     dir: deploy/compose/tracing
     cmds:
-      - docker compose logs --tail=50
+      - docker compose -p school_schedule_tracing logs --tail=50
 
   logs-otel:
     desc: "Логи otel сервисов"
     dir: deploy/compose/otel
     cmds:
-      - docker compose logs --tail=50
+      - docker compose -p school_schedule_otel logs --tail=50
 
 # =============================================================================
 # DOCKER COMPOSE - ОЧИСТКА И УПРАВЛЕНИЕ РЕСУРСАМИ
@@ -727,3 +727,245 @@ tasks:
       - echo "[task] 🧹 Очищаем все Docker ресурсы"
       - docker system prune -a --volumes -f
       - echo "✅ Очистка завершена"
+
+# =============================================================================
+# API ТЕСТИРОВАНИЕ ЧЕРЕЗ ENVOY
+# =============================================================================
+
+  api:test:health:
+    desc: "Проверить health check через Envoy"
+    cmds:
+      - echo "[task] 🏥 Проверяем health check"
+      - curl -sS http://localhost:8080/healthz || echo "❌ Health check failed"
+
+  api:test:register:
+    desc: "Тестировать регистрацию пользователя через Envoy"
+    cmds:
+      - echo "[task] 👤 Регистрируем пользователя"
+      - |
+        curl -sS -X POST http://localhost:8080/api/v1/users/register \
+          -H 'content-type: application/json' \
+          -d '{"info":{"login":"testuser","email":"test@example.com"},"password":"secret123"}' \
+          | jq . || echo "❌ Registration failed"
+
+  api:test:login:
+    desc: "Тестировать логин пользователя через Envoy"
+    cmds:
+      - echo "[task] 🔐 Логинимся пользователем"
+      - |
+        curl -sS -X POST http://localhost:8080/api/v1/auth/login \
+          -H 'content-type: application/json' \
+          -d '{"login":"testuser","password":"secret123"}' \
+          | jq . || echo "❌ Login failed"
+
+  api:test:whoami:
+    desc: "Автоматически получить session_id из логина и вызвать whoami"
+    cmds:
+      - |
+        echo "[task] 🔐 Сначала логинимся и получаем session_id"
+        SESSION_ID=$(curl -sS -X POST http://localhost:8080/api/v1/auth/login \
+          -H 'content-type: application/json' \
+          -d '{"login":"testuser","password":"secret123"}' \
+          | jq -r '.session_id' 2>/dev/null)
+        if [ "$SESSION_ID" = "null" ] || [ -z "$SESSION_ID" ]; then
+          echo "❌ Не удалось получить session_id из логина"
+          exit 1
+        fi
+        echo "✅ Получен session_id: $SESSION_ID"
+        echo "[task] 👤 Теперь получаем информацию о пользователе"
+        curl -sS -X GET http://localhost:8080/api/v1/auth/whoami \
+          -H "Cookie: X-Session-Uuid=$SESSION_ID" \
+          | jq . || echo "❌ Whoami failed"
+
+  api:test:logout:
+    desc: "Автоматически получить session_id из логина и вызвать logout"
+    cmds:
+      - echo "[task] 🔐 Сначала логинимся и получаем session_id"
+      - |
+        SESSION_ID=$(curl -sS -X POST http://localhost:8080/api/v1/auth/login \
+          -H 'content-type: application/json' \
+          -d '{"login":"testuser","password":"secret123"}' \
+          | jq -r '.session_id' 2>/dev/null)
+      - |
+        if [ "$SESSION_ID" = "null" ] || [ -z "$SESSION_ID" ]; then
+          echo "❌ Не удалось получить session_id из логина"
+          exit 1
+        fi
+      - |
+        echo "✅ Получен session_id: $SESSION_ID"
+      - echo "[task] 🚪 Теперь выходим из системы"
+      - |
+        curl -sS -X POST http://localhost:8080/api/v1/auth/logout \
+          -H 'content-type: application/json' \
+          -H "sid: $SESSION_ID" \
+          -d '{"session_id":"'$SESSION_ID'"}' \
+          | jq . || echo "❌ Logout failed"
+
+  api:test-full:
+    desc: "Полный тест всех RBAC операций: регистрация, логин, whoami, CRUD ролей, назначение/отзыв ролей, logout"
+    cmds:
+      - echo "[task] 🔄 Запускаем полный тест всех RBAC операций"
+      - |
+        echo "=========================================="
+        echo "1️⃣ Регистрация нового пользователя"
+        USER_LOGIN="rbactest$(date +%s)"
+        USER_EMAIL="rbactest$(date +%s)@example.com"
+        echo "📝 Регистрируем пользователя: $USER_LOGIN"
+        curl -sS -X POST http://localhost:8080/api/v1/users/register \
+          -H 'content-type: application/json' \
+          -d '{"info":{"login":"'$USER_LOGIN'","email":"'$USER_EMAIL'"},"password":"secret123"}' \
+          | jq . || echo "❌ Registration failed"
+        
+        echo "=========================================="
+        echo "2️⃣ Логин пользователя"
+        SESSION_ID=$(curl -sS -X POST http://localhost:8080/api/v1/auth/login \
+          -H 'content-type: application/json' \
+          -d '{"login":"'$USER_LOGIN'","password":"secret123"}' \
+          | jq -r '.session_id')
+        echo "📝 Session ID: $SESSION_ID"
+        if [ "$SESSION_ID" = "null" ] || [ -z "$SESSION_ID" ]; then
+          echo "❌ Login failed"
+          exit 1
+        fi
+        
+        echo "=========================================="
+        echo "3️⃣ Получение информации о пользователе (whoami)"
+        curl -sS -X GET http://localhost:8080/api/v1/auth/whoami \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Whoami failed"
+        
+        echo "=========================================="
+        echo "4️⃣ Получение списка ролей (до создания)"
+        curl -sS -X GET http://localhost:8080/api/v1/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Roles list failed"
+        
+        echo "=========================================="
+        echo "5️⃣ Создание новой роли"
+        ROLE_NAME="TestRole$(date +%s)"
+        echo "📝 Создаем роль: $ROLE_NAME"
+        ROLE_ID=$(curl -sS -X POST http://localhost:8080/api/v1/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          -d '{"name":"'$ROLE_NAME'","description":"Test role for RBAC testing"}' \
+          | jq -r '.role_id')
+        echo "📝 Created Role ID: $ROLE_ID"
+        if [ "$ROLE_ID" = "null" ] || [ -z "$ROLE_ID" ]; then
+          echo "❌ Role creation failed"
+          exit 1
+        fi
+        
+        echo "=========================================="
+        echo "6️⃣ Получение созданной роли по ID"
+        curl -sS -X GET http://localhost:8080/api/v1/roles/$ROLE_ID \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Get role failed"
+        
+        echo "=========================================="
+        echo "7️⃣ Обновление роли"
+        UPDATED_NAME="Updated$ROLE_NAME"
+        echo "📝 Обновляем роль на: $UPDATED_NAME"
+        curl -sS -X PUT http://localhost:8080/api/v1/roles/$ROLE_ID \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          -d '{"name":"'$UPDATED_NAME'","description":"Updated test role"}' \
+          | jq . || echo "❌ Role update failed"
+        
+        echo "=========================================="
+        echo "8️⃣ Получение списка ролей (после создания)"
+        curl -sS -X GET http://localhost:8080/api/v1/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Roles list failed"
+        
+        echo "=========================================="
+        echo "9️⃣ Получение списка прав"
+        curl -sS -X GET http://localhost:8080/api/v1/permissions \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Permissions list failed"
+        
+        echo "=========================================="
+        echo "🔟 Получение ролей пользователя (до назначения)"
+        USER_ID=$(curl -sS -X GET http://localhost:8080/api/v1/auth/whoami \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq -r '.info.user.id')
+        echo "📝 User ID: $USER_ID"
+        curl -sS -X GET http://localhost:8080/api/v1/users/$USER_ID/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Get user roles failed"
+        
+        echo "=========================================="
+        echo "1️⃣1️⃣ Назначение роли пользователю"
+        echo "📝 Назначаем роль $ROLE_ID пользователю $USER_ID"
+        curl -sS -X POST http://localhost:8080/api/v1/users/$USER_ID/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          -d '{"role_id":"'$ROLE_ID'"}' \
+          | jq . || echo "❌ Assign role failed"
+        
+        echo "=========================================="
+        echo "1️⃣2️⃣ Получение ролей пользователя (после назначения)"
+        curl -sS -X GET http://localhost:8080/api/v1/users/$USER_ID/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Get user roles failed"
+        
+        echo "=========================================="
+        echo "1️⃣3️⃣ Получение пользователей роли"
+        curl -sS -X GET http://localhost:8080/api/v1/roles/$ROLE_ID/users \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Get role users failed"
+        
+        echo "=========================================="
+        echo "1️⃣4️⃣ Отзыв роли у пользователя"
+        echo "📝 Отзываем роль $ROLE_ID у пользователя $USER_ID"
+        curl -sS -X DELETE http://localhost:8080/api/v1/users/$USER_ID/roles/$ROLE_ID \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Revoke role failed"
+        
+        echo "=========================================="
+        echo "1️⃣5️⃣ Получение ролей пользователя (после отзыва)"
+        curl -sS -X GET http://localhost:8080/api/v1/users/$USER_ID/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Get user roles failed"
+        
+        echo "=========================================="
+        echo "1️⃣6️⃣ Удаление роли"
+        echo "📝 Удаляем роль $ROLE_ID"
+        curl -sS -X DELETE http://localhost:8080/api/v1/roles/$ROLE_ID \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Delete role failed"
+        
+        echo "=========================================="
+        echo "1️⃣7️⃣ Получение списка ролей (после удаления)"
+        curl -sS -X GET http://localhost:8080/api/v1/roles \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          | jq . || echo "❌ Roles list failed"
+        
+        echo "=========================================="
+        echo "1️⃣8️⃣ Выход из системы"
+        curl -sS -X POST http://localhost:8080/api/v1/auth/logout \
+          -H 'content-type: application/json' \
+          -H "Cookie: X-Session-Id=$SESSION_ID" \
+          -d '{}' \
+          | jq . || echo "❌ Logout failed"
+        
+        echo "=========================================="
+        echo "✅ Полный тест всех RBAC операций завершен!"
+        echo "📊 Тестированы все операции:"
+        echo "   • Регистрация и аутентификация"
+        echo "   • CRUD операции с ролями"
+        echo "   • Назначение и отзыв ролей пользователям"
+        echo "   • Получение списков ролей и прав"
+        echo "   • Выход из системы"

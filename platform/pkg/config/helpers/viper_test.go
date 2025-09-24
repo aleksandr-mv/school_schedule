@@ -150,7 +150,7 @@ func TestReset(t *testing.T) {
 func BenchmarkGetSection(b *testing.B) {
 	// Инициализируем в ENV-only режиме для теста
 	Reset()
-	InitViper("")
+	_ = InitViper("")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -162,7 +162,7 @@ func BenchmarkGetSection(b *testing.B) {
 func BenchmarkGetViper(b *testing.B) {
 	// Инициализируем в ENV-only режиме для теста
 	Reset()
-	InitViper("")
+	_ = InitViper("")
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

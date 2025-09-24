@@ -40,8 +40,22 @@ func (s *ServiceSuite) TestWhoamiSuccess() {
 		},
 	}
 
+	roleID := uuid.MustParse("550e8400-e29b-41d4-a716-446655440001")
+	permissionID := uuid.MustParse("550e8400-e29b-41d4-a716-446655440002")
+
+	expectedWhoami.RolesWithPermissions = []*model.RoleWithPermissions{
+		{
+			Role: &model.Role{
+				ID:   roleID,
+				Name: "admin",
+			},
+			Permissions: []*model.Permission{
+				{ID: permissionID, Resource: "user", Action: "read"},
+			},
+		},
+	}
+
 	s.sessionRepository.On("Get", mock.Anything, sessionID).Return(expectedWhoami, nil)
-	s.rbacClient.On("GetUserRoles", mock.Anything, userID).Return([]*model.RoleWithPermissions{}, nil)
 
 	result, err := s.service.Whoami(s.ctx, sessionID)
 
@@ -51,9 +65,9 @@ func (s *ServiceSuite) TestWhoamiSuccess() {
 	assert.Equal(s.T(), expectedWhoami.User.ID, result.User.ID)
 	assert.Equal(s.T(), expectedWhoami.User.Login, result.User.Login)
 	assert.Equal(s.T(), expectedWhoami.User.Email, result.User.Email)
+	assert.Equal(s.T(), expectedWhoami.RolesWithPermissions, result.RolesWithPermissions)
 
 	s.sessionRepository.AssertExpectations(s.T())
-	s.rbacClient.AssertExpectations(s.T())
 }
 
 func (s *ServiceSuite) TestWhoamiSessionNotFound() {
@@ -92,7 +106,7 @@ func (s *ServiceSuite) TestWhoamiSessionExpired() {
 	s.sessionRepository.AssertExpectations(s.T())
 }
 
-func (s *ServiceSuite) TestWhoamiRBACError() {
+func (s *ServiceSuite) TestWhoamiWithoutRoles() {
 	userID := uuid.New()
 	sessionID := uuid.New()
 	expiresAt := time.Now().Add(time.Hour)
@@ -105,18 +119,16 @@ func (s *ServiceSuite) TestWhoamiRBACError() {
 		User: model.User{
 			ID: userID,
 		},
+		RolesWithPermissions: []*model.RoleWithPermissions{}, // Пустые роли из Redis
 	}
 
 	s.sessionRepository.On("Get", mock.Anything, sessionID).Return(expectedWhoami, nil)
-	s.rbacClient.On("GetUserRoles", mock.Anything, userID).Return(nil, assert.AnError)
 
 	result, err := s.service.Whoami(s.ctx, sessionID)
 
-	// Должен вернуть успех с пустыми ролями при ошибке RBAC
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), result)
 	assert.Empty(s.T(), result.RolesWithPermissions)
 
 	s.sessionRepository.AssertExpectations(s.T())
-	s.rbacClient.AssertExpectations(s.T())
 }

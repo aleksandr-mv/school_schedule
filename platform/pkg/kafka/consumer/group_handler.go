@@ -2,9 +2,10 @@ package consumer
 
 import (
 	"github.com/IBM/sarama"
+	"go.uber.org/zap"
+
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/kafka/model"
-	"go.uber.org/zap"
 )
 
 // Middleware — функция middleware для дополнительной обработки.

@@ -12,23 +12,20 @@ import (
 func (r *repository) Set(ctx context.Context, role *model.EnrichedRole, expiresAt time.Time) error {
 	cacheKey := r.getCacheKey(role.Role.ID.String())
 
-	redisView, err := converter.CreateEnrichedRoleCacheView(role)
-	if err != nil {
-		return fmt.Errorf("failed to create cache view: %w", err)
-	}
-
 	ttl := time.Until(expiresAt)
 	if ttl <= 0 {
 		return fmt.Errorf("expiration time is in the past")
 	}
 
-	err = r.redis.HashSet(ctx, cacheKey, redisView)
+	roleConverter := converter.NewEnrichedRoleCacheConverter()
+	data, err := roleConverter.ToCache(role)
 	if err != nil {
-		return fmt.Errorf("failed to store role in cache: %w", err)
+		return fmt.Errorf("failed to convert to protobuf: %w", err)
 	}
 
-	if err = r.redis.Expire(ctx, cacheKey, ttl); err != nil {
-		return fmt.Errorf("failed to set expiration: %w", err)
+	err = r.redis.Set(ctx, cacheKey, data, ttl)
+	if err != nil {
+		return fmt.Errorf("failed to store role in cache: %w", err)
 	}
 
 	return nil

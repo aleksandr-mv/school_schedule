@@ -13,7 +13,10 @@ func RoleToDomain(r *commonV1.Role) *model.Role {
 		return nil
 	}
 
-	roleID, _ := uuid.Parse(r.Id)
+	roleID, err := uuid.Parse(r.Id)
+	if err != nil {
+		return nil
+	}
 
 	role := &model.Role{
 		ID:          roleID,

@@ -9,6 +9,7 @@ package role_permission_v1
 import (
 	_ "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -134,16 +135,16 @@ var File_role_permission_v1_role_permission_proto protoreflect.FileDescriptor
 
 const file_role_permission_v1_role_permission_proto_rawDesc = "" +
 	"\n" +
-	"(role_permission/v1/role_permission.proto\x12\x12role_permission.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x1bcommon/v1/annotations.proto\"a\n" +
+	"(role_permission/v1/role_permission.proto\x12\x12role_permission.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17validate/validate.proto\x1a\x1bcommon/v1/annotations.proto\"a\n" +
 	"\rAssignRequest\x12!\n" +
 	"\arole_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\x12-\n" +
 	"\rpermission_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\fpermissionId\"a\n" +
 	"\rRevokeRequest\x12!\n" +
 	"\arole_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\x12-\n" +
-	"\rpermission_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\fpermissionId2\xd7\x01\n" +
-	"\x15RolePermissionService\x12^\n" +
-	"\x06Assign\x12!.role_permission.v1.AssignRequest\x1a\x16.google.protobuf.Empty\"\x19\x8a\xb5\x18\x15role_permission:write\x12^\n" +
-	"\x06Revoke\x12!.role_permission.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"\x19\x8a\xb5\x18\x15role_permission:writeBgZegithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role_permission/v1;role_permission_v1b\x06proto3"
+	"\rpermission_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\fpermissionId2\xc2\x02\n" +
+	"\x15RolePermissionService\x12\x8c\x01\n" +
+	"\x06Assign\x12!.role_permission.v1.AssignRequest\x1a\x16.google.protobuf.Empty\"G\x8a\xb5\x18\x15role_permission:write\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/roles/{role_id}/permissions\x12\x99\x01\n" +
+	"\x06Revoke\x12!.role_permission.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"T\x8a\xb5\x18\x15role_permission:write\x82\xd3\xe4\x93\x025*3/api/v1/roles/{role_id}/permissions/{permission_id}BgZegithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role_permission/v1;role_permission_v1b\x06proto3"
 
 var (
 	file_role_permission_v1_role_permission_proto_rawDescOnce sync.Once

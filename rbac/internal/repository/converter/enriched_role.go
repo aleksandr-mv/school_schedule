@@ -1,94 +1,126 @@
 package converter
 
 import (
-	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
-	repoModel "github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository/model"
+	commonv1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 )
 
-func EnrichedRoleToRedis(enrichedRole *model.EnrichedRole) (repoModel.EnrichedRoleRedisView, error) {
-	permissionsJSON, err := json.Marshal(enrichedRole.Permissions)
-	if err != nil {
-		return repoModel.EnrichedRoleRedisView{}, err
-	}
+type EnrichedRoleCacheConverter struct{}
 
-	roleView := repoModel.EnrichedRoleRedisView{
-		ID:          enrichedRole.Role.ID.String(),
-		Name:        enrichedRole.Role.Name,
-		Description: enrichedRole.Role.Description,
-		CreatedAt:   enrichedRole.Role.CreatedAt.Format(time.RFC3339),
-		Permissions: string(permissionsJSON),
-	}
-
-	if enrichedRole.Role.UpdatedAt != nil {
-		roleView.UpdatedAt = enrichedRole.Role.UpdatedAt.Format(time.RFC3339)
-	}
-
-	if enrichedRole.Role.DeletedAt != nil {
-		roleView.DeletedAt = enrichedRole.Role.DeletedAt.Format(time.RFC3339)
-	}
-
-	return roleView, nil
+func NewEnrichedRoleCacheConverter() *EnrichedRoleCacheConverter {
+	return &EnrichedRoleCacheConverter{}
 }
 
-func EnrichedRoleFromRedis(redisView repoModel.EnrichedRoleRedisView) (*model.EnrichedRole, error) {
-	roleID, err := uuid.Parse(redisView.ID)
-	if err != nil {
-		return nil, err
+func (c *EnrichedRoleCacheConverter) ToCache(enrichedRole *model.EnrichedRole) ([]byte, error) {
+	if enrichedRole == nil {
+		return nil, fmt.Errorf("enriched role cannot be nil")
 	}
 
-	createdAt, err := time.Parse(time.RFC3339, redisView.CreatedAt)
+	pbRole := &commonv1.RoleWithPermissions{
+		Role: &commonv1.Role{
+			Id:          enrichedRole.Role.ID.String(),
+			Name:        enrichedRole.Role.Name,
+			Description: enrichedRole.Role.Description,
+			CreatedAt:   timestamppb.New(enrichedRole.Role.CreatedAt),
+			UpdatedAt: func() *timestamppb.Timestamp {
+				if enrichedRole.Role.UpdatedAt != nil {
+					return timestamppb.New(*enrichedRole.Role.UpdatedAt)
+				}
+				return nil
+			}(),
+		},
+		Permissions: PermissionsToCache(enrichedRole.Permissions),
+	}
+
+	data, err := proto.Marshal(pbRole)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal protobuf: %w", err)
+	}
+
+	return data, nil
+}
+
+func (c *EnrichedRoleCacheConverter) FromCache(data []byte) (*model.EnrichedRole, error) {
+	if len(data) == 0 {
+		return nil, fmt.Errorf("data cannot be empty")
+	}
+
+	pbRole := &commonv1.RoleWithPermissions{}
+	if err := proto.Unmarshal(data, pbRole); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal protobuf: %w", err)
+	}
+
+	if pbRole.Role == nil {
+		return nil, fmt.Errorf("role cannot be nil")
+	}
+
+	roleID, err := uuid.Parse(pbRole.Role.Id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid role ID: %w", err)
 	}
 
 	var updatedAt *time.Time
-	if redisView.UpdatedAt != "" {
-		parsed, err := time.Parse(time.RFC3339, redisView.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-		updatedAt = &parsed
+	if pbRole.Role.UpdatedAt != nil {
+		t := pbRole.Role.UpdatedAt.AsTime()
+		updatedAt = &t
 	}
 
-	var deletedAt *time.Time
-	if redisView.DeletedAt != "" {
-		parsed, err := time.Parse(time.RFC3339, redisView.DeletedAt)
-		if err != nil {
-			return nil, err
-		}
-		deletedAt = &parsed
-	}
+	permissions := PermissionsFromCache(pbRole.Permissions)
 
-	var permissions []*model.Permission
-	if err := json.Unmarshal([]byte(redisView.Permissions), &permissions); err != nil {
-		return nil, err
-	}
-
-	return &model.EnrichedRole{
+	enrichedRole := &model.EnrichedRole{
 		Role: model.Role{
 			ID:          roleID,
-			Name:        redisView.Name,
-			Description: redisView.Description,
-			CreatedAt:   createdAt,
+			Name:        pbRole.Role.Name,
+			Description: pbRole.Role.Description,
+			CreatedAt:   pbRole.Role.CreatedAt.AsTime(),
 			UpdatedAt:   updatedAt,
-			DeletedAt:   deletedAt,
 		},
 		Permissions: permissions,
-	}, nil
-}
-
-func CreateEnrichedRoleCacheView(enrichedRole *model.EnrichedRole) (repoModel.EnrichedRoleCacheView, error) {
-	roleView, err := EnrichedRoleToRedis(enrichedRole)
-	if err != nil {
-		return repoModel.EnrichedRoleCacheView{}, err
 	}
 
-	return repoModel.EnrichedRoleCacheView{
-		RoleRedisView: roleView,
-	}, nil
+	return enrichedRole, nil
+}
+
+func PermissionsToCache(permissions []*model.Permission) []*commonv1.Permission {
+	if permissions == nil {
+		return nil
+	}
+
+	pbPermissions := make([]*commonv1.Permission, len(permissions))
+	for i, p := range permissions {
+		pbPermissions[i] = &commonv1.Permission{
+			Id:       p.ID.String(),
+			Resource: p.Resource,
+			Action:   p.Action,
+		}
+	}
+	return pbPermissions
+}
+
+func PermissionsFromCache(pbPermissions []*commonv1.Permission) []*model.Permission {
+	if pbPermissions == nil {
+		return nil
+	}
+
+	permissions := make([]*model.Permission, len(pbPermissions))
+	for i, pbp := range pbPermissions {
+		permissionID, err := uuid.Parse(pbp.Id)
+		if err != nil {
+			continue
+		}
+
+		permissions[i] = &model.Permission{
+			ID:       permissionID,
+			Resource: pbp.Resource,
+			Action:   pbp.Action,
+		}
+	}
+	return permissions
 }

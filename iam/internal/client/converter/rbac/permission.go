@@ -13,7 +13,10 @@ func PermissionToDomain(p *commonV1.Permission) *model.Permission {
 		return nil
 	}
 
-	permissionID, _ := uuid.Parse(p.Id)
+	permissionID, err := uuid.Parse(p.Id)
+	if err != nil {
+		return nil
+	}
 
 	return &model.Permission{
 		ID:       permissionID,

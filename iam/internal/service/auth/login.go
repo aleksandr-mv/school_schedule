@@ -4,12 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
-	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
-	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 )
 
 func (s *AuthService) Login(ctx context.Context, credentials *model.LoginCredentials) (uuid.UUID, error) {
@@ -42,9 +43,25 @@ func (s *AuthService) Login(ctx context.Context, credentials *model.LoginCredent
 
 	user.NotificationMethods = notificationMethods
 
+	roles, err := s.rbacClient.GetUserRoles(ctx, user.ID)
+	if err != nil {
+		errreport.Report(ctx, "⚠️ [Service] Ошибка получения ролей пользователя при логине", err)
+		roles = []*model.RoleWithPermissions{}
+	}
+
 	expiresAt := time.Now().Add(s.sessionTTL)
 
-	sessionID, err := s.sessionRepository.Create(ctx, *user, expiresAt)
+	whoamiForCache := &model.WhoAMI{
+		Session: model.Session{
+			ExpiresAt: expiresAt,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		User:                 *user,
+		RolesWithPermissions: roles,
+	}
+
+	sessionID, err := s.sessionRepository.Create(ctx, whoamiForCache, expiresAt)
 	if err != nil {
 		errreport.Report(ctx, "❌ [Service] Ошибка создания сессии", err)
 		return uuid.Nil, model.ErrFailedToCreateSession

@@ -37,18 +37,7 @@ static_resources:
 
               routes:
               
-              # Health check
-              - match:
-                  path: "/healthz"
-                route:
-                  cluster: iam_service
-                  timeout: 5s
-                typed_per_filter_config:
-                  envoy.filters.http.ext_authz:
-                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
-                    disabled: true
-                  
-              # IAM публичные API
+              # IAM публичные API (более специфичные маршруты ПЕРВЫМИ)
               - match:
                   prefix: "/api/v1/users/register"
                 route:
@@ -79,7 +68,13 @@ static_resources:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
               
-              # IAM защищенные API
+              # IAM защищенные API (менее специфичные маршруты ПОСЛЕ)
+              - match:
+                  prefix: "/api/v1/auth/logout"
+                route:
+                  cluster: iam_service
+                  timeout: 15s
+                  
               - match:
                   prefix: "/api/v1/auth"
                 route:
@@ -92,36 +87,31 @@ static_resources:
                   cluster: iam_service
                   timeout: 15s
                   
-              - match:
-                  prefix: "/api/v1/whoami"
-                route:
-                  cluster: iam_service
-                  timeout: 15s
-              
-              # RBAC API
+              # RBAC API - роли
               - match:
                   prefix: "/api/v1/roles"
                 route:
                   cluster: rbac_service
                   timeout: 15s
                   
+              # RBAC API - права
               - match:
                   prefix: "/api/v1/permissions"
                 route:
                   cluster: rbac_service
                   timeout: 15s
-                  
-              - match:
-                  prefix: "/api/v1/user-roles"
-                route:
-                  cluster: rbac_service
-                  timeout: 15s
 
+              # Health check - прямой ответ без проксирования
               - match:
-                  prefix: "/api/v1/role-permissions"
-                route:
-                  cluster: rbac_service
-                  timeout: 15s
+                  path: "/healthz"
+                direct_response:
+                  status: 200
+                  body:
+                    inline_string: "OK"
+                typed_per_filter_config:
+                  envoy.filters.http.ext_authz:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                    disabled: true
                   
               # Маршрут по умолчанию
               - match:
@@ -141,7 +131,7 @@ static_resources:
                         ],
                         "protected_endpoints": [
                           "GET /api/v1/users - User management",
-                          "GET /api/v1/whoami - Current user info",
+                          "GET /api/v1/auth/whoami - Current user info",
                           "GET /api/v1/roles - Role management",
                           "GET /api/v1/permissions - Permission management",
                           "GET /api/v1/user-roles - User role assignments",
@@ -149,10 +139,10 @@ static_resources:
                         ],
                         "authentication": {
                           "methods": [
-                            "Header: Session-UUID: <uuid>",
-                            "Header: X-Session-ID: <uuid>", 
-                            "Header: Authorization: Bearer <uuid>",
-                            "Cookie: X-Session-Uuid=<uuid>"
+                            "Header: session-uuid: <session_id>",
+                            "Header: x-session-id: <session_id>", 
+                            "Header: authorization: Bearer <session_id>",
+                            "Cookie: X-Session-Uuid=<session_id>"
                           ]
                         }
                       }
@@ -183,10 +173,7 @@ static_resources:
               
               allowed_headers:
                 patterns:
-                  - exact: "authorization"
                   - exact: "cookie"
-                  - exact: "session-uuid"
-                  - exact: "x-session-id"
                   - exact: "user-agent"
                   - exact: "x-forwarded-for"
                   - exact: "x-real-ip"
@@ -197,7 +184,7 @@ static_resources:
             typed_config:
               "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
               proto_descriptor: "/etc/envoy/microservices_descriptor.pb"
-              services: ["auth.v1.AuthService", "user.v1.UserService", "role.v1.RoleService", "permission.v1.PermissionService", "user_role.v1.UserRoleService"]
+              services: ["auth.v1.AuthService", "user.v1.UserService", "role.v1.RoleService", "role_permission.v1.RolePermissionService", "user_role.v1.UserRoleService", "permission.v1.PermissionService"]
               match_incoming_request_route: true
               print_options:
                 add_whitespace: true

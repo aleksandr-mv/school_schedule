@@ -9,6 +9,7 @@ package user_v1
 import (
 	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -215,7 +216,7 @@ var File_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_user_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\x12user/v1/user.proto\x12\auser.v1\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x1bcommon/v1/annotations.proto\"i\n" +
+	"\x12user/v1/user.proto\x12\auser.v1\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x1bcommon/v1/annotations.proto\x1a\x1cgoogle/api/annotations.proto\"i\n" +
 	"\x0fRegisterRequest\x121\n" +
 	"\x04info\x18\x01 \x01(\v2\x13.common.v1.UserInfoB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04info\x12#\n" +
 	"\bpassword\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x06R\bpassword\"5\n" +
@@ -224,9 +225,9 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\x0eGetUserRequest\x12!\n" +
 	"\auser_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06userId\"@\n" +
 	"\x0fGetUserResponse\x12-\n" +
-	"\x04user\x18\x01 \x01(\v2\x0f.common.v1.UserB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04user2\x9d\x01\n" +
-	"\vUserService\x12A\n" +
-	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x19.user.v1.RegisterResponse\"\x00\x12K\n" +
+	"\x04user\x18\x01 \x01(\v2\x0f.common.v1.UserB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04user2\xc2\x01\n" +
+	"\vUserService\x12f\n" +
+	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x19.user.v1.RegisterResponse\"%\x90\xb5\x18\x01\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/users/register\x12K\n" +
 	"\aGetUser\x12\x17.user.v1.GetUserRequest\x1a\x18.user.v1.GetUserResponse\"\r\x8a\xb5\x18\tuser:readBQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user/v1;user_v1b\x06proto3"
 
 var (

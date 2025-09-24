@@ -11,36 +11,28 @@ import (
 	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository/converter"
 )
 
-func (r *sessionRepository) Create(ctx context.Context, user model.User, expiresAt time.Time) (uuid.UUID, error) {
+func (r *sessionRepository) Create(ctx context.Context, whoami *model.WhoAMI, expiresAt time.Time) (uuid.UUID, error) {
 	sessionID := uuid.New()
-	now := time.Now()
-
-	session := model.Session{
-		ID:        sessionID,
-		ExpiresAt: expiresAt,
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
-
 	cacheKey := r.getCacheKey(sessionID.String())
-
-	redisView, err := converter.CreateSessionCacheView(session, &user)
-	if err != nil {
-		return uuid.Nil, fmt.Errorf("%w: failed to create cache view: %w", model.ErrInvalidSessionData, err)
-	}
 
 	ttl := time.Until(expiresAt)
 	if ttl <= 0 {
 		return uuid.Nil, model.ErrSessionExpired
 	}
 
-	err = r.redis.HashSet(ctx, cacheKey, redisView)
+	hash, err := converter.ToRedisHash(whoami, sessionID, expiresAt)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("%w: %w", model.ErrFailedToStoreInCache, err)
+		return uuid.Nil, fmt.Errorf("%w: failed to convert to hash: %w", model.ErrInvalidSessionData, err)
 	}
 
-	if err = r.redis.Expire(ctx, cacheKey, ttl); err != nil {
-		return uuid.Nil, fmt.Errorf("%w: failed to set expiration: %w", model.ErrFailedToStoreInCache, err)
+	err = r.redis.HSet(ctx, cacheKey, hash)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("%w: failed to store hash: %w", model.ErrFailedToStoreInCache, err)
+	}
+
+	err = r.redis.Expire(ctx, cacheKey, ttl)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("%w: failed to set TTL: %w", model.ErrFailedToStoreInCache, err)
 	}
 
 	return sessionID, nil

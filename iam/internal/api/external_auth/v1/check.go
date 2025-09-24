@@ -22,5 +22,5 @@ func (api *API) Check(ctx context.Context, req *authv3.CheckRequest) (*authv3.Ch
 		return api.denyRequest("Invalid session", 401), nil
 	}
 
-	return api.allowRequest(whoami), nil
+	return api.allowRequest(whoami, sessionID), nil
 }

@@ -8,7 +8,7 @@ import (
 	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"github.com/google/uuid"
 
-	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
 )
 
 func (api *API) extractSessionID(req *authv3.CheckRequest) (uuid.UUID, error) {
@@ -17,16 +17,11 @@ func (api *API) extractSessionID(req *authv3.CheckRequest) (uuid.UUID, error) {
 	}
 
 	headers := req.Attributes.Request.Http.Headers
-
-	if sessionID, ok := headers[model.HeaderSessionID]; ok && sessionID != "" {
-		return uuid.Parse(sessionID)
-	}
-
-	if cookieHeader, ok := headers[model.HeaderCookie]; ok && cookieHeader != "" {
+	if cookieHeader, ok := headers[interceptor.HeaderCookie]; ok && cookieHeader != "" {
 		req := &http.Request{Header: make(http.Header)}
-		req.Header.Add(model.HeaderCookie, cookieHeader)
+		req.Header.Add(interceptor.HeaderCookie, cookieHeader)
 
-		if cookie, err := req.Cookie(model.SessionCookieName); err == nil {
+		if cookie, err := req.Cookie(interceptor.SessionCookieName); err == nil {
 			sessionID, err := url.QueryUnescape(cookie.Value)
 			if err != nil {
 				return uuid.Parse(cookie.Value)
@@ -35,5 +30,5 @@ func (api *API) extractSessionID(req *authv3.CheckRequest) (uuid.UUID, error) {
 		}
 	}
 
-	return uuid.Nil, fmt.Errorf("session ID not found in headers or cookies")
+	return uuid.Nil, fmt.Errorf("session ID not found in cookies")
 }

@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"errors"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -8,16 +10,16 @@ import (
 )
 
 func mapError(err error) error {
-	switch err {
-	case model.ErrUserRoleNotFound:
+	switch {
+	case errors.Is(err, model.ErrUserRoleNotFound):
 		return status.Error(codes.NotFound, "Связь пользователь-роль не найдена")
-	case model.ErrRoleNotFound:
+	case errors.Is(err, model.ErrRoleNotFound):
 		return status.Error(codes.NotFound, "Роль не найдена")
-	case model.ErrRoleAlreadyAssigned:
+	case errors.Is(err, model.ErrRoleAlreadyAssigned):
 		return status.Error(codes.AlreadyExists, "Роль уже назначена пользователю")
-	case model.ErrRoleNotAssigned:
+	case errors.Is(err, model.ErrRoleNotAssigned):
 		return status.Error(codes.FailedPrecondition, "Роль не назначена пользователю")
-	case model.ErrInternal:
+	case errors.Is(err, model.ErrInternal):
 		return status.Error(codes.Internal, "Внутренняя ошибка")
 	default:
 		return status.Error(codes.Internal, "Внутренняя ошибка сервера")

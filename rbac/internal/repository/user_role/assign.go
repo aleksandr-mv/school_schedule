@@ -26,7 +26,7 @@ func (r *userRoleRepository) Assign(ctx context.Context, userID, roleID string, 
 		return fmt.Errorf("%w: assign role failed: %w", model.ErrInternal, err)
 	}
 
-	if n := result.RowsAffected(); n == 0 {
+	if rows := result.RowsAffected(); rows == 0 {
 		return fmt.Errorf("%w: assign role failed: no rows affected", model.ErrInternal)
 	}
 

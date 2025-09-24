@@ -10,7 +10,7 @@ import (
 	statusv3 "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 
-	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
 )
 
 func (api *API) denyRequest(message string, statusCode int32) *authv3.CheckResponse {
@@ -26,14 +26,14 @@ func (api *API) denyRequest(message string, statusCode int32) *authv3.CheckRespo
 				Headers: []*corev3.HeaderValueOption{
 					{
 						Header: &corev3.HeaderValue{
-							Key:   model.HeaderContentType,
-							Value: model.ContentTypeJSON,
+							Key:   interceptor.HeaderContentType,
+							Value: interceptor.ContentTypeJSON,
 						},
 					},
 					{
 						Header: &corev3.HeaderValue{
-							Key:   model.HeaderAuthStatus,
-							Value: model.AuthStatusDenied,
+							Key:   interceptor.HeaderAuthStatus,
+							Value: interceptor.AuthStatusDenied,
 						},
 					},
 				},

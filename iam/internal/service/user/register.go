@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *UserService) Register(ctx context.Context, login, email, password string) (*model.User, error) {

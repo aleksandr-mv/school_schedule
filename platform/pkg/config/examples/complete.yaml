@@ -10,59 +10,19 @@ app:
   swagger_path: "../shared/api/http/order/v1/order.swagger.yaml"
   swagger_ui_path: "./api/swagger-ui.html"
 
-# Сетевые настройки CORS (rawCorsConfig)
-cors:
-  allowed_origins:
-    - "http://localhost:3000"
-  allowed_methods:
-    - "GET"
-    - "POST"
-    - "PUT"
-    - "DELETE"
-    - "OPTIONS"
-  allowed_headers:
-    - "Content-Type"
-    - "Authorization"
-    - "X-Trace-ID"
-    - "X-Request-ID"
-  exposed_headers:
-    - "X-Trace-ID"
-    - "X-Request-ID"
-  allow_credentials: true
-  max_age: 600
-
-# HTTP сервер (rawHTTPConfig)
-http_server:
-  host: "0.0.0.0"
-  port: 8080
-  read_timeout: "15s"
-  write_timeout: "15s"
-  idle_timeout: "60s"
-  read_header_timeout: "5s"
-  max_header_bytes: 1048576  # 1MB
-  shutdown_timeout: "10s"
-  handler_timeout: "15s"
-
-# gRPC сервер (grpcRawConfig)
-grpc_server:
+# Единая gRPC конфигурация (rawConfig)
+grpc:
+  # Настройки сервера
   host: "0.0.0.0"
   port: 50051
   timeout: "15s"
   idle_timeout: "60s"
   shutdown_timeout: "10s"
-
-# gRPC клиентские лимиты (grpcClientLimitsRaw)
-grpc_client_limits:
+  
+  # Настройки клиента
   max_recv_msg_size: 4194304  # 4MB
   max_send_msg_size: 4194304  # 4MB
-  timeout: "5s"
-
-# TLS конфигурация для транспортного слоя
-tls:
-  enabled: false
-  cert_file: "/path/to/cert.pem"
-  key_file: "/path/to/key.pem"
-  ca_file: "/path/to/ca.pem"
+  client_timeout: "5s"
 
 # rawPostgresConfig
 database:

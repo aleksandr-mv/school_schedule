@@ -9,6 +9,7 @@ package user_role_v1
 import (
 	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -363,7 +364,7 @@ var File_user_role_v1_user_role_proto protoreflect.FileDescriptor
 
 const file_user_role_v1_user_role_proto_rawDesc = "" +
 	"\n" +
-	"\x1cuser_role/v1/user_role.proto\x12\fuser_role.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/role.proto\x1a\x1bcommon/v1/annotations.proto\"\x95\x01\n" +
+	"\x1cuser_role/v1/user_role.proto\x12\fuser_role.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/role.proto\x1a\x1bcommon/v1/annotations.proto\"\x95\x01\n" +
 	"\rAssignRequest\x12!\n" +
 	"\auser_id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06userId\x12!\n" +
 	"\arole_id\x18\x02 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x06roleId\x12.\n" +
@@ -390,12 +391,12 @@ const file_user_role_v1_user_role_proto_rawDesc = "" +
 	"\vnext_cursor\x18\x03 \x01(\tH\x00R\n" +
 	"nextCursor\x88\x01\x01\x12\x19\n" +
 	"\bhas_more\x18\x04 \x01(\bR\ahasMoreB\x0e\n" +
-	"\f_next_cursor2\x8f\x03\n" +
-	"\x0fUserRoleService\x12R\n" +
-	"\x06Assign\x12\x1b.user_role.v1.AssignRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12R\n" +
-	"\x06Revoke\x12\x1b.user_role.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"\x13\x8a\xb5\x18\x0fuser_role:write\x12i\n" +
-	"\fGetUserRoles\x12!.user_role.v1.GetUserRolesRequest\x1a\".user_role.v1.GetUserRolesResponse\"\x12\x8a\xb5\x18\x0euser_role:read\x12i\n" +
-	"\fGetRoleUsers\x12!.user_role.v1.GetRoleUsersRequest\x1a\".user_role.v1.GetRoleUsersResponse\"\x12\x8a\xb5\x18\x0euser_role:readB[ZYgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1;user_role_v1b\x06proto3"
+	"\f_next_cursor2\xb3\x04\n" +
+	"\x0fUserRoleService\x12z\n" +
+	"\x06Assign\x12\x1b.user_role.v1.AssignRequest\x1a\x16.google.protobuf.Empty\";\x8a\xb5\x18\x0fuser_role:write\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/users/{user_id}/roles\x12\x81\x01\n" +
+	"\x06Revoke\x12\x1b.user_role.v1.RevokeRequest\x1a\x16.google.protobuf.Empty\"B\x8a\xb5\x18\x0fuser_role:write\x82\xd3\xe4\x93\x02)*'/api/v1/users/{user_id}/roles/{role_id}\x12\x8e\x01\n" +
+	"\fGetUserRoles\x12!.user_role.v1.GetUserRolesRequest\x1a\".user_role.v1.GetUserRolesResponse\"7\x8a\xb5\x18\x0euser_role:read\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/users/{user_id}/roles\x12\x8e\x01\n" +
+	"\fGetRoleUsers\x12!.user_role.v1.GetRoleUsersRequest\x1a\".user_role.v1.GetRoleUsersResponse\"7\x8a\xb5\x18\x0euser_role:read\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/roles/{role_id}/usersB[ZYgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/user_role/v1;user_role_v1b\x06proto3"
 
 var (
 	file_user_role_v1_user_role_proto_rawDescOnce sync.Once

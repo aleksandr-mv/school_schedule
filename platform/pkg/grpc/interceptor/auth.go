@@ -2,47 +2,50 @@ package interceptor
 
 import (
 	"context"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-
-	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
-	commonV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 )
 
 const (
-	// SessionIDMetadataKey ключ для передачи ID сессии в gRPC metadata
-	SessionIDMetadataKey = "session-id"
+	// Заголовки от Envoy External Auth (после успешной аутентификации)
+	// Минимальный набор: session ID для идентификации и permissions для авторизации
+	HeaderSessionID       = "x-session-id"
+	HeaderUserPermissions = "x-user-permissions"
+
+	// HTTP заголовки
+	HeaderCookie        = "cookie"
+	HeaderAuthorization = "authorization"
+	HeaderContentType   = "content-type"
+	HeaderAuthStatus    = "X-Auth-Status"
+
+	// Cookies
+	SessionCookieName = "X-Session-Id"
+
+	// Значения
+	ContentTypeJSON  = "application/json"
+	AuthStatusDenied = "denied"
 )
 
 type contextKey string
 
 const (
-	// userContextKey ключ для хранения пользователя в контексте
-	userContextKey contextKey = "user"
 	// sessionIDContextKey ключ для хранения session ID в контексте
 	sessionIDContextKey contextKey = "session-id"
-	// userRolesWithPermissionsContextKey ключ для хранения ролей с правами пользователя в контексте
-	userRolesWithPermissionsContextKey contextKey = "user-roles-with-permissions"
+	// userPermissionsStringsContextKey ключ для хранения прав как строк
+	userPermissionsStringsContextKey contextKey = "user-permissions-strings"
 )
 
-// IAMClient интерфейс для аутентификации пользователей
-type IAMClient interface {
-	Whoami(ctx context.Context, req *authV1.WhoamiRequest, opts ...grpc.CallOption) (*authV1.WhoamiResponse, error)
-}
-
-// AuthInterceptor interceptor для аутентификации gRPC запросов
-type AuthInterceptor struct {
-	iamClient IAMClient
-}
+// AuthInterceptor interceptor для чтения данных пользователя из Envoy заголовков
+// Работает ТОЛЬКО с защищенными методами (публичные уже отфильтрованы PublicFilter)
+type AuthInterceptor struct{}
 
 // NewAuthInterceptor создает новый interceptor аутентификации
-func NewAuthInterceptor(iamClient IAMClient) *AuthInterceptor {
-	return &AuthInterceptor{
-		iamClient: iamClient,
-	}
+func NewAuthInterceptor() *AuthInterceptor {
+	return &AuthInterceptor{}
 }
 
 // Unary возвращает unary server interceptor для аутентификации
@@ -53,6 +56,10 @@ func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (any, error) {
+		if IsPublicMethod(ctx) {
+			return handler(ctx, req)
+		}
+
 		authCtx, err := i.authenticate(ctx)
 		if err != nil {
 			return nil, err
@@ -62,98 +69,32 @@ func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	}
 }
 
-// authenticate выполняет аутентификацию и добавляет пользователя в контекст
+// authenticate читает данные пользователя из Envoy заголовков и создает контекст
 func (i *AuthInterceptor) authenticate(ctx context.Context) (context.Context, error) {
-	// Извлекаем metadata из контекста
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "missing metadata")
 	}
 
-	// Получаем session ID из metadata
-	sessionIDs := md.Get(SessionIDMetadataKey)
-	if len(sessionIDs) == 0 {
-		return nil, status.Error(codes.Unauthenticated, "missing session-id in metadata")
+	sessionIDs := md.Get(HeaderSessionID)
+	if len(sessionIDs) == 0 || sessionIDs[0] == "" {
+		return nil, status.Error(codes.Unauthenticated, "missing session ID from Envoy")
 	}
 
-	sessionID := sessionIDs[0]
-	if sessionID == "" {
-		return nil, status.Error(codes.Unauthenticated, "empty session-id")
+	var permissions []string
+	if permHeaders := md.Get(HeaderUserPermissions); len(permHeaders) > 0 && permHeaders[0] != "" {
+		permissions = strings.Split(permHeaders[0], ",")
 	}
 
-	// Валидируем сессию через IAM сервис
-	whoamiRes, err := i.iamClient.Whoami(ctx, &authV1.WhoamiRequest{
-		SessionId: sessionID,
-	})
-	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "invalid session")
-	}
-
-	// Добавляем пользователя, session ID и роли с правами в контекст
-	authCtx := context.WithValue(ctx, userContextKey, whoamiRes.User)
-	authCtx = context.WithValue(authCtx, sessionIDContextKey, sessionID)
-	authCtx = context.WithValue(authCtx, userRolesWithPermissionsContextKey, whoamiRes.RolesWithPermissions)
+	authCtx := context.WithValue(ctx, sessionIDContextKey, sessionIDs[0])
+	authCtx = context.WithValue(authCtx, userPermissionsStringsContextKey, permissions)
 
 	return authCtx, nil
 }
 
-// GetUserFromContext извлекает пользователя из контекста
-func GetUserFromContext(ctx context.Context) (*commonV1.User, bool) {
-	user, ok := ctx.Value(userContextKey).(*commonV1.User)
-	return user, ok
-}
-
-// GetUserContextKey возвращает ключ контекста для пользователя
-func GetUserContextKey() contextKey {
-	return userContextKey
-}
-
-// GetUserRolesWithPermissionsContextKey возвращает ключ контекста для ролей с правами пользователя
-func GetUserRolesWithPermissionsContextKey() contextKey {
-	return userRolesWithPermissionsContextKey
-}
-
-// GetUserRolesWithPermissionsFromContext извлекает роли с правами пользователя из контекста
-func GetUserRolesWithPermissionsFromContext(ctx context.Context) ([]*commonV1.RoleWithPermissions, bool) {
-	rolesWithPermissions, ok := ctx.Value(userRolesWithPermissionsContextKey).([]*commonV1.RoleWithPermissions)
-	return rolesWithPermissions, ok
-}
-
-// GetUserRolesFromContext извлекает только роли пользователя из контекста
-func GetUserRolesFromContext(ctx context.Context) ([]*commonV1.Role, bool) {
-	rolesWithPermissions, ok := GetUserRolesWithPermissionsFromContext(ctx)
-	if !ok {
-		return nil, false
-	}
-
-	roles := make([]*commonV1.Role, 0, len(rolesWithPermissions))
-	for _, rwp := range rolesWithPermissions {
-		roles = append(roles, rwp.Role)
-	}
-
-	return roles, true
-}
-
-// GetUserPermissionsFromContext извлекает все права пользователя из контекста
-func GetUserPermissionsFromContext(ctx context.Context) ([]*commonV1.Permission, bool) {
-	rolesWithPermissions, ok := GetUserRolesWithPermissionsFromContext(ctx)
-	if !ok {
-		return nil, false
-	}
-
-	permissionsMap := make(map[string]*commonV1.Permission)
-	for _, rwp := range rolesWithPermissions {
-		for _, permission := range rwp.Permissions {
-			permissionsMap[permission.Id] = permission
-		}
-	}
-
-	permissions := make([]*commonV1.Permission, 0, len(permissionsMap))
-	for _, permission := range permissionsMap {
-		permissions = append(permissions, permission)
-	}
-
-	return permissions, true
+// GetSessionIDContextKey возвращает ключ для session ID в контексте
+func GetSessionIDContextKey() contextKey {
+	return sessionIDContextKey
 }
 
 // GetSessionIDFromContext извлекает session ID из контекста
@@ -162,17 +103,8 @@ func GetSessionIDFromContext(ctx context.Context) (string, bool) {
 	return sessionID, ok
 }
 
-// AddSessionIDToContext добавляет session ID в контекст
-func AddSessionIDToContext(ctx context.Context, sessionID string) context.Context {
-	return context.WithValue(ctx, sessionIDContextKey, sessionID)
-}
-
-// ForwardSessionIDToGRPC добавляет session ID из контекста в исходящие gRPC metadata
-func ForwardSessionIDToGRPC(ctx context.Context) context.Context {
-	sessionID, ok := GetSessionIDFromContext(ctx)
-	if !ok || sessionID == "" {
-		return ctx
-	}
-
-	return metadata.AppendToOutgoingContext(ctx, SessionIDMetadataKey, sessionID)
+// GetUserPermissionsStringsFromContext извлекает права как строки из контекста для авторизации
+func GetUserPermissionsStringsFromContext(ctx context.Context) ([]string, bool) {
+	permissions, ok := ctx.Value(userPermissionsStringsContextKey).([]string)
+	return permissions, ok
 }

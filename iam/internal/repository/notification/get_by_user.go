@@ -2,7 +2,6 @@ package notification
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -29,10 +28,5 @@ func (r *notificationRepository) GetByUser(ctx context.Context, userID uuid.UUID
 		return nil, r.mapDatabaseError(err, "list")
 	}
 
-	result, err := converter.NotificationMethodListFromRepo(notificationMethods)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", model.ErrInternal, err)
-	}
-
-	return result, nil
+	return converter.ToDomainNotificationMethods(notificationMethods), nil
 }

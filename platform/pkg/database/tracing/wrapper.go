@@ -38,11 +38,10 @@ func (tw *TracingWrapper[T]) Execute(ctx context.Context, methodName string, fn 
 }
 
 // ExecuteWithResult для методов с возвращаемым значением
-func ExecuteWithResult[T any, R any](tw *TracingWrapper[T], ctx context.Context, methodName string, fn func(T, context.Context) (R, error)) (R, error) {
+func ExecuteWithResult[T, R any](tw *TracingWrapper[T], ctx context.Context, methodName string, fn func(T, context.Context) (R, error)) (R, error) {
 	result, err := tw.executeWithTracing(ctx, methodName, func() (interface{}, error) {
 		return fn(tw.target, ctx)
 	})
-
 	if err != nil {
 		var zero R
 		return zero, err
@@ -55,7 +54,7 @@ func ExecuteWithResult[T any, R any](tw *TracingWrapper[T], ctx context.Context,
 func (tw *TracingWrapper[T]) executeWithTracing(ctx context.Context, methodName string, fn func() (interface{}, error)) (interface{}, error) {
 	operationName := tw.formatOperationName(methodName)
 
-	ctx, span := tw.tracer.Start(ctx, operationName)
+	_, span := tw.tracer.Start(ctx, operationName)
 	defer span.End()
 
 	// Добавляем базовые атрибуты
@@ -94,7 +93,7 @@ func (tw *TracingWrapper[T]) TraceCall(ctx context.Context, fn func(T, context.C
 }
 
 // TraceCallWithResult автоматическое определение имени операции для методов с результатом
-func TraceCallWithResult[T any, R any](tw *TracingWrapper[T], ctx context.Context, fn func(T, context.Context) (R, error)) (R, error) {
+func TraceCallWithResult[T, R any](tw *TracingWrapper[T], ctx context.Context, fn func(T, context.Context) (R, error)) (R, error) {
 	methodName := tw.getCallerMethodName()
 	return ExecuteWithResult(tw, ctx, methodName, fn)
 }

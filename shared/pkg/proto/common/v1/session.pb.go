@@ -92,11 +92,73 @@ func (x *Session) GetExpiresAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// Информация о пользователе и его сессии (WhoAmI)
+// Используется для кэширования и API ответов
+type WhoamiInfo struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Session              *Session               `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
+	User                 *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	RolesWithPermissions []*RoleWithPermissions `protobuf:"bytes,3,rep,name=roles_with_permissions,json=rolesWithPermissions,proto3" json:"roles_with_permissions,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *WhoamiInfo) Reset() {
+	*x = WhoamiInfo{}
+	mi := &file_common_v1_session_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WhoamiInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WhoamiInfo) ProtoMessage() {}
+
+func (x *WhoamiInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_common_v1_session_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WhoamiInfo.ProtoReflect.Descriptor instead.
+func (*WhoamiInfo) Descriptor() ([]byte, []int) {
+	return file_common_v1_session_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *WhoamiInfo) GetSession() *Session {
+	if x != nil {
+		return x.Session
+	}
+	return nil
+}
+
+func (x *WhoamiInfo) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+func (x *WhoamiInfo) GetRolesWithPermissions() []*RoleWithPermissions {
+	if x != nil {
+		return x.RolesWithPermissions
+	}
+	return nil
+}
+
 var File_common_v1_session_proto protoreflect.FileDescriptor
 
 const file_common_v1_session_proto_rawDesc = "" +
 	"\n" +
-	"\x17common/v1/session.proto\x12\tcommon.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"\xd4\x01\n" +
+	"\x17common/v1/session.proto\x12\tcommon.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/user.proto\x1a\x14common/v1/role.proto\"\xd4\x01\n" +
 	"\aSession\x12\x18\n" +
 	"\x02id\x18\x01 \x01(\tB\b\xfaB\x05r\x03\xb0\x01\x01R\x02id\x129\n" +
 	"\n" +
@@ -104,7 +166,12 @@ const file_common_v1_session_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\n" +
-	"expires_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAtBUZSgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
+	"expires_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\xc9\x01\n" +
+	"\n" +
+	"WhoamiInfo\x126\n" +
+	"\asession\x18\x01 \x01(\v2\x12.common.v1.SessionB\b\xfaB\x05\x8a\x01\x02\x10\x01R\asession\x12-\n" +
+	"\x04user\x18\x02 \x01(\v2\x0f.common.v1.UserB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x04user\x12T\n" +
+	"\x16roles_with_permissions\x18\x03 \x03(\v2\x1e.common.v1.RoleWithPermissionsR\x14rolesWithPermissionsBUZSgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1b\x06proto3"
 
 var (
 	file_common_v1_session_proto_rawDescOnce sync.Once
@@ -118,20 +185,26 @@ func file_common_v1_session_proto_rawDescGZIP() []byte {
 	return file_common_v1_session_proto_rawDescData
 }
 
-var file_common_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_common_v1_session_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_common_v1_session_proto_goTypes = []any{
 	(*Session)(nil),               // 0: common.v1.Session
-	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*WhoamiInfo)(nil),            // 1: common.v1.WhoamiInfo
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*User)(nil),                  // 3: common.v1.User
+	(*RoleWithPermissions)(nil),   // 4: common.v1.RoleWithPermissions
 }
 var file_common_v1_session_proto_depIdxs = []int32{
-	1, // 0: common.v1.Session.created_at:type_name -> google.protobuf.Timestamp
-	1, // 1: common.v1.Session.updated_at:type_name -> google.protobuf.Timestamp
-	1, // 2: common.v1.Session.expires_at:type_name -> google.protobuf.Timestamp
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 0: common.v1.Session.created_at:type_name -> google.protobuf.Timestamp
+	2, // 1: common.v1.Session.updated_at:type_name -> google.protobuf.Timestamp
+	2, // 2: common.v1.Session.expires_at:type_name -> google.protobuf.Timestamp
+	0, // 3: common.v1.WhoamiInfo.session:type_name -> common.v1.Session
+	3, // 4: common.v1.WhoamiInfo.user:type_name -> common.v1.User
+	4, // 5: common.v1.WhoamiInfo.roles_with_permissions:type_name -> common.v1.RoleWithPermissions
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_common_v1_session_proto_init() }
@@ -139,13 +212,15 @@ func file_common_v1_session_proto_init() {
 	if File_common_v1_session_proto != nil {
 		return
 	}
+	file_common_v1_user_proto_init()
+	file_common_v1_role_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_v1_session_proto_rawDesc), len(file_common_v1_session_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

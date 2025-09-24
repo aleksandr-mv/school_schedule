@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"errors"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -9,14 +11,14 @@ import (
 
 // mapError преобразует внутренние ошибки в gRPC статусы
 func mapError(err error) error {
-	switch err {
-	case model.ErrRoleNotFound:
+	switch {
+	case errors.Is(err, model.ErrRoleNotFound):
 		return status.Error(codes.NotFound, "Роль не найдена")
-	case model.ErrRoleAlreadyExists:
+	case errors.Is(err, model.ErrRoleAlreadyExists):
 		return status.Error(codes.AlreadyExists, "Роль с таким именем уже существует")
-	case model.ErrFailedToCreateRole:
+	case errors.Is(err, model.ErrFailedToCreateRole):
 		return status.Error(codes.Internal, "Не удалось создать роль")
-	case model.ErrInternal:
+	case errors.Is(err, model.ErrInternal):
 		return status.Error(codes.Internal, "Внутренняя ошибка")
 	default:
 		return status.Error(codes.Internal, "Внутренняя ошибка сервера")

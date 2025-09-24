@@ -9,6 +9,7 @@ package role_v1
 import (
 	v1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -404,7 +405,7 @@ var File_role_v1_role_proto protoreflect.FileDescriptor
 
 const file_role_v1_role_proto_rawDesc = "" +
 	"\n" +
-	"\x12role/v1/role.proto\x12\arole.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/role.proto\x1a\x1bcommon/v1/annotations.proto\"P\n" +
+	"\x12role/v1/role.proto\x12\arole.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17validate/validate.proto\x1a\x14common/v1/role.proto\x1a\x1bcommon/v1/annotations.proto\"P\n" +
 	"\rCreateRequest\x12\x1d\n" +
 	"\x04name\x18\x01 \x01(\tB\t\xfaB\x06r\x04\x10\x02\x182R\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"3\n" +
@@ -425,16 +426,16 @@ const file_role_v1_role_proto_rawDesc = "" +
 	"\x04data\x18\x01 \x01(\v2\x1e.common.v1.RoleWithPermissionsR\x04data\"\r\n" +
 	"\vListRequest\"3\n" +
 	"\fListResponse\x12#\n" +
-	"\x04data\x18\x01 \x03(\v2\x0f.common.v1.RoleR\x04data2\xf1\x02\n" +
-	"\vRoleService\x12I\n" +
-	"\x06Create\x12\x16.role.v1.CreateRequest\x1a\x17.role.v1.CreateResponse\"\x0e\x8a\xb5\x18\n" +
-	"role:write\x12H\n" +
-	"\x06Update\x12\x16.role.v1.UpdateRequest\x1a\x16.google.protobuf.Empty\"\x0e\x8a\xb5\x18\n" +
-	"role:write\x12H\n" +
-	"\x06Delete\x12\x16.role.v1.DeleteRequest\x1a\x16.google.protobuf.Empty\"\x0e\x8a\xb5\x18\n" +
-	"role:write\x12?\n" +
-	"\x03Get\x12\x13.role.v1.GetRequest\x1a\x14.role.v1.GetResponse\"\r\x8a\xb5\x18\trole:read\x12B\n" +
-	"\x04List\x12\x14.role.v1.ListRequest\x1a\x15.role.v1.ListResponse\"\r\x8a\xb5\x18\trole:readBQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role/v1;role_v1b\x06proto3"
+	"\x04data\x18\x01 \x03(\v2\x0f.common.v1.RoleR\x04data2\xfe\x03\n" +
+	"\vRoleService\x12a\n" +
+	"\x06Create\x12\x16.role.v1.CreateRequest\x1a\x17.role.v1.CreateResponse\"&\x8a\xb5\x18\n" +
+	"role:write\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/roles\x12j\n" +
+	"\x06Update\x12\x16.role.v1.UpdateRequest\x1a\x16.google.protobuf.Empty\"0\x8a\xb5\x18\n" +
+	"role:write\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/v1/roles/{role_id}\x12g\n" +
+	"\x06Delete\x12\x16.role.v1.DeleteRequest\x1a\x16.google.protobuf.Empty\"-\x8a\xb5\x18\n" +
+	"role:write\x82\xd3\xe4\x93\x02\x19*\x17/api/v1/roles/{role_id}\x12^\n" +
+	"\x03Get\x12\x13.role.v1.GetRequest\x1a\x14.role.v1.GetResponse\",\x8a\xb5\x18\trole:read\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/roles/{role_id}\x12W\n" +
+	"\x04List\x12\x14.role.v1.ListRequest\x1a\x15.role.v1.ListResponse\"\"\x8a\xb5\x18\trole:read\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/rolesBQZOgithub.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/role/v1;role_v1b\x06proto3"
 
 var (
 	file_role_v1_role_proto_rawDescOnce sync.Once

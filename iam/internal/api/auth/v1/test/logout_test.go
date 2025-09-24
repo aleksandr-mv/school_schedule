@@ -1,6 +1,7 @@
 package auth_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -10,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/grpc/interceptor"
 	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
 )
 
@@ -25,14 +27,14 @@ func (s *APISuite) TestLogout() {
 	}{
 		{
 			name:          "Success",
-			req:           &authV1.LogoutRequest{SessionId: sessionID.String()},
+			req:           &authV1.LogoutRequest{},
 			serviceError:  nil,
 			expectedCode:  codes.OK,
 			expectedError: false,
 		},
 		{
 			name:          "SessionNotFound",
-			req:           &authV1.LogoutRequest{SessionId: sessionID.String()},
+			req:           &authV1.LogoutRequest{},
 			serviceError:  model.ErrSessionNotFound,
 			expectedCode:  codes.Unauthenticated,
 			expectedError: true,
@@ -40,7 +42,7 @@ func (s *APISuite) TestLogout() {
 
 		{
 			name:          "InternalError",
-			req:           &authV1.LogoutRequest{SessionId: sessionID.String()},
+			req:           &authV1.LogoutRequest{},
 			serviceError:  model.ErrInternal,
 			expectedCode:  codes.Internal,
 			expectedError: true,
@@ -49,9 +51,11 @@ func (s *APISuite) TestLogout() {
 
 	for _, tc := range testCases {
 		s.T().Run(tc.name, func(t *testing.T) {
-			s.authService.On("Logout", mock.Anything, mock.AnythingOfType("uuid.UUID")).Return(tc.serviceError).Once()
+			ctx := context.WithValue(s.ctx, interceptor.GetSessionIDContextKey(), sessionID.String())
 
-			result, err := s.api.Logout(s.ctx, tc.req)
+			s.authService.On("Logout", mock.Anything, sessionID).Return(tc.serviceError).Once()
+
+			result, err := s.api.Logout(ctx, tc.req)
 
 			if tc.expectedError {
 				assert.Error(t, err)

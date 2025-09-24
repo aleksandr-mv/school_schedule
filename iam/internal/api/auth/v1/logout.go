@@ -3,19 +3,17 @@ package v1
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
+	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/converter"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 	authV1 "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/auth/v1"
 )
 
 func (api *API) Logout(ctx context.Context, req *authV1.LogoutRequest) (*authV1.LogoutResponse, error) {
-	sessionID, err := uuid.Parse(req.SessionId)
+	sessionID, err := converter.ExtractSessionIDFromContext(ctx)
 	if err != nil {
-		logger.Warn(ctx, "❌ [API] Неверный формат UUID сессии при выходе", zap.Error(err))
-		return nil, mapProtoError(ctx, model.ErrInvalidSessionData)
+		return nil, mapProtoError(ctx, err)
 	}
 
 	err = api.authService.Logout(ctx, sessionID)

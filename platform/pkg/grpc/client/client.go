@@ -52,7 +52,6 @@ func PropagateSessionIDUnaryClientInterceptor() grpc.UnaryClientInterceptor {
 		invoker grpc.UnaryInvoker,
 		opts ...grpc.CallOption,
 	) error {
-		ctx = grpcint.ForwardSessionIDToGRPC(ctx)
 		return invoker(ctx, method, req, reply, cc, opts...)
 	}
 }

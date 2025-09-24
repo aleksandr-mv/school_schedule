@@ -8,7 +8,6 @@ require (
 	github.com/Alexander-Mandzhiev/school_schedule/shared v0.0.0-00010101000000-000000000000
 	github.com/IBM/sarama v1.45.2
 	github.com/caarlos0/env/v11 v11.3.1
-	github.com/go-chi/chi/v5 v5.2.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/pressly/goose/v3 v3.24.3

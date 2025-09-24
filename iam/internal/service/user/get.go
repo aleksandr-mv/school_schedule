@@ -3,9 +3,10 @@ package user
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	"github.com/Alexander-Mandzhiev/school_schedule/iam/internal/model"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
-	"github.com/google/uuid"
 )
 
 func (s *UserService) GetUser(ctx context.Context, id uuid.UUID) (*model.User, error) {

@@ -10,22 +10,22 @@ disable-version-string: true
 
 packages:
   # IAM сервис
-  github.com/aleksandr-mv/school_schedule/iam/internal/service:
+  github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service:
     config:
       include-regex: ".*Service"
-  github.com/aleksandr-mv/school_schedule/iam/internal/repository:
+  github.com/Alexander-Mandzhiev/school_schedule/iam/internal/repository:
     config:
       include-regex: ".*Repository"
 
   # RBAC сервис
-  github.com/aleksandr-mv/school_schedule/rbac/internal/service:
+  github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/service:
     config:
       include-regex: ".*Service"
-  github.com/aleksandr-mv/school_schedule/rbac/internal/repository:
+  github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/repository:
     config:
       include-regex: ".*Repository"
 
   # gRPC клиенты IAM
-  github.com/aleksandr-mv/school_schedule/iam/internal/client/grpc:
+  github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/grpc:
     config:
       include-regex: ".*Client"

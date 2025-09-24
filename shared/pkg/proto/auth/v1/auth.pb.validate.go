@@ -301,28 +301,8 @@ func (m *WhoamiRequest) validate(all bool) error {
 
 	var errors []error
 
-	if err := m._validateUuid(m.GetSessionId()); err != nil {
-		err = WhoamiRequestValidationError{
-			field:  "SessionId",
-			reason: "value must be a valid UUID",
-			cause:  err,
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if len(errors) > 0 {
 		return WhoamiRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-func (m *WhoamiRequest) _validateUuid(uuid string) error {
-	if matched := _auth_uuidPattern.MatchString(uuid); !matched {
-		return errors.New("invalid uuid format")
 	}
 
 	return nil
@@ -421,9 +401,9 @@ func (m *WhoamiResponse) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetSession() == nil {
+	if m.GetInfo() == nil {
 		err := WhoamiResponseValidationError{
-			field:  "Session",
+			field:  "Info",
 			reason: "value is required",
 		}
 		if !all {
@@ -433,11 +413,11 @@ func (m *WhoamiResponse) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetSession()).(type) {
+		switch v := interface{}(m.GetInfo()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, WhoamiResponseValidationError{
-					field:  "Session",
+					field:  "Info",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -445,94 +425,20 @@ func (m *WhoamiResponse) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, WhoamiResponseValidationError{
-					field:  "Session",
+					field:  "Info",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetSession()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetInfo()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WhoamiResponseValidationError{
-				field:  "Session",
+				field:  "Info",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-	}
-
-	if m.GetUser() == nil {
-		err := WhoamiResponseValidationError{
-			field:  "User",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if all {
-		switch v := interface{}(m.GetUser()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, WhoamiResponseValidationError{
-					field:  "User",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, WhoamiResponseValidationError{
-					field:  "User",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return WhoamiResponseValidationError{
-				field:  "User",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	for idx, item := range m.GetRolesWithPermissions() {
-		_, _ = idx, item
-
-		if all {
-			switch v := interface{}(item).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, WhoamiResponseValidationError{
-						field:  fmt.Sprintf("RolesWithPermissions[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, WhoamiResponseValidationError{
-						field:  fmt.Sprintf("RolesWithPermissions[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return WhoamiResponseValidationError{
-					field:  fmt.Sprintf("RolesWithPermissions[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	if len(errors) > 0 {
@@ -635,28 +541,8 @@ func (m *LogoutRequest) validate(all bool) error {
 
 	var errors []error
 
-	if err := m._validateUuid(m.GetSessionId()); err != nil {
-		err = LogoutRequestValidationError{
-			field:  "SessionId",
-			reason: "value must be a valid UUID",
-			cause:  err,
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if len(errors) > 0 {
 		return LogoutRequestMultiError(errors)
-	}
-
-	return nil
-}
-
-func (m *LogoutRequest) _validateUuid(uuid string) error {
-	if matched := _auth_uuidPattern.MatchString(uuid); !matched {
-		return errors.New("invalid uuid format")
 	}
 
 	return nil

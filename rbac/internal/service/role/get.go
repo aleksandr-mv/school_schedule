@@ -4,11 +4,12 @@ import (
 	"context"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/errreport"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/logger"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/tracing"
 	"github.com/Alexander-Mandzhiev/school_schedule/rbac/internal/model"
-	"go.uber.org/zap"
 )
 
 func (s *RoleService) Get(ctx context.Context, id string) (*model.EnrichedRole, error) {

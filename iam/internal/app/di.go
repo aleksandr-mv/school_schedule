@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	authv3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	v1 "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/api/auth/v1"
+	externalAuthAPI "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/api/external_auth/v1"
 	userAPI "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/api/user/v1"
 	grpcClient "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/grpc"
 	rbacV1 "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/client/grpc/rbac"
@@ -21,6 +23,7 @@ import (
 	authService "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service/auth"
 	userService "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service/user"
 	userProducerService "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service/user_producer"
+	whoamiService "github.com/Alexander-Mandzhiev/school_schedule/iam/internal/service/whoami"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/cache"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/cache/builder"
 	"github.com/Alexander-Mandzhiev/school_schedule/platform/pkg/closer"
@@ -37,11 +40,13 @@ import (
 type diContainer struct {
 	cfg contracts.Provider
 
-	authV1 authv1.AuthServiceServer
-	userV1 userV1.UserServiceServer
+	authV1         authv1.AuthServiceServer
+	userV1         userV1.UserServiceServer
+	externalAuthV1 authv3.AuthorizationServer
 
-	authService service.AuthService
-	userService service.UserService
+	authService   service.AuthService
+	userService   service.UserService
+	whoamiService service.WhoAMIService
 
 	rbacClient grpcClient.RBACClient
 
@@ -68,7 +73,12 @@ func (d *diContainer) AuthV1API(ctx context.Context) (authv1.AuthServiceServer, 
 			return nil, err
 		}
 
-		d.authV1 = v1.NewAPI(authService)
+		whoamiService, err := d.WhoAMIService(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.authV1 = v1.NewAPI(authService, whoamiService)
 	}
 
 	return d.authV1, nil
@@ -85,6 +95,19 @@ func (d *diContainer) UserV1API(ctx context.Context) (userV1.UserServiceServer, 
 	}
 
 	return d.userV1, nil
+}
+
+func (d *diContainer) ExternalAuthV1API(ctx context.Context) (authv3.AuthorizationServer, error) {
+	if d.externalAuthV1 == nil {
+		whoamiService, err := d.WhoAMIService(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.externalAuthV1 = externalAuthAPI.NewAPI(whoamiService)
+	}
+
+	return d.externalAuthV1, nil
 }
 
 func (d *diContainer) AuthService(ctx context.Context) (service.AuthService, error) {
@@ -136,6 +159,19 @@ func (d *diContainer) UserService(ctx context.Context) (service.UserService, err
 	}
 
 	return d.userService, nil
+}
+
+func (d *diContainer) WhoAMIService(ctx context.Context) (service.WhoAMIService, error) {
+	if d.whoamiService == nil {
+		sessionRepo, err := d.SessionRepository(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		d.whoamiService = whoamiService.NewService(sessionRepo)
+	}
+
+	return d.whoamiService, nil
 }
 
 func (d *diContainer) UserRepository(ctx context.Context) (repository.UserRepository, error) {
@@ -359,6 +395,7 @@ func (d *diContainer) UserProducerService(ctx context.Context) (service.UserProd
 		}
 
 		builder := producerBuilder.NewBuilder(d.cfg.Kafka())
+		builder.WithLogger(logger.Logger())
 		userCreatedProducer, err := builder.BuildProducer("user_created")
 		if err != nil {
 			return nil, fmt.Errorf("failed to build user_created producer: %w", err)

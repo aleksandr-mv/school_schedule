@@ -3,6 +3,7 @@ syntax = "proto3";
 package role.v1;
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 import "validate/validate.proto";
 import "common/v1/role.proto";
 import "common/v1/annotations.proto";
@@ -17,26 +18,43 @@ service RoleService {
   // Создание новой роли
   rpc Create(CreateRequest) returns (CreateResponse) {
     option (common.v1.permission) = "role:write";
+    option (google.api.http) = {
+      post: "/api/v1/roles"
+      body: "*"
+    };
   }
 
   // Обновление роли
   rpc Update(UpdateRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "role:write";
+    option (google.api.http) = {
+      put: "/api/v1/roles/{role_id}"
+      body: "*"
+    };
   }
 
   // Удаление роли
   rpc Delete(DeleteRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "role:write";
+    option (google.api.http) = {
+      delete: "/api/v1/roles/{role_id}"
+    };
   }
 
   // Получение роли по ID
   rpc Get(GetRequest) returns (GetResponse) {
     option (common.v1.permission) = "role:read";
+    option (google.api.http) = {
+      get: "/api/v1/roles/{role_id}"
+    };
   }
 
   // Получение списка ролей
   rpc List(ListRequest) returns (ListResponse) {
     option (common.v1.permission) = "role:read";
+    option (google.api.http) = {
+      get: "/api/v1/roles"
+    };
   }
 
 }

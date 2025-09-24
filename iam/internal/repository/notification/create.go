@@ -13,12 +13,12 @@ import (
 )
 
 func (r *notificationRepository) Create(ctx context.Context, notificationMethod model.NotificationMethod) (*model.NotificationMethod, error) {
-	repoNotificationMethod := converter.NotificationMethodToRepo(&notificationMethod)
+	repoMethod := converter.ToRepoNotificationMethod(&notificationMethod)
 
 	query, args, err := sq.StatementBuilder.
 		Insert("notification_methods").
 		Columns("user_id", "provider_name", "target").
-		Values(repoNotificationMethod.UserID, repoNotificationMethod.ProviderName, repoNotificationMethod.Target).
+		Values(repoMethod.UserID, repoMethod.ProviderName, repoMethod.Target).
 		Suffix("RETURNING user_id, provider_name, target, created_at, updated_at").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -37,5 +37,5 @@ func (r *notificationRepository) Create(ctx context.Context, notificationMethod 
 		return nil, r.mapDatabaseError(err, "create")
 	}
 
-	return converter.NotificationMethodFromRepo(&createdNotification), nil
+	return converter.ToDomainNotificationMethod(&createdNotification), nil
 }

@@ -1,38 +1,46 @@
 extensions:
   health_check:
-    endpoint: "0.0.0.0:${CORE_OTEL_COLLECTOR_HEALTH_PORT}"
+    endpoint: "0.0.0.0:13133"
 
 receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: "0.0.0.0:${OTEL_GRPC_PORT}"
+        endpoint: "0.0.0.0:4317"
+        max_recv_msg_size: 4194304  # 4MB
+        max_concurrent_streams: 16
+        read_buffer_size: 524288
+        write_buffer_size: 524288
 
 processors:
   resource:
     attributes:
       - key: deployment.environment
-        value: ${ENVIRONMENT}
+        value: "development"
         action: insert
   batch:
-    send_batch_size: ${OTEL_BATCH_SIZE}
-    timeout: ${OTEL_BATCH_TIMEOUT}
-    send_batch_max_size: ${OTEL_BATCH_SIZE}
+    send_batch_size: 1000
+    timeout: 5s
+    send_batch_max_size: 1000
   probabilistic_sampler:
-    sampling_percentage: ${TRACING_SAMPLE_RATIO}
+    sampling_percentage: 100
 
 exporters:
   otlp/jaeger:
-    endpoint: ${JAEGER_HOST}:${JAEGER_PORT}
+    endpoint: jaeger:4317
   elasticsearch:
-    endpoints: ["http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
+    endpoints: ["http://elasticsearch:9200"]
     logs_index: "logs-%{+yyyy.mm.dd}"
+    tls:
+      insecure: true
     mapping:
       mode: ecs
   prometheusremotewrite:
-    endpoint: http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/write
+    endpoint: http://prometheus:9090/api/v1/write
+    tls:
+      insecure: true
   debug:
-    verbosity: ${OTEL_LOG_LEVEL}
+    verbosity: detailed
 
 service:
   extensions: [health_check]

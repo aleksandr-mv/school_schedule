@@ -3,6 +3,7 @@ syntax = "proto3";
 package user_role.v1;
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 import "validate/validate.proto";
 import "common/v1/role.proto";
 import "common/v1/annotations.proto";
@@ -17,21 +18,34 @@ service UserRoleService {
   // Назначение роли пользователю
   rpc Assign(AssignRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "user_role:write";
+    option (google.api.http) = {
+      post: "/api/v1/users/{user_id}/roles"
+      body: "*"
+    };
   }
 
   // Отзыв роли у пользователя
   rpc Revoke(RevokeRequest) returns (google.protobuf.Empty) {
     option (common.v1.permission) = "user_role:write";
+    option (google.api.http) = {
+      delete: "/api/v1/users/{user_id}/roles/{role_id}"
+    };
   }
 
   // Получение ролей пользователя
   rpc GetUserRoles(GetUserRolesRequest) returns (GetUserRolesResponse) {
     option (common.v1.permission) = "user_role:read";
+    option (google.api.http) = {
+      get: "/api/v1/users/{user_id}/roles"
+    };
   }
 
   // Получение пользователей роли
   rpc GetRoleUsers(GetRoleUsersRequest) returns (GetRoleUsersResponse) {
     option (common.v1.permission) = "user_role:read";
+    option (google.api.http) = {
+      get: "/api/v1/roles/{role_id}/users"
+    };
   }
 }
 

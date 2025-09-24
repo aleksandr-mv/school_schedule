@@ -4,6 +4,8 @@ package common.v1;
 
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
+import "common/v1/user.proto";
+import "common/v1/role.proto";
 
 option go_package = "github.com/Alexander-Mandzhiev/school_schedule/shared/pkg/proto/common/v1;common_v1";
 
@@ -17,4 +19,12 @@ message Session {
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
   google.protobuf.Timestamp expires_at = 4;
+}
+
+// Информация о пользователе и его сессии (WhoAmI)
+// Используется для кэширования и API ответов
+message WhoamiInfo {
+  Session session = 1 [(validate.rules).message.required = true];
+  User user = 2 [(validate.rules).message.required = true];
+  repeated RoleWithPermissions roles_with_permissions = 3;
 }

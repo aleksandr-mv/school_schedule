@@ -25,7 +25,7 @@ type asyncProducer struct {
 	maxDelay   time.Duration
 
 	// Для graceful shutdown
-	ctx    context.Context
+	ctx    context.Context //nolint:containedctx // required for async producer lifecycle
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
 
@@ -196,7 +196,7 @@ func (p *asyncProducer) handleDeliveryError(err *sarama.ProducerError) {
 func (p *asyncProducer) processRetry(failedMsg model.FailedMessage) {
 	// Вычисляем задержку с экспоненциальным backoff
 	delay := p.calculateRetryDelay(failedMsg.Attempt)
-	time.Sleep(delay)
+	time.Sleep(delay) //nolint:forbidigo // required for exponential backoff retry
 
 	message := &sarama.ProducerMessage{
 		Topic: p.topic,

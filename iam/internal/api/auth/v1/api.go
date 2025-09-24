@@ -8,12 +8,14 @@ import (
 // API реализует AuthService gRPC сервер
 type API struct {
 	authV1.UnimplementedAuthServiceServer
-	authService service.AuthService
+	authService   service.AuthService
+	whoAMIService service.WhoAMIService
 }
 
 // NewAPI создает новый экземпляр API для AuthService
-func NewAPI(authService service.AuthService) *API {
+func NewAPI(authService service.AuthService, whoAMIService service.WhoAMIService) *API {
 	return &API{
-		authService: authService,
+		authService:   authService,
+		whoAMIService: whoAMIService,
 	}
 }

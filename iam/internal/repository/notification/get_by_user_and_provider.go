@@ -27,5 +27,5 @@ func (r *notificationRepository) GetByUserAndProvider(ctx context.Context, userI
 		return nil, r.mapDatabaseError(err, "get")
 	}
 
-	return converter.NotificationMethodFromRepo(&notificationMethod), nil
+	return converter.ToDomainNotificationMethod(&notificationMethod), nil
 }

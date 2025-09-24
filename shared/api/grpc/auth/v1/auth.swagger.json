@@ -15,7 +15,97 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "summary": "Аутентификация пользователя",
+        "operationId": "AuthService_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "summary": "Выход из системы",
+        "operationId": "AuthService_Logout",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1LogoutResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1LogoutRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/api/v1/auth/whoami": {
+      "get": {
+        "summary": "Получение информации о текущей сессии",
+        "operationId": "AuthService_Whoami",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1WhoamiResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AuthService"
+        ]
+      }
+    }
+  },
   "definitions": {
     "protobufAny": {
       "type": "object",
@@ -45,6 +135,18 @@
         }
       }
     },
+    "v1LoginRequest": {
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "title": "Запрос на аутентификацию"
+    },
     "v1LoginResponse": {
       "type": "object",
       "properties": {
@@ -53,6 +155,10 @@
         }
       },
       "title": "Ответ на аутентификацию"
+    },
+    "v1LogoutRequest": {
+      "type": "object",
+      "title": "Запрос на выход из системы"
     },
     "v1LogoutResponse": {
       "type": "object",
@@ -191,7 +297,7 @@
       },
       "title": "Базовая информация о пользователе"
     },
-    "v1WhoamiResponse": {
+    "v1WhoamiInfo": {
       "type": "object",
       "properties": {
         "session": {
@@ -206,6 +312,15 @@
             "type": "object",
             "$ref": "#/definitions/v1RoleWithPermissions"
           }
+        }
+      },
+      "title": "Информация о пользователе и его сессии (WhoAmI)\nИспользуется для кэширования и API ответов"
+    },
+    "v1WhoamiResponse": {
+      "type": "object",
+      "properties": {
+        "info": {
+          "$ref": "#/definitions/v1WhoamiInfo"
         }
       },
       "title": "Ответ с информацией о текущей сессии"

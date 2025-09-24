@@ -13,7 +13,7 @@ import (
 
 type APISuite struct {
 	suite.Suite
-	ctx context.Context
+	ctx context.Context //nolint:containedctx // test context setup
 
 	api           *externalAuthV1.API
 	whoAMIService *serviceMocks.WhoAMIService

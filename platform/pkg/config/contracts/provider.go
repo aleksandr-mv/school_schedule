@@ -26,9 +26,8 @@ package contracts
 // - Простота: минимальный и понятный API
 //
 // Доступные модули:
-//   - Network(): сетевые настройки (CORS, TLS)
-//   - Transport(): транспортные протоколы (HTTP, gRPC)
 //   - App(): приложение и логирование
+//   - GRPC(): gRPC транспорт
 //   - Database(): агрегация баз данных (PostgreSQL, MongoDB)
 //   - Redis(): конфигурация Redis кэша
 //   - Services(): внешние сервисы
@@ -37,8 +36,7 @@ package contracts
 // Пример использования:
 //
 //	cfg := config.Load(ctx)
-//	httpServer := cfg.Transport().HTTP()
-//	corsConfig := cfg.Network().CORS()
+//	grpcAddr := cfg.GRPC().Address()
 //	loggerLevel := cfg.Logger().LoggerLevel()
 //
 //	// Kafka опциональна

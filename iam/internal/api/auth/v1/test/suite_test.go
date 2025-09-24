@@ -15,8 +15,9 @@ type APISuite struct {
 	suite.Suite
 	ctx context.Context // nolint:containedctx
 
-	authService *mocks.AuthServiceInterface
-	api         *api.API
+	authService   *mocks.AuthService
+	whoAMIService *mocks.WhoAMIService
+	api           *api.API
 }
 
 func (s *APISuite) SetupTest() {
@@ -26,8 +27,9 @@ func (s *APISuite) SetupTest() {
 		panic(err)
 	}
 
-	s.authService = mocks.NewAuthServiceInterface(s.T())
-	s.api = api.NewAPI(s.authService)
+	s.authService = mocks.NewAuthService(s.T())
+	s.whoAMIService = mocks.NewWhoAMIService(s.T())
+	s.api = api.NewAPI(s.authService, s.whoAMIService)
 }
 
 func (s *APISuite) TearDownTest() {}
